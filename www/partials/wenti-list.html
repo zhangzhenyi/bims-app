@@ -26,14 +26,14 @@
 				<span class="z2" ng-show="item.important==2">重要</span>
 				<span class="z1" ng-show="item.important==3">紧急</span>
 				</i>
-{{::item.issueTitle}}
+{{::item.issueTitle|cutTail:false:10:" ..."}}
 			<strong class="no" ng-show="item.issueStatus== {{::Constants.ISSUESTATUS_PUBLISHED}}">{{::item.issueStatusDescStr}}</strong>
 				<strong class="yes" ng-show="item.issueStatus ==Constants.ISSUESTATUS_HANDLED">已处理，待验收</strong>
 				<strong class="pass" ng-show="item.issueStatus >= Constants.ISSUESTATUS_ACCEPTED">已解决</strong>
-				<span class="txt">{{::item.issueDesc}}</span>
+				<span class="txt">{{::item.issueDesc|cutTail:false:10:" ..."}}</span>
 			</span>
 			<span class="mt3 clearfix">
-				<span class="name">创建人：{{::item.publisherName}}</span>
+				<span class="name">创建人：{{::item.publisherName|cutTail:false:5:" ..."}}</span>
 				<span class="commend"><img src="img/i-commend.png"/>{{::item.totalCommentNum}}</span>
 				<span class="time">{{::formatDate(item.publishTime)}}</span>
 			</span>

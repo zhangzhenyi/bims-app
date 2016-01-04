@@ -89,6 +89,23 @@ function closefullwindow1(id){
 	$(document.body).removeClass("noscroll");
 }
 
+String.prototype.getByteLen = function(val){
+	var len = 0;
+    for (var i = 0; i < val.length; i++) {
+         var a = val.charAt(i);
+         if (a.match(/[^\x00-\xff]/ig) != null) 
+        {
+            len += 2;
+        }
+        else
+        {
+            len += 1;
+        }
+    }
+    return len;
+}
+
+
 Date.prototype.format = Date.prototype.format || function(fmt, utc) {
     var _r, _o = {
         "M+" : (utc?this.getUTCMonth():this.getMonth()) + 1,
@@ -120,6 +137,21 @@ function isBlankString(s){
 }
 
 angular.module("bridgeH5", ["myRoute", "ngSanitize"])
+.filter('cutTail', [function () {
+	  return function (value, wordwise, max, tail) {
+		    if (!value) return '';
+		    if(value.length <= max) return value;
+		    value = value.substr(0, max);
+		    if (wordwise) {
+		      var lastspace = value.lastIndexOf(' ');
+		      if (lastspace != -1) {
+		        value = value.substr(0, lastspace);
+		      }
+		    }
+
+		    return value + (tail || ' …');
+	  }
+}])
 .directive("myDatetimePicker", ["$parse", function($parse) {
 	return {
 		restrict: "E",
@@ -624,6 +656,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 }])
 .controller("cLoading", ["$scope", function($scope) {
 	$scope.displayLoading = function() {
+		if($scope.loading ){
+			tipmessage1(message="努力加载中",img="<img src='img/loading.gif';><br/>",id="tipimg");
+		}else{
+			closetipmessage1(id="tipimg");
+		}
 		return $scope.loading ? "block" : "none";
 	};
 }])
@@ -811,7 +848,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		if(d) {
 			$scope.hotfocus.current = d;
 			//更新点赞状态
-			$scope.voteMembers = (isBlankString($scope.hotfocus.current.voteUsersX)? [] : $scope.hotfocus.current.voteUsersX).split(",");
+			$scope.voteMembers = (isBlankString($scope.hotfocus.current.voteUsersX))? [] : $scope.hotfocus.current.voteUsersX.split(",");
 		    if($scope.voteMembers.length > 0){
 		    	$scope.voteMemberStr = $scope.voteMembers.join("，"); 
 		    	if($scope.voteMembers.length > 0){
@@ -1163,7 +1200,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		    	$scope.issueItem.issueCategoryRemark = issueCats[$scope.issueItem.issueCategory-1]; 
 		    }
 
-		    $scope.voteMembers = (isBlankString($scope.issueItem.voteUsersX)?[]:$scope.issueItem.voteUsersX).split(",");
+		    $scope.voteMembers = (isBlankString($scope.issueItem.voteUsersX))?[]:$scope.issueItem.voteUsersX.split(",");
 		    if($scope.voteMembers.length > 0){
 		    	$scope.voteMemberStr = $scope.voteMembers.join("，"); 
 		    	for (x in $scope.voteMembers){

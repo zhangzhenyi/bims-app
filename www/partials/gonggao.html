@@ -11,7 +11,7 @@
 		<a ng-click="notice.itemClick(item)" href="">
 			<span class="i"><img ng-src="{{::getImg(item.thumbnailUrl)}}"/></span>
 			<span class="r">
-				<span class="title">{{::item.title}}</span>
+				<span class="title">{{::item.title|cutTail:false:10:" ..."}}</span>
 				<span class="time time1">{{::formatDate(item.createTime)}}<span class="c1">{{::item.totalCommentNum}} 评论</span></span>
 			</span>
 		</a>
