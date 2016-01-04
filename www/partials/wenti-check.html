@@ -1,0 +1,26 @@
+<div class="pb75">
+
+<!--header-->
+
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">处理</p>
+	<span class="txt1" ><a ng-click="save()" href=""><span style="display:none">保存</span></a></span><span class="nochoose"><a ng-click="submit()" href="">提交</a></span>
+</header>
+
+<section class="mt10 mlr10 bg2 pb75">
+	<ul class="list-3">
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-12.jpg"/>验收意见</span><span class="r">
+			<label for="iHandleDesc" style="color:#aaa;">您还可输入{{remain}}个字符</label>
+			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged()" id="iHandleDesc" ng-model="issueItem.acceptDesc"></textarea>
+			</span>
+		</li>
+	</ul>
+</section>
+
+
+<div class="mtip" style="display:{{tipVisibility}};">{{tipContent}}</div>
+
+
+</div>

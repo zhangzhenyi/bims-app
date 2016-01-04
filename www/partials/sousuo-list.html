@@ -1,0 +1,18 @@
+<div class="pb75">
+<header class="bg1">
+<span ng-if="files.parentId > 1" class="return"><a ng-click="backClick()" href=""><img src="img/11.png"/></a></span>
+<p class="title">{{files.current.fileName}}</p>
+</header>
+<section class="mt15">
+	<ul class="list-1">
+		<li ng-repeat="item in ::items" ng-if="item.show"><a ng-click="itemClicked(item)" href=""><i><img ng-src="{{::files.getIcon(item.fileName,item.dir)}}"/></i>{{::item.fileName}}</a></li>
+	</ul>
+</section>
+<nav>
+	<a ng-click="$location.path('/sousuo', true)" href="" class="{{status[0]}}"><span class="i1"></span>搜索</a>
+	<a ng-click="$location.path('/henji', true)" href="" class="{{status[1]}}"><span class="i2"></span>痕迹</a>
+	<a ng-click="$location.path('/', true)" href="" class="{{status[2]}}"><span class="i3"></span>首页</a>
+	<a ng-click="$location.path('/faxian', true)" href="" class="{{status[3]}}"><span class="i4"></span>发现</a>
+	<a ng-click="$location.path('/wode', true)" href="" class="{{status[4]}}"><span class="i5"></span>个人</a>
+</nav>
+</div>
