@@ -20,7 +20,9 @@
 </head>
 <body ng-app="bridgeH5">
 <div my-view></div>
-<i style="display:{{displayLoading()}};" ng-controller="cLoading"></i>
+<div style="width:100%; height:100%; position:absolute; top:0;left:0; background:rgba(0,0,0,0.6); display:{{displayLoading()}};" 
+ng-controller="cLoading" id="loadingContainer" onclick="return false;">
+</div>
 <script src="js/bridge.js"></script>
 </body>
 </html>

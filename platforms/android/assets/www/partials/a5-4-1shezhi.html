@@ -1,0 +1,25 @@
+<div class="pb75">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">设置</p>
+</header>
+<section class="mt15 mlr10">
+	<ul class="list-8">
+		<li><a ng-click="onepage.id='about';$location.path('/onepage')" href="" class="clearfix"><span class="l">关于我们</span></a></li>
+		<li class="nojian"><a class="clearfix"><span class="l">版本信息</span><span class="r">V1.1.2.443</span></a></li>
+		<li class="nojian"><a class="clearfix"><span class="l">新消息提示</span><span class="r">1</span></a></li>
+		<li class="nojian"><a href="" class="clearfix"><span class="l">WIFI自动上传</span><span class="r r1"><img src="img/i-wifiopen.jpg" class="i2"/></span></a></li>
+	</ul>
+</section>
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".list-8 li span.r1").click(function(){
+		if($(this).find("img").attr("src") == "img/i-wifiopen.jpg"){
+			$(this).find("img").attr("src","img/i-wificlose.jpg");
+		}else{
+			$(this).find("img").attr("src","img/i-wifiopen.jpg");
+		}
+	})
+})
+</script>
+</div>

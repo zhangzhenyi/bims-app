@@ -1,0 +1,48 @@
+<div class="pb75">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">新闻图片详情</p>
+</header>
+<section class="mlr10 mt15">
+	<p class="title-1">{{::news.current.title}}</p>
+	<p class="title-2 clearfix"><span class="time">{{::formatDate(news.current.createTime)}}</span><span class="name">创建人：{{::publisher}}</span></p>
+</section>
+<section class="mt10 mlr10">
+<span class="txt1 content-img" ng-bind-html="news.current.content"></span>
+</section>
+<section class="mt10 mlr10">
+	<div class="clearfix snsblock"><a href="#.html" class="c"><img src="img/i-commend.png"/>{{news.current.totalCommentNum}} 评论</a><a href="" class="z"><img src="img/i-zan.png"/><i>点赞</i></a></div>
+</section>
+<section class="mt20 mlr20 commendblock" my-scroll="load()">
+	<span class="j"><img src="img/i-jian-1.png"/></span>
+	<div><img src="img/i-commend.png"/><i>FF2</i>,<i>erro</i></div>
+	<ul class="list-5">
+		<li class="clearfix" ng-repeat="c in comments track by c.id">
+			<span class="i"><img ng-src="{{::creatorAvatarUrl(c)}}"/></span>
+			<div class="r">
+			<p class="name">{{::c.creatorCName}}</p>
+			<p class="txt">{{::c.content}}</p>
+			<p class="time">{{::formatDate(c.createTime)}}</p>
+			</div>
+		</li>
+	</ul>
+</section>
+<section class="comformblock">
+<div class="comformblock1">
+	<div class="comform"><input ng-model="newComment" type="text" class="i" placeholder="随便说说什么"><input ng-click="save()" type="button" class="b"></div>
+</div>
+</section>
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".snsblock a.z").click(function(){
+		if($(this).find("img").attr("src") == "img/i-zan.png"){
+			$(this).find("img").attr("src","img/i-zanon.png");
+			$(this).find("i").html("已赞");
+		}else{
+			$(this).find("img").attr("src","img/i-zan.png");
+			$(this).find("i").html("点赞");
+		}
+	})
+})
+</script>
+</div>

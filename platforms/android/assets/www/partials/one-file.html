@@ -1,0 +1,11 @@
+<div class="pb75">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">{{::files.filename}}</p>
+</header>
+<section class="mt15 mlr10">
+<img ng-if="img" ng-src="{{::files.filepath}}" title="{{::files.filename}}" style="width:100%;"/>
+<my-pdf ng-if="pdf" src="files.filepath"></my-pdf>
+<my-video ng-if="video" src="files.filepath" controls="true" autoplay="true" width="100%"></my-video>
+</section>
+</div>

@@ -1,0 +1,77 @@
+<div>
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">上传管理列表</p>
+</header>
+<section class="mt10 mlr10">
+	<ul class="list-9">
+		<li class="clearfix">
+		<a href="#.html">
+			<span class="title">虎门二桥工程讨论<i class="o1">未上传</i></span>
+			<span class="txt">劣影响。要以徐才厚、谷俊山案件为反面教材开展警示教育，使各级干部特别是高级干部受警醒、明底线、知敬畏，切实引以为戒。</span>
+			<span class="time time1">2015-11-12 11:34</span>
+		</a>
+		</li>
+		<li class="clearfix">
+		<a href="#.html">
+			<span class="title">虎门二桥工程讨论<i class="o2">上传中</i></span>
+			<span class="txt">劣影响。要以徐才厚、谷俊山案件为反面教材开展警示教育，使各级干部特别是高级干部受警醒、明底线、知敬畏，切实引以为戒。</span>
+			<span class="time time1">2015-11-12 11:34</span>
+		</a>
+		</li>
+		<li class="clearfix">
+		<a href="#.html">
+			<span class="title">虎门二桥工程讨论<i class="o1">未上传</i></span>
+			<span class="txt">劣影响。要以徐才厚、谷俊山案件为反面教材开展警示教育，使各级干部特别是高级干部受警醒、明底线、知敬畏，切实引以为戒。</span>
+			<span class="time time1">2015-11-12 11:34</span>
+		</a>
+		</li>
+		<li class="clearfix">
+		<a href="#.html">
+			<span class="title">虎门二桥工程讨论<i class="o2">上传中</i></span>
+			<span class="txt">劣影响。要以徐才厚、谷俊山案件为反面教材开展警示教育，使各级干部特别是高级干部受警醒、明底线、知敬畏，切实引以为戒。</span>
+			<span class="time time1">2015-11-12 11:34</span>
+		</a>
+		</li>
+	</ul>
+</section>
+
+<!--message tip-->
+<div class="mtip">上传成功</div>
+
+<!--popwindow-->
+<div id="zoomscrollblock">
+	<div id="zoomscroll" class="pop_catewindow">
+		<div id="zoom">
+		</div>
+	</div>
+	<div class="online-blockmessage-1">
+			<div class="ob">
+				<div class="tb">
+					<p class="title">虎门二桥工程讨论</p>
+					<p class="txt">劣影响。要以徐才厚、谷俊山案件为反面教材开展警示教育，使各级干部特别是高级干部受警醒、明底线、知敬畏，切实引以为戒。</p>
+				</div>
+				<ul>
+					<li><a href="#.html">详情</a></li>
+					<li class="pr">上传<input type="file" class="file"/></li>
+					<li><a href="#.html">删除</a></li>
+				</ul>
+			</div>
+			</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".list-9 li").click(function(){
+		$("#zoomscroll").addClass("loaded");
+		$(document.body).addClass("noscroll");
+		$(".online-blockmessage-1").show();
+	})
+	$("#zoomscroll").click(function(){
+		$("#zoomscroll").removeClass("loaded");
+		$(document.body).removeClass("noscroll");
+		$(".online-blockmessage-1").hide();
+	})
+})
+</script>
+
+</div>
