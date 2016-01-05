@@ -235,6 +235,76 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	};
 }])
+.factory("transferCache", ["$timeout", function($timeout) {
+ var key = "transferQ", modified = false, value = {list: []};
+ 
+ (function() {
+  var v = window.localStorage ? localStorage[key] : null;
+  if (v) value = JSON.parse(v);
+ })();
+ 
+ function _save() {
+  if (window.localStorage)
+   localStorage[key] = JSON.stringify(value);
+ }
+ 
+ function _read(file, callback) {
+  var reader = new FileReader();
+  reader.onloadend = function() {
+   if (reader.error) callback(false);
+   else callback(reader.result);
+  };
+  //reader.readAsBinaryString(file);
+  //reader.readAsArrayBuffer(file);
+  reader.readAsDataURL(file);
+ }
+ 
+ return {
+  list: function() {
+   return value.list;
+  },
+  push: function(item, type) {
+   var e = angular.extend({
+    _index: value.list.length,
+    _type: type || 'redian',
+    _status: "o1",
+    _statusText: "未上传",
+    _time: new Date(),   
+   }, item), i, counter = 0, total = item.picAttachmentList.length + item.videoAttachmentList.length;
+   e.picAttachmentList = [];
+   e.videoAttachmentList = [];
+   
+   for (i = 0; i < item.picAttachmentList.length; i++) {
+    _read(item.picAttachmentList[i].file, function(r) {
+     if (r) e.picAttachmentList.push({ file: r });
+     counter++;
+    });
+   }
+   for (i = 0; i < item.videoAttachmentList.length; i++) {
+    _read(item.videoAttachmentList[i].file, function(r) {
+     if (r) e.videoAttachmentList.push({ file: r });
+     counter++;
+    });
+   }
+   
+   $timeout(function _fn_reading() {
+    if (counter >= total) {
+     value.list.push(e);
+     _save();
+    } else $timeout(_fn_reading, 200);
+   });
+  },
+  remove: function(item) {
+   for (var i = 0; i < value.list.length; i++) {
+    if (value.list[i]._index == item._index) {
+     value.list.splice(i, 1);
+     _save();
+     break;
+    }
+   }
+  }
+ };
+}])
 .factory("model", ["$rootScope", "$http", "$interval", "$timeout", "myRoute", function($rootScope, $http, $interval, $timeout, myRoute) {
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
 	function _fn() {
@@ -942,7 +1012,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	});
 }])
-.controller("cRediantianjia", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
+.controller("cRediantianjia", ["$scope", "$timeout", "model","transferCache", function($scope, $timeout, model,transferCache) {
 	function _upload(file, blob, c) {
 		var formData = new FormData();
 		formData.append("file", file);
@@ -1026,7 +1096,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	});
 }])
-.controller("cWode", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
+.controller("cWode", ["$scope", "$timeout", "model","transferCache", function($scope, $timeout, model, transferCache) {
 	switch($scope.$location.path()) {
 	case '/shezhi-guanyuwomen':
 		$scope.onepage.id = "about";
@@ -1106,6 +1176,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}
 		});
 		break;
+	case '/shangchuanguanli':
+		  angular.extend($scope, {
+		   tipVisibility: "none",
+		   tasks: transferCache.list(),
+		   transfer: function() {
+		    
+		   },
+		   detail: function(task) {
+		    
+		   }
+		  });
+		  break;
 	}
 }])
 .controller("cOnePage", ["$scope", "model", function($scope, model) {
