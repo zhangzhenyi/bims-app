@@ -1,4 +1,4 @@
-<div class="pb75">
+<div class="pb75 pt60 ng-scope">
 
 <!--header-->
 
@@ -12,7 +12,7 @@
 		<li ng-show="issueItem.issueStatus == 1 && user.id == issueItem.publisherId"><a href="" ng-click="$location.path('/issue-edit')" ><img src="img/icon-edit201512.png"/> 编辑</a></li>
 		<li ng-show="user.id == issueItem.publisherId && user.id == issueItem.publisherId"><a href="javascript:void(0))" id="del" ><img src="img/icon-del201512.png"/> 删除</a></li>
 		<li ng-show="issueItem.issueStatus == 1"><a href="" ng-click="$location.path('/issue-handle')" ><img src="img/icon-m201512.png"/> 处理</a></li>
-		<li ng-if="issueItem.issueStatus == 2"><a href="" ng-click="$location.path('/issue-check')" ><img src="img/icon-m201512.png"/> 检验</a></li>
+		<li ng-if="issueItem.issueStatus == 2"><a href="" ng-click="$location.path('/issue-check')" ><img src="img/icon-m201512.png"/> 验收</a></li>
 		
 	</ul>
 	</div>
@@ -29,7 +29,7 @@
 <section class="mt10">
 	<ul class="list-3">
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-1.jpg"/>问题编号</span><span class="r">{{::issueItem.id}}</span>
+			<span class="l"><img src="img/i-xq-1.jpg"/>问题编号</span><span class="r">{{::issueItem.code}}</span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span><span class="r">{{issueItem.location}}</span>
@@ -44,10 +44,10 @@
 			<textarea ng-model="issueItem.issueRectification" cols="" rows="" class="fromarea" placeholder="" readonly="true"></textarea></span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r"><a ng-repeat="itemP in issueItem.issuePicAttachmentList" ng-href="{{::itemP.fileUrl}}" class="pic" ng-if="itemP.fileType==Constants.ATTACHMENTTYPE_PICTURE"><img ng-src="{{::(itemP.thumbnailUrl || 'img/tem-img/img-100100-1.jpg')}}"/></a></span>
+			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r"><a ng-repeat="itemP in issueItem.issuePicAttachmentList" ng-click="fileClicked('相片', itemP.fileUrl)" href="" class="pic" ng-if="itemP.fileType==Constants.ATTACHMENTTYPE_PICTURE"><img ng-src="{{::(itemP.thumbnailUrl || 'img/tem-img/img-100100-1.jpg')}}"/></a></span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r"><a ng-repeat="v in issueItem.issueVideoAttachmentList" href="{{::v.fileUrl}}" target="_blank" class="pic"><img ng-src="{{::(v.thumbnailUrl || 'img/tem-img/img-100100-1.jpg')}}"/></a></span>
+			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r"><a ng-repeat="v in issueItem.issueVideoAttachmentList" ng-click="fileClicked('视频', v.fileUrl)" href="" target="_blank" class="pic"><img ng-src="{{::(v.thumbnailUrl || 'img/tem-img/img-100100-1.jpg')}}"/></a></span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-6.jpg"/>整改期限</span><span class="r">{{formatDate(issueItem.deadlineTime)}}</span>
@@ -66,10 +66,10 @@
 			<span class="l1"><img src="img/i-xq-12.jpg"/>整改落实<br/>情况</span><span class="r">{{::issueItem.handleDesc}}</span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r"><a ng-repeat="itemH in issueItem.handlePicList" ng-href="{{::itemH.fileUrl}}" class="pic"><img ng-src="{{::(itemH.thumbnailUrl||'img/tem-img/img-100100-1.jpg')}}"/></a></span>
+			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r"><a ng-repeat="itemH in issueItem.handlePicList" ng-click="fileClicked('相片', itemH.fileUrl)" href="" class="pic"><img ng-src="{{::(itemH.thumbnailUrl||'img/tem-img/img-100100-1.jpg')}}"/></a></span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r"><a ng-repeat="v in issueItem.handleVideoList" href="{{::v.fileUrl}}" target="_blank" class="pic"><img ng-src="{{::(v.thumbnailUrl || 'img/tem-img/img-100100-1.jpg')}}"/></a></span>
+			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r"><a ng-repeat="v in issueItem.handleVideoList" ng-click="fileClicked('视频', v.fileUrl)" href="" target="_blank" class="pic"><img ng-src="{{::(v.thumbnailUrl || 'img/tem-img/img-100100-1.jpg')}}"/></a></span>
 		</li>
 		<li class="clearfix">
 			<span class="l1"><img src="img/i-xq-8.jpg"/>人员教育<br/>情况</span><span class="r">{{::issueItem.lessonDesc}}</span>
@@ -105,10 +105,10 @@
 </section>
 
 <section class="mt20 mlr20 commendblock"  my-scroll="load()">
-	<span class="j"><img src="img/i-jian-1.png"/></span>
-	<div><img src="img/i-commend.png"/><i>{{voteMemberStr}}</i></div>
+	<span class="j" ng-if="voteMembers.length > 0 || comments.length > 0"><img src="img/i-jian-1.png"/></span>
+	<div ng-if="voteMembers.length > 0"><img src="img/i-zan.png"/><i>{{voteMemberStr}}</i></div>
 	<ul class="list-5">
-		<li class="clearfix" ng-repeat="c in comments">
+		<li class="clearfix" ng-repeat="c in comments  track by c.id">
 			<span class="i"><img ng-src="{{::(c.creatorAvatarUrl || 'img/tem-img/img-person.jpg')}}"/></span>
 			<div class="r">
 			<p class="name">{{::c.creatorCName}}</p>

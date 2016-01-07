@@ -1,4 +1,4 @@
-<div class="pb75">
+<div class="pb75 pt60 ng-scope">
 <header class="bg1">
 	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
 	<p class="title">热点议题详情</p>
@@ -27,8 +27,8 @@
 	<img src="img/i-zanon.png" ng-if="isVote"/><i>点赞</i></a></div>
 </section>
 <section class="mt20 mlr20 commendblock" my-scroll="load()">
-	<span class="j"><img src="img/i-jian-1.png"/></span>
-	<div><img src="img/i-commend.png"/><i>{{voteMemberStr}}</i></div>
+	<span class="j" ng-if="voteMembers.length > 0 || comments.length > 0"><img src="img/i-jian-1.png"/></span>
+	<div ng-if="voteMembers.length > 0"><img src="img/i-zan.png"/><i>{{voteMemberStr}}</i></div>
 	<ul class="list-5">
 		<li class="clearfix" ng-repeat="c in comments track by c.id">
 			<span class="i"><img ng-src="{{::(c.creatorAvatarUrl || 'img/tem-img/img-person.jpg')}}"/></span>

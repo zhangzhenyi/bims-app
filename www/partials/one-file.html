@@ -1,11 +1,15 @@
-<div class="pb75">
+<div class="pb75 pt60 ng-scope">
 <header class="bg1">
 	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
 	<p class="title">{{::files.filename}}</p>
 </header>
-<section class="mt15 mlr10">
-<img ng-if="img" ng-src="{{::files.filepath}}" title="{{::files.filename}}" style="width:100%;"/>
-<my-pdf ng-if="pdf" src="files.filepath"></my-pdf>
-<my-video ng-if="video" src="files.filepath" controls="true" autoplay="true" width="100%"></my-video>
+<section class="mt15 mlr10" ng-if="img">
+<img  ng-src="{{::files.filepath}}" title="{{::files.filename}}" style="width:100%;"/>
+</section>
+<section class="mt15" ng-if="pdf">
+<my-pdf  src="files.filepath"></my-pdf>
+</section>
+<section class="mt15 mlr10" ng-if="video">
+<my-video  src="files.filepath" controls="true" autoplay="true" width="100%"></my-video>
 </section>
 </div>

@@ -465,6 +465,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 						pageNum: num
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			get:function(id, c){
+				_req({
+					method: "get",
+					url: "notice/get.jo",
+					params: {
+						id: id
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
 			}
 		},
 		comment: {
@@ -724,7 +733,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	};
 }])
-.controller("cLoading", ["$scope", function($scope) {
+.controller("cLoading", ["$scope", "$document", "$rootScope", function($scope, $document, $rootScope) {
+	$rootScope.myHeaderPosition = "fixed";
 	$scope.displayLoading = function() {
 		if($scope.loading ){
 			tipmessage1(message="努力加载中",img="<img src='img/loading.gif';><br/>",id="tipimg");
@@ -733,6 +743,22 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 		return $scope.loading ? "block" : "none";
 	};
+	
+//	$document.ready(function () 
+//		    {
+//		$document.bind("hidekeyboard", onHide, false);
+//		$document.bind("showkeyboard", onShow, false);
+//
+//		    });
+//	
+	$scope.onHide = function(){
+		alert("show Keyboard");
+		$rootScope.myHeaderPosition = "fixed";
+	};
+	$scope.onShow = function(){
+		$rootScope.myHeaderPosition = "relative";
+	};
+	
 }])
 .controller("cLogin", ["$scope", "model", function($scope, model) {
 	if (window.localStorage) {
@@ -866,9 +892,43 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	});
 }])
 .controller("cGonggaoxiangqing", ["$scope", "model", function($scope, model) {
+	//Get latest data
+	model.notice.get($scope.notice.current.id, function(d) {
+		if(d) {
+			$scope.notice.current = d;
+			$scope.voteMembers = (isBlankString($scope.notice.current.voteUsersX))? [] : $scope.notice.current.voteUsersX.split(",");
+		    if($scope.voteMembers.length > 0){
+		    	$scope.voteMemberStr = $scope.voteMembers.join("，"); 
+		    	if($scope.voteMembers.length > 0){
+			    	$scope.voteMemberStr = $scope.voteMembers.join("，"); 
+			    	for (x in $scope.voteMembers){
+			    		if($scope.voteMembers[x] == $scope.user.name){
+							$scope.isVote = true;
+							break;
+						}
+			    	}
+			    }
+			    
+			    if($scope.isVote){
+			    		//Judge whether is voted or not
+				    	model.vote.isVoted($scope.notice.current.id, $scope.notice.current.topicType, function(d){
+				    		if(d){
+				    			$scope.isVote = true;
+				    		}else{
+				    			$scope.isVote = false;
+				    		}
+				    	})
+			    }
+		    	
+		    }
+		}
+	});
 	angular.extend($scope, {
 		page: 1,
 		comments: [],
+		isVote:false,
+		voteMembers:[],
+		voteMemberStr:"",
 		load: function() {
 			model.comment.list($scope.notice.current.id, $scope.notice.current.topicType, $scope.page, function(d) {
 				if (d && d.length > 0) {
@@ -877,7 +937,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					$scope.page++;
 				}
 			});
+			
 		},
+		
 		newComment: "",
 		save: function() {
 			if ($scope.newComment != "") {
@@ -891,6 +953,34 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				});
 				$scope.newComment = "";
 			}
+		},
+		
+		topicId:$scope.notice.current.id,
+		topicType:$scope.notice.current.topicType,
+		doLike:function(){
+			if(!$scope.isVote){
+				model.vote.doLike($scope.topicId, $scope.topicType, function(d){
+					console.log("Click vote true");
+					$scope.voteMembers.push($scope.user.name);
+					$scope.isVote = true;
+					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
+				});
+				
+			}else{
+				if($scope.voteMembers.length <=0) return;
+				model.vote.disLike($scope.topicId, $scope.topicType, function(d){
+					console.log("unselect vote true");
+					for(var i=0; i < $scope.voteMembers.length; i++){
+						if($scope.voteMembers[i] == $scope.user.name){
+							$scope.voteMembers.splice(i,1);
+							break;
+						}
+					}
+					$scope.isVote = false;
+					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
+				});
+			}
+			
 		}
 	});
 }])
@@ -1353,6 +1443,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				});
 			}
 			
+		},
+		fileClicked: function(name, path) {
+			$scope.files.filename = name;
+			$scope.files.filepath = path;
+			$scope.$location.path("/onefile");
 		}
 	});
 	
@@ -1888,8 +1983,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	});
 }])
 .controller("cOneFile", ["$scope", "model", function($scope, model) {
-	var ext = $scope.files.filepath.substr($scope.files.filepath.lastIndexOf(".") + 1, 3).toLowerCase();
-	$scope.img = (ext == 'png' || ext == 'jpg' || ext == 'gif');
+	var len = $scope.files.filepath.length - $scope.files.filepath.lastIndexOf(".")-1;
+	var ext = $scope.files.filepath.substr($scope.files.filepath.lastIndexOf(".") + 1, len).toLowerCase();
+	$scope.img = (ext == 'png' || ext == 'jpg' || ext == 'gif' || ext == 'jpeg');
 	$scope.pdf = ext == 'pdf';
 	$scope.video = (ext == "mp4" || ext =="ogg" || ext == "3gp" || ext == "mov");
 	if ($scope.files.filename.length > 8) $scope.files.filename = $scope.files.filename.substring(0, 8) + " ...";

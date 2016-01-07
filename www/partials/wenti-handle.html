@@ -1,19 +1,19 @@
-<div class="pb75">
+<div class="pb75 pt60 ng-scope">
 
 <!--header-->
 
-<header class="bg1">
+<header class="bg1" style="position:{{myHeaderPosition}}}">
 	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
 	<p class="title">处理</p>
 	<span class="txt1" ><a ng-click="save()" href=""><span style="display:none">保存</span></a></span><span class="nochoose"><a ng-click="submit()" href="">提交</a></span>
 </header>
 
 <section class="mt10 mlr10 bg2 pb75">
-	<ul class="list-3">
+	<ul class="list-3 list-3-1">
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-12.jpg"/>整改落实<br/>情况</span><span class="r">
+			<span class="l l1"><img src="img/i-xq-12.jpg"/>整改落实<br/>情况</span><span class="r r1">
 			<label for="iHandleDesc" style="color:#aaa;">您还可输入{{remain}}个字符</label>
-			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged(0)" id="iHandleDesc" ng-model="issueItem.handleDesc"></textarea>
+			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged(0)" id="iHandleDesc" ng-model="issueItem.handleDesc" placeholder="点此输入"></textarea>
 			</span>
 		</li>
 		<li class="clearfix">
@@ -23,22 +23,23 @@
 			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r pr"><span ng-repeat="vid in issueItem.handleVideoList" class="vid" style="margin-right:5px;"><my-video src="vid.thumbnailUrl" height="50px"></my-video></span><img src="img/i-jia.jpg" class="pic"/><input type="file" accept="video/*" class="file" onchange="angular.element(this).scope().videoChanged(this)"/></span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-8.jpg"/>人员教育<br/>情况</span>
-			<span class="r">
+			<span class="l l1"><img src="img/i-xq-8.jpg"/>人员教育<br/>情况</span>
+			<span class="r r1">
 			<label for="iLessonDesc" style="color:#aaa;">您还可输入{{remain1}}个字符</label>
-			<textarea cols="" rows="" class="fromarea"  ng-change="contentChanged(1)" id="iLessonDesc" ng-model="issueItem.lessonDesc"></textarea>
+			<textarea cols="" rows="" class="fromarea"  ng-change="contentChanged(1)" id="iLessonDesc" ng-model="issueItem.lessonDesc" placeholder="点此输入"></textarea>
 			</span>
 		</li>
 
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-9.jpg"/>同类问题<br/>防治措施</span><span class="r">
+			<span class="l l1"><img src="img/i-xq-9.jpg"/>同类问题<br/>防治措施</span>
+			<span class="r r1">
 			<label for="iPreventionDesc" style="color:#aaa;">您还可输入{{remain2}}个字符</label>
-			<textarea ng-model="issueItem.preventionDesc" id="iPreventionDesc" cols="" rows="" class="fromarea" placeholder="" ng-change="contentChanged(2)"></textarea></span>
+			<textarea ng-model="issueItem.preventionDesc" id="iPreventionDesc" cols="" rows="" class="fromarea" placeholder="" ng-change="contentChanged(2)" placeholder="点此输入"></textarea></span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-10.jpg"/>隐患类型</span><span class="r">
 			<select ng-model="issueItem.issueCategory" ng-change="selectAction()"  ng-options="cat.id as cat.name for cat in issueCats"></select>
-			<span class="r" ng-if="issueItem.issueCategory==4" ><input ng-model="issueItem.issueCategoryRemark" type="text" class="fromtxt" placeholder="请输入其他隐患类型"/></span>
+			<span class="r" ng-if="issueItem.issueCategory==4" ><input ng-model="issueItem.issueCategoryRemark" type="text" class="fromtxt" placeholder="请输入其他隐患类型" placeholder="点此输入"/></span>
 			</span>
 			  
 		</li>
