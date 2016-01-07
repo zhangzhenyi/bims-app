@@ -134,6 +134,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		    return value + (tail || ' …');
 	  };
 }])
+
 .directive("myDatetimePicker", ["$parse", function($parse) {
 	return {
 		restrict: "E",
