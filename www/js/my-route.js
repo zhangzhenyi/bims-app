@@ -58,7 +58,7 @@
 							});
 							templateUrl = next.templateUrl;
 							if (angular.isFunction(templateUrl)) templateUrl = templateUrl();
-							templateUrl = $sce.getTrustedResourceUrl(templateUrl)
+							templateUrl = $sce.getTrustedResourceUrl(templateUrl);
 							if (angular.isDefined(templateUrl)) {
 								next.loadedTemplateUrl = templateUrl;
 								template = $templateRequest(templateUrl);
@@ -130,8 +130,8 @@
 					if (angular.isDefined(template)) {
 						var newScope = scope.$new(),
 						current = myRoute.current,
-						clone = $transclude(newScope, function(clone) {
-							$animate.enter(clone, null, currentElement || $element).then(function onNgViewEnter() {
+						clone = $transclude(newScope, function(c) {
+							$animate.enter(c, null, currentElement || $element).then(function onNgViewEnter() {
 								if (angular.isDefined(autoScrollExp) && (!autoScrollExp || scope.$eval(autoScrollExp))) {
 									$anchorScroll();
 								}
