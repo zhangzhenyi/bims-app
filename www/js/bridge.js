@@ -735,7 +735,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 //		    });
 //	
 	$scope.onHide = function(){
-		alert("show Keyboard");
+//		alert("show Keyboard");
 		$rootScope.myHeaderPosition = "fixed";
 	};
 	$scope.onShow = function(){
@@ -762,7 +762,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				$scope.user.roles = (d.roles || {}).name || "App游客";
 				$scope.user.id = d.id;
 				$scope.$location.path("/");
-			} else alert("无效的用户名和密码。");
+			} else {
+				tipmessage("无效的用户名和密码。", "invalidUP");
+			}
 		});
 	};
 }])
@@ -776,7 +778,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		},
 		register: function() {
 			if ($scope.user.password != $scope.password0) {
-				alert("请输入正确的密码！");
+				tipmessage("请输入正确的密码！", "wrongPwd");
 				return;
 			}
 			model.user.exists($scope.user.username, function(d) {
@@ -789,7 +791,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 							}, 2000);
 						}
 					});
-				} else alert("用户已经存在！");
+				} else {
+					tipmessage("用户已经存在！", "existedUser");
+				}
 			});
 		}
 	});

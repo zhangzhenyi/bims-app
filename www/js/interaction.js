@@ -1,9 +1,10 @@
 
 //提示信息成功或者失败
 function tipmessage(message,id){
-	$("#loadingContainer").append("<div class='tipmessage' id='"+id+"'><span>"+message+"</span></div>");
+	$("#msgContainer").append("<div class='tipmessage' id='"+id+"'><span>"+message+"</span></div>");
 	$("#"+id).animate({opacity:1},300);
-	setTimeout(function(){$("#"+id).animate({opacity:0},300);setTimeout(function(){$("#"+id).remove();},100);},2000);
+	$("#msgContainer").show();
+ 	setTimeout(function(){$("#"+id).animate({opacity:0},300);setTimeout(function(){$("#"+id).remove();$("#msgContainer").hide();},100);},2000); 
 }
 //提示信息带图片
 function tipmessage1(message,img,id){
