@@ -18,8 +18,8 @@
 
 /*列均分*/
 function thumbnailist(thumbblcok,thumbul){
-	var listwidth = $(thumbblcok).width();
-	var listliamargin = $(thumbul+" li div").css("marginRight");
+	var listwidth = $(thumbblcok).width(),
+	listliamargin = $(thumbul+" li div").css("marginRight");
 	$(thumbul).css("width",listwidth+parseInt(listliamargin));
 	$(window).resize(function(){thumbnailist(thumbblcok,thumbul);});
 }
@@ -31,19 +31,19 @@ function searchtool(){
 		$("header .search").hide();
 		$("header .jia").hide();
 		$("header .nochoose").show();
-	})
+	});
 	$("header .nochoose").click(function(){
 		$(".searchblock").fadeOut();
 		$("header .search").show();
 		$("header .jia").show();
 		$("header .nochoose").hide();
-	})
+	});
 	$(".searchblock input").blur(function(){
 		$(".searchblock").fadeOut();
 		$("header .search").show();
 		$("header .jia").show();
 		$("header .nochoose").hide();
-	})
+	});
 }
 
 /*块的显示隐藏*/
@@ -74,37 +74,25 @@ function meumpop(v){
 
 //全屏弹窗
 function popfullwindow1(id){
-	$(document.body).addClass("noscroll");
-	//var bodyH = $(window).height();
-	//alert(bodyH);
-	//var mh = $(id).offset().top;
+    $(document.body).addClass("noscroll");
 	$(id).css({"z-Index":200});
 	$(id).animate({opacity:1},200);
 }
 
 //关闭全屏弹窗
 function closefullwindow1(id){
-	$(id).animate({opacity:0},200);
-	setTimeout(function(){$(id).css({"z-Index":-1})},250);
-	$(document.body).removeClass("noscroll");
+    $(id).animate({opacity:0},200);
+    setTimeout(function(){$(id).css({"z-Index":-1});},250);
+    $(document.body).removeClass("noscroll");
 }
 
-String.prototype.getByteLen = function(val){
-	var len = 0;
-    for (var i = 0; i < val.length; i++) {
-         var a = val.charAt(i);
-         if (a.match(/[^\x00-\xff]/ig) != null) 
-        {
-            len += 2;
-        }
-        else
-        {
-            len += 1;
-        }
+String.prototype.getByteLen = function(val) {
+    var r = i = 0;
+    for (; i < val.length; i++, r++) {
+         if (val.charAt(i).match(/[^\x00-\xff]/ig) != null) r++;
     }
-    return len;
-}
-
+    return r;
+};
 
 Date.prototype.format = Date.prototype.format || function(fmt, utc) {
     var _r, _o = {
@@ -124,16 +112,11 @@ Date.prototype.format = Date.prototype.format || function(fmt, utc) {
     }
     return _r;
 };
-function isBlankString(s){
-	if(!s){
-		return true;
-	}
-    else if (s.replace(/(^s*)|(s*$)/g, "").length ==0) 
-	{ 
-		return true; 
-	}else{
-		return false;
-	}
+
+function isBlankString(s) {
+	if (!s) return true;
+	if (s.replace(/(^s*)|(s*$)/g, "").length ==0) return true;
+	return false;
 }
 
 angular.module("bridgeH5", ["myRoute", "ngSanitize"])
@@ -148,9 +131,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		        value = value.substr(0, lastspace);
 		      }
 		    }
-
 		    return value + (tail || ' …');
-	  }
+	  };
 }])
 .directive("myDatetimePicker", ["$parse", function($parse) {
 	return {
@@ -191,10 +173,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		link: function (scope, element, attrs) {
 			var win = angular.element($window), first = true;
 			function handler() {
-				if ((element.offset().top + element.height()) - (win.height() + win.scrollTop()) <= 0)
+				if ((element.offset().top + element.height()) - (win.height() + win.scrollTop()) < 0)
 					scope.$apply(attrs.myScroll);
 			}
-			win.on('scroll', function() {
+			win.on('scroll', function(e) {
 				if (first) first = false;
 				else handler();
 			});
@@ -236,74 +218,74 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	};
 }])
 .factory("transferCache", ["$timeout", function($timeout) {
- var key = "transferQ", modified = false, value = {list: []};
- 
- (function() {
-  var v = window.localStorage ? localStorage[key] : null;
-  if (v) value = JSON.parse(v);
- })();
- 
- function _save() {
-  if (window.localStorage)
-   localStorage[key] = JSON.stringify(value);
- }
- 
- function _read(file, callback) {
-  var reader = new FileReader();
-  reader.onloadend = function() {
-   if (reader.error) callback(false);
-   else callback(reader.result);
-  };
-  //reader.readAsBinaryString(file);
-  //reader.readAsArrayBuffer(file);
-  reader.readAsDataURL(file);
- }
- 
- return {
-  list: function() {
-   return value.list;
-  },
-  push: function(item, type) {
-   var e = angular.extend({
-    _index: value.list.length,
-    _type: type || 'redian',
-    _status: "o1",
-    _statusText: "未上传",
-    _time: new Date(),   
-   }, item), i, counter = 0, total = item.picAttachmentList.length + item.videoAttachmentList.length;
-   e.picAttachmentList = [];
-   e.videoAttachmentList = [];
-   
-   for (i = 0; i < item.picAttachmentList.length; i++) {
-    _read(item.picAttachmentList[i].file, function(r) {
-     if (r) e.picAttachmentList.push({ file: r });
-     counter++;
-    });
-   }
-   for (i = 0; i < item.videoAttachmentList.length; i++) {
-    _read(item.videoAttachmentList[i].file, function(r) {
-     if (r) e.videoAttachmentList.push({ file: r });
-     counter++;
-    });
-   }
-   
-   $timeout(function _fn_reading() {
-    if (counter >= total) {
-     value.list.push(e);
-     _save();
-    } else $timeout(_fn_reading, 200);
-   });
-  },
-  remove: function(item) {
-   for (var i = 0; i < value.list.length; i++) {
-    if (value.list[i]._index == item._index) {
-     value.list.splice(i, 1);
-     _save();
-     break;
-    }
-   }
-  }
- };
+	var key = "transferQ", value = {list: []};
+	 
+	 (function() {
+	  var v = window.localStorage ? localStorage[key] : null;
+	  if (v) value = JSON.parse(v);
+	 })();
+	 
+	function _save() {
+		 if (window.localStorage)
+			 localStorage[key] = JSON.stringify(value);
+	 }
+	 
+	 function _read(file, callback) {
+	  var reader = new FileReader();
+	  reader.onloadend = function() {
+	   if (reader.error) callback(false);
+	   else callback(reader.result);
+	  };
+	  //reader.readAsBinaryString(file);
+	  //reader.readAsArrayBuffer(file);
+	  reader.readAsDataURL(file);
+	 }
+	 
+	 return {
+	  list: function() {
+	   return value.list;
+	  },
+	  push: function(item, type) {
+	   var e = angular.extend({
+	    _index: value.list.length,
+	    _type: type || 'redian',
+	_status: "o1",
+	_statusText: "未上传",
+	    _time: new Date(),   
+	   }, item), i, counter = 0, total = item.picAttachmentList.length + item.videoAttachmentList.length;
+	   e.picAttachmentList = [];
+	   e.videoAttachmentList = [];
+	   
+	   for (i = 0; i < item.picAttachmentList.length; i++) {
+	    _read(item.picAttachmentList[i].file, function(r) {
+	     if (r) e.picAttachmentList.push({ file: r });
+	     counter++;
+	    });
+	   }
+	   for (i = 0; i < item.videoAttachmentList.length; i++) {
+	    _read(item.videoAttachmentList[i].file, function(r) {
+	     if (r) e.videoAttachmentList.push({ file: r });
+	     counter++;
+	    });
+	   }
+	   
+	   $timeout(function _fn_reading() {
+	    if (counter >= total) {
+	     value.list.push(e);
+	     _save();
+	    } else $timeout(_fn_reading, 200);
+	   });
+	  },
+	  remove: function(item) {
+	   for (var i = 0; i < value.list.length; i++) {
+	    if (value.list[i]._index == item._index) {
+	     value.list.splice(i, 1);
+	     _save();
+	     break;
+	    }
+	   }
+	  }
+	 };
 }])
 .factory("model", ["$rootScope", "$http", "$interval", "$timeout", "myRoute", function($rootScope, $http, $interval, $timeout, myRoute) {
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
@@ -382,7 +364,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			getIcon: function(name, dir) {
 				return "img/" + (_icons[name] || (dir ? "icon-24" : "icon-11")) + ".png";
 			}
-		}
+		};
 	})();
 	
 	function _req(o,c) {
@@ -839,7 +821,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	model.issues.getLatestIssue(function(d){
 		if(d) {
 			$scope.issues.latestData = d;
-			if(d.length > 0){
+			if(d.length > 0) {
 				$scope.issues.first = d[0];
 			}
 			if (d.length > 1) $scope.issues.second = d[1];
@@ -847,17 +829,21 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	});
 }])
 .controller("cGonggao", ["$scope", "model", function($scope, model) {
+	var _page = 0;
 	angular.extend($scope, {
 		page: 1,
 		data: [],
 		load: function() {
-			model.notice.list(20, $scope.page, function(d, s) {
-				if (d && d.length > 0) {
-					for (var i = 0; i < d.length; i++)
-						$scope.data.push(d[i]);
-					$scope.page++;
-				}
-			});
+			if (_page != $scope.page) {
+				_page = $scope.page;
+				model.notice.list(20, $scope.page, function(d, s) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.data.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
 		},
 		getImg: function(url) {
 			var uri = model.base();
@@ -895,17 +881,21 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	});
 }])
 .controller("cRedian", ["$scope", "model", function($scope, model) {
+	var _page = 0;
 	angular.extend($scope, {
 		page: 1,
 		items: [],
 		load: function() {
-			model.hotfocus.list($scope.page, function(d) {
-				if (d && d.length > 0) {
-					for (var i = 0; i < d.length; i++)
-						$scope.items.push(d[i]);
-					$scope.page++;
-				}
-			});
+			if (_page != $scope.page) {
+				_page = $scope.page;
+				model.hotfocus.list($scope.page, function(d) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.items.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
 		},
 		itemClick: function(item) {
 			$scope.hotfocus.current = item;
@@ -939,7 +929,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				    		}else{
 				    			$scope.isVote = false;
 				    		}
-				    	})
+				    	});
 			    }
 		    	
 		    }
@@ -1100,7 +1090,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	switch($scope.$location.path()) {
 	case '/shezhi-guanyuwomen':
 		$scope.onepage.id = "about";
-		$scope.$location.path('/onepage')
+		$scope.$location.path('/onepage');
 		break;
 	case '/wode-gerenxinxi':
 		$scope.imgChanged = function(e) {
@@ -1197,17 +1187,21 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	});
 }])
 .controller("cNews", ["$scope", "model", function($scope, model) {
+	var _page = 0;
 	angular.extend($scope, {
 		page: 1,
 		list: [],
 		load: function() {
-			model.news.list($scope.page, function(d) {
-				if(d && d.length > 0) {
-					for (var i = 0; i < d.length; i++)
-						$scope.list.push(d[i]);
-					$scope.page++;
-				}
-			});
+			if (_page != $scope.page) {
+				_page = $scope.page;
+				model.news.list($scope.page, function(d) {
+					if(d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.list.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
 		},
 		getImg: function(url) {
 			var uri = model.base();
@@ -1224,47 +1218,47 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	});
 }])
 .controller("cIssues", ["$scope", "model", function($scope, model) {
-	var s = $scope.issues.currentSectId;
-	var t = $scope.issues.currentIssueType;
+	var s = $scope.issues.currentSectId,
+	t = $scope.issues.currentIssueType,
+	lastLoaded = 0;
 
 	angular.extend($scope, {
 		page: 1,
 		items: [],
-		myPublisherCat:0,
+		myPublisherCat: 0,
 		load: function() {
-			model.issues.list(s, t, $scope.page, $scope.myPublisherCat, function(d) {
-				if (d && d.length > 0) {
-					for (var i = 0; i < d.length; i++)
-						$scope.items.push(d[i]);
-					$scope.page++;
-				}
-			});
+			if ($scope.page != lastLoaded) {
+				lastLoaded = $scope.page;
+				model.issues.list(s, t, $scope.page, $scope.myPublisherCat, function(d) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.items.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
+		},
+		issueClick: function(n) {
+			$scope.issues.currentIssue = n;
+			$scope.$location.path("/issue-details");
+		},
+		filterClick: function(n) {
+			$scope.items = [];
+			$scope.page = 1;
+			lastLoaded = 0;
+			switch(n) {
+				case 1:
+					$scope.myPublisherCat = 1;
+					break;
+				case 2:
+					$scope.myPublisherCat = 2;
+					break;
+				default:
+					$scope.myPublisherCat = 0;
+			}
+			$scope.load();
 		}
-		
 	});
-//	model.issues.list(s, t, 0, function(d) {
-//		if(d) $scope.issues.data = d;
-//	});
-	$scope.issueClick = function(n) {
-		$scope.issues.currentIssue = n;
-		$scope.$location.path("/issue-details");
-	};
-
-	$scope.filterClick = function(n){
-		$scope.items = [];
-		$scope.page = 1;
-		switch(n) {
-			case 1:
-				$scope.myPublisherCat = 1;
-				break;
-			case 2:
-				$scope.myPublisherCat = 2;
-				break;
-			default:
-				$scope.myPublisherCat = 0;
-		}
-		$scope.load();
-	};
 }])
 .controller("cIssueDetails", ["$scope", "model", "$timeout", function($scope, model, $timeout) {
 	var id = $scope.issues.currentIssue.id;
@@ -1301,9 +1295,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			    		}else{
 			    			$scope.isVote = false;
 			    		}
-			    	})
+			    	});
 		    	}
-		    
 		}
 	});
 	
@@ -1819,17 +1812,21 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	};
 }])
 .controller("cNewsDetail", ["$scope", "model", function($scope, model) {
+	var _lastPage = 0;
 	angular.extend($scope, {
 		page: 1,
 		comments: [],
 		load: function() {
-			model.comment.list($scope.news.current.id, $scope.news.current.topicType, $scope.page, function(d) {
-				if (d && d.length > 0) {
-					for (var i = 0; i < d.length; i++)
-						$scope.comments.push(d[i]);
-					$scope.page++;
-				}
-			});
+			if ($scope.page != _lastPage) {
+				_lastPage = $scope.page;
+				model.comment.list($scope.news.current.id, $scope.news.current.topicType, $scope.page, function(d) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.comments.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
 		},
 		publisher: $scope.news.current.publisherName || $scope.news.current.createUser || $scope.news.current.updateUser || "n/a",
 		newComment: "",
@@ -1862,7 +1859,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 	model.getFileList($scope.files.parentId, function(d) {
 		if(d) {
-			if ($scope.files.parentId < 2) d.fileName = '搜索'
+			if ($scope.files.parentId < 2) d.fileName = '搜索';
 			$scope.files.current = d;
 			$scope.items = d.dirList.concat(d.filesList);
 		}
