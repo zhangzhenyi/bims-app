@@ -633,6 +633,32 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					}, angular.isFunction(c) ? c : angular.noop);
 				}
 			},
+			search:function(s,t,pn,st,cat, c){
+				if(cat ==0){
+					_req({
+						method: "post",
+						url: "issue/searchissue.jo",
+						data:{
+							sectionId: s,
+							issueType: t,
+							pageNum: pn,
+							issueTitle:st
+						}
+					}, angular.isFunction(c) ? c : angular.noop);
+				}else{
+					_req({
+						method: "post",
+						url: "issue/searchissue.jo",
+						data:{
+							sectionId: s,
+							issueType: t,
+							pageNum: pn,
+							publisherCat: cat,
+							issueTitle:st
+						}
+					}, angular.isFunction(c) ? c : angular.noop);
+				}
+			},
 			getIssue: function(id, c) {
 				_req({
 					method: "get",
@@ -1462,17 +1488,39 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		page: 1,
 		items: [],
 		myPublisherCat: 0,
+		filterChanged:false,
+		filterTitle:"",
 		load: function() {
-			if ($scope.page != lastLoaded) {
-				lastLoaded = $scope.page;
-				model.issues.list(s, t, $scope.page, $scope.myPublisherCat, function(d) {
-					if (d && d.length > 0) {
-						for (var i = 0; i < d.length; i++)
-							$scope.items.push(d[i]);
-						$scope.page++;
-					}
-				});
+			if($scope.filterChanged){
+				if ($scope.page != lastLoaded) {
+					model.issues.search(s, t, $scope.page, $scope.filterTitle, $scope.myPublisherCat, function(d) {
+						if (d && d.length > 0) {
+							for (var i = 0; i < d.length; i++)
+								$scope.items.push(d[i]);
+							$scope.page++;
+						}
+					});
+				}
+			}else{
+				if ($scope.page != lastLoaded) {
+					lastLoaded = $scope.page;
+					model.issues.list(s, t, $scope.page, $scope.myPublisherCat, function(d) {
+						if (d && d.length > 0) {
+							for (var i = 0; i < d.length; i++)
+								$scope.items.push(d[i]);
+							$scope.page++;
+						}
+					});
+				}
 			}
+			
+		},
+		search:function(){
+			$scope.filterChanged = true;
+			$scope.page = 1;
+			lastLoaded = 0;
+			$scope.items.length = 0;
+			$scope.load();
 		},
 		issueClick: function(n) {
 			$scope.issues.currentIssue = n;
