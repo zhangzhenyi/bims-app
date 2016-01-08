@@ -1790,7 +1790,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	
 	$scope.newIssue = {
 		issuePicAttachmentList: [],
-		issueVideoAttachmentList: []
+		issueVideoAttachmentList: [],
+		issueRectification:"",
+		issueDesc:""
 	};
 	
 	$scope.newIssue.important = $scope.Constants.ISSUE_IMPORTANT_3;
