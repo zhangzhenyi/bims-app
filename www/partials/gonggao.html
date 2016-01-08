@@ -4,7 +4,7 @@
 	<p class="title">公告</p>
 	<span class="search search1"><img src="img/icon-search.png"/></span><span class="nochoose" style="display:none;cursor:pointer;">取消</span>
 </header>
-<section class="mlr10 searchblock"><input name="" type="text"></section>
+<section class="mlr10 searchblock"><input name="" type="text" ng-model="filterTitle" ng-change="search()"></section>
 <section class="mt10" my-scroll="load()">
 	<ul class="list-6">
 		<li class="clearfix" ng-repeat="item in data track by item.id">

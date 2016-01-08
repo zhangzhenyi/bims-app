@@ -4,7 +4,7 @@
 <p class="title">热点议题</p>
 <span class="search"><img src="img/icon-search.png"/></span><span ng-click="$location.path('/rediantianjia')" class="jia"><img src="img/icon-jia.png"/></span><span class="nochoose" style="display:none;cursor:pointer;">取消</span>
 </header>
-<section class="mlr10 searchblock"><input name="" type="text"></section>
+<section class="mlr10 searchblock"><input name="" type="text" ng-model="filterTitle" ng-change="search()"></section>
 <section class="mlr10 mt15" my-scroll="load()">
 	<ul class="list-6">
 		<li class="clearfix" ng-repeat="item in items track by item.id">
@@ -20,3 +20,9 @@
 	</ul>
 </section>
 </div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	searchtool();
+})
+</script>

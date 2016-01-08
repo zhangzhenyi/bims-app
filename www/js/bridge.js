@@ -449,6 +449,17 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
+			search: function(count,num, t, c) {
+				_req({
+					method: "post",
+					url: "notice/search.jo",
+					data: {
+						pageCnt: count,
+						pageNum: num,
+						title: t
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
 			get:function(id, c){
 				_req({
 					method: "get",
@@ -496,6 +507,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					method: "get",
 					url: "hotfocus/list.jo",
 					params: {
+						pageNum: p
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			search: function(t,p,c) {
+				_req({
+					method: "post",
+					url: "hotfocus/search.jo",
+					data: {
+						title:t,
 						pageNum: p
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
@@ -916,17 +937,40 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	angular.extend($scope, {
 		page: 1,
 		data: [],
+		filterChanged:false,
+		filterTitle:"",
 		load: function() {
-			if (_page != $scope.page) {
-				_page = $scope.page;
-				model.notice.list(20, $scope.page, function(d, s) {
-					if (d && d.length > 0) {
-						for (var i = 0; i < d.length; i++)
-							$scope.data.push(d[i]);
-						$scope.page++;
-					}
-				});
+			if($scope.filterChanged){
+				if (_page != $scope.page) {
+					_page = $scope.page;
+					model.notice.search(20, $scope.page, $scope.filterTitle, function(d, s) {
+						if (d && d.length > 0) {
+							for (var i = 0; i < d.length; i++)
+								$scope.data.push(d[i]);
+							$scope.page++;
+						}
+					});
+				}
+			}else{
+				if (_page != $scope.page) {
+					_page = $scope.page;
+					model.notice.list(20, $scope.page, function(d, s) {
+						if (d && d.length > 0) {
+							for (var i = 0; i < d.length; i++)
+								$scope.data.push(d[i]);
+							$scope.page++;
+						}
+					});
+				}
 			}
+			
+		},
+		search:function(){
+			$scope.filterChanged = $scope.filterTitle.length == 0? false:true;
+			$scope.page = 1;
+			_page = 0;
+			$scope.data.length = 0;
+			$scope.load();
 		},
 		getImg: function(url) {
 			var uri = model.base();
@@ -1031,8 +1075,22 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	var _page = 0;
 	angular.extend($scope, {
 		page: 1,
+		filterChanged:false,
+		filterTitle:"",
 		items: [],
 		load: function() {
+		if($scope.filterChanged){
+			if (_page != $scope.page) {
+				_page = $scope.page;
+				model.hotfocus.search($scope.filterTitle, $scope.page, function(d) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.items.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
+		}else{
 			if (_page != $scope.page) {
 				_page = $scope.page;
 				model.hotfocus.list($scope.page, function(d) {
@@ -1043,6 +1101,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					}
 				});
 			}
+		}
+			
+		},
+		search:function(){
+			$scope.filterChanged = true;
+			$scope.page = 1;
+			_page = 0;
+			$scope.items.length = 0;
+			$scope.load();
 		},
 		itemClick: function(item) {
 			$scope.hotfocus.current = item;
@@ -1493,6 +1560,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		load: function() {
 			if($scope.filterChanged){
 				if ($scope.page != lastLoaded) {
+					lastLoaded = $scope.page;
 					model.issues.search(s, t, $scope.page, $scope.filterTitle, $scope.myPublisherCat, function(d) {
 						if (d && d.length > 0) {
 							for (var i = 0; i < d.length; i++)
@@ -1981,11 +2049,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 	$scope.issueCats = [];
 	angular.extend($scope, {
-		issueCats:[{id:1,name:"制度／方案缺陷"}, {id:2, name:"交底培训缺陷"},{id:3,name:"有章不循"},{id:4, name:"其他"}],
+		issueCats:[{id:0,name:"制度／方案缺陷"}, {id:1, name:"交底培训缺陷"},{id:2,name:"有章不循"},{id:4, name:"其他"}],
+		issueCatsSafe:[{id:0,name:"制度／方案缺陷"}, {id:1, name:"交底培训缺陷"},{id:2,name:"有章不循"},{id:3,name:"未识别的危险源"},{id:4, name:"其他"}],
 		issueItem:{
 			id : $scope.issues.currentIssue.id,
-			issueCategory:1,
+			issueCategory:0,
 			issueCategoryRemark:"",
+			issueType:$scope.issues.currentIssue.issueType,
 			handlePicList: [],
 			handleVideoList: [],
 			handleTotalAttachmentList: []
