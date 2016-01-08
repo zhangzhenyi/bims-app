@@ -10,7 +10,7 @@
 	<img src="img/icon-jian5.png" class="j"><div class="cb"></div>
 	<ul>
 		<li ng-show="issueItem.issueStatus == 1 && user.id == issueItem.publisherId"><a href="" ng-click="$location.path('/issue-edit')" ><img src="img/icon-edit201512.png"/> 编辑</a></li>
-		<li ng-show="user.id == issueItem.publisherId && user.id == issueItem.publisherId"><a href="javascript:void(0))" id="del" ><img src="img/icon-del201512.png"/> 删除</a></li>
+		<li ng-show="user.id == issueItem.publisherId"><a href="javascript:void(0))" id="del" ><img src="img/icon-del201512.png"/> 删除</a></li>
 		<li ng-show="issueItem.issueStatus == 1"><a href="" ng-click="$location.path('/issue-handle')" ><img src="img/icon-m201512.png"/> 处理</a></li>
 		<li ng-if="issueItem.issueStatus == 2"><a href="" ng-click="$location.path('/issue-check')" ><img src="img/icon-m201512.png"/> 验收</a></li>
 		
@@ -132,7 +132,7 @@
 <div id="zoomscrollblock">
     <div id="zoomscroll" class="pop_catewindow">
         <div class="i-block20151214-6">
-			<p class="txt-24">确定要删除改问题么？</p>
+			<p class="txt-24">确定要删除该问题么？</p>
 			<div class="line-1"></div>
 			<p class="txt-25"><a ng-click="del()" href="">确定</a><a href="javascript:void(0);">取消</a><span class="line"></span></p>
 		</div>

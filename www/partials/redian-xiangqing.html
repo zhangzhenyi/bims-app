@@ -2,6 +2,14 @@
 <header class="bg1">
 	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
 	<p class="title">热点议题详情</p>
+	<span class="more" ng-show="user.id == hotfocus.current.publisherId"><img src="img/icon-more-1.png" style="width:24px;height:20px;"></span>
+	<div class="pop-window1" >
+	<img src="img/icon-jian5.png" class="j"><div class="cb"></div>
+	<ul>
+		<li ><a href="" ng-click="$location.path('/redian-edit')" ><img src="img/icon-edit201512.png"/> 编辑</a></li>
+		<li ><a href="javascript:void(0))" id="del" ><img src="img/icon-del201512.png"/> 删除</a></li>
+	</ul>
+	</div>
 </header>
 <section class="mlr10 mt15">
 	<p class="title-1">{{::hotfocus.current.title}}</p>
@@ -45,8 +53,26 @@
 	<div class="comform"><input ng-model="newComment" type="text" class="i" placeholder="随便说说什么"><input ng-click="save()" type="button" class="b"></div>
 </div>
 </section>
+<!--pop window-->
+<div id="zoomscrollblock">
+    <div id="zoomscroll" class="pop_catewindow">
+        <div class="i-block20151214-6">
+			<p class="txt-24">确定要删除该议题么？</p>
+			<div class="line-1"></div>
+			<p class="txt-25"><a ng-click="del()" href="">确定</a><a href="javascript:void(0);">取消</a><span class="line"></span></p>
+		</div>
+    </div>
+</div>
+
 <script type="text/javascript">
 $(document).ready(function(){
+	$("header .more").click(function(){
+		if($(".pop-window1").height()== "0"){
+			$(".pop-window1").animate({height:100},300);
+		}else{
+			$(".pop-window1").animate({height:0},300);
+		}
+	})
 	$(".snsblock a.z").click(function(){
 		if($(this).find("img").attr("src") == "img/i-zan.png"){
 			$(this).find("img").attr("src","img/i-zanon.png");
@@ -55,6 +81,17 @@ $(document).ready(function(){
 			$(this).find("img").attr("src","img/i-zan.png");
 			$(this).find("i").html("点赞");
 		}
+	})
+	
+	//弹窗弹出状态
+	$(".pop-window1 #del").click(function(){
+	$("#zoomscroll").addClass("loaded").animate({opacity:1},200);
+	$(document.body).addClass("noscroll");
+	$(".txt-25 a").click(function(){
+		$(".pop-window1").animate({height:0},50);
+		$("#zoomscroll").animate({opacity:0},200);
+		setTimeout(function(){$('#zoomscroll').removeClass('loaded');$(document.body).removeClass("noscroll");$("#zoom").html("");},400);
+	})
 	})
 })
 </script>

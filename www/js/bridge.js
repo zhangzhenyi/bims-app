@@ -508,6 +508,23 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 						id: i
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			update: function(i, c) {
+				_req({
+					method: "post",
+					url: "hotfocus/update.jo",
+					data: i
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			//id is issue ID
+			remove: function(id, c) {
+				_req({
+					method: "delete",
+					url: "hotfocus/delete.jo",
+					params: {
+						id:parseInt(id)
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
 			}
 		},
 		feedback: {
@@ -1090,10 +1107,117 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				$scope.newComment = "";
 			}
 		},
+		del : function(){
+			model.hotfocus.remove($scope.hotfocus.current.id, function(d){
+				if(d){
+					$scope.tipContent = "删除成功";
+					$scope.tipVisibility = "block";
+					$timeout(function(){
+						$scope.$location.path("/redian");
+					} ,1000);
+				}else{
+					$scope.tipContent = "删除失败";
+					$scope.tipVisibility = "block";
+					$timeout(function(){
+						$scope.tipVisibility = "none";
+					} ,1000);
+				}
+			});
+		},
 		fileClicked: function(name, path) {
 			$scope.files.filename = name;
 			$scope.files.filepath = path;
 			$scope.$location.path("/onefile");
+		}
+	});
+}])
+.controller("cRedianEdit", ["$scope", "$timeout", "model","transferCache", function($scope, $timeout, model,transferCache) {
+	function _upload(file, blob, c) {
+		var formData = new FormData();
+		formData.append("file", file);
+		formData.append("attachment", blob);
+		model.uploadFile("attachment/upload.jo", formData, c);
+	}
+	$scope.newItem = {};
+	model.hotfocus.get($scope.hotfocus.current.id, function(d) {
+		if(d) {
+			$scope.hotfocus.current = d;
+			$scope.newItem = d;
+			
+			$scope.changed();
+		}
+	});
+	angular.extend($scope, {
+		tipVisibility: "none",
+		remain: 150,
+		changed: function() {
+			$scope.remain = 150 - $scope.newItem.content.length;
+		},
+		imgChanged: function(e) {
+			var file = (angular.element(e))[0].files[0];
+			$scope.newItem.picAttachmentList.push({
+				file: file,
+				thumbnailUrl: URL.createObjectURL(file)
+			});
+			$scope.$apply();
+			e.outerHTML = e.outerHTML;
+		},
+		videoChanged: function(e) {
+			var file = angular.element(e)[0].files[0];
+			$scope.newItem.videoAttachmentList.push({
+				file: file,
+				thumbnailUrl: URL.createObjectURL(file)
+			});
+			$scope.$apply();
+			e.outerHTML = e.outerHTML;
+		},
+		submit: function() {
+			var _item = {
+				id:$scope.newItem.id,
+				title: $scope.newItem.title,
+				content: $scope.newItem.content,
+				attachments: [],
+				picAttachmentList:[],
+				videoAttachmentList: []
+			},
+			total = $scope.newItem.picAttachmentList.length + $scope.newItem.videoAttachmentList.length,
+			counter = 0,
+			picBlob = new Blob(['{"fileType":2,"topicType":2}'], { type: "application/json"}),
+			vidBlob = new Blob(['{"fileType":3,"topicType":2}'], { type: "application/json"}), i;
+			for (i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
+				_upload($scope.newItem.picAttachmentList[i].file, picBlob, function(d) {
+					if (d) {
+						_item.attachments.push(d);
+						_item.picAttachmentList.push(d);
+					}
+					counter++;
+				});
+			}
+			for (i = 0; i < $scope.newItem.videoAttachmentList.length; i++) {
+				_upload($scope.newItem.videoAttachmentList[i].file, vidBlob, function(d) {
+					if (d) {
+						_item.attachments.push(d);
+						_item.videoAttachmentList.push(d);
+					}
+					counter++;
+				});
+			}
+			$timeout(function _fn_create() {
+				if (counter >= total) {
+					model.hotfocus.update(_item, function(d) {
+						if (d) {
+//							$scope.tipVisibility = "block";
+							tipmessage("修改成功");
+							$timeout(function() {
+								$scope.$location.back();
+							}, 1000);
+						}
+					});
+				} else $timeout(_fn_create, 200);
+			});
+		},
+		save: function() {
+			
 		}
 	});
 }])
@@ -1167,7 +1291,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				if (counter >= total) {
 					model.hotfocus.create(_item, function(d) {
 						if (d) {
-							$scope.tipVisibility = "block";
+							tipmessage("创建成功");
 							$timeout(function() {
 								$scope.$location.back();
 							}, 1000);
@@ -2025,6 +2149,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	.when("/rediantianjia", {
 		templateUrl: "partials/redian-create.html",
 		controller: "cRediantianjia"
+	})
+	.when("/redian-edit", {
+		templateUrl: "partials/redian-edit.html",
+		controller: "cRedianEdit"
 	})
 	.when("/sousuo", {
 		templateUrl: "partials/sousuo-list.html",
