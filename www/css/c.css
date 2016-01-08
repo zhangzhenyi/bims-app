@@ -374,3 +374,4 @@ nav a.on span.i5,nav a:hover span.i5{ background: url(../img/nav-i5on.png) no-re
    z-index: 999999;
    display: none;
 }
+.triangle-up {width: 0;height: 0;border-left: 10px solid;border-right: 10px solid;border-bottom: 20px solid red;}

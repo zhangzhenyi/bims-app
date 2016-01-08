@@ -346,6 +346,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	$rootScope.issues = {};
 	$rootScope.issue = {};
 	$rootScope.onepage = {id: "about"};
+	$rootScope.setting ={
+			installer : "http://101.201.141.1/test/install.html",
+			currentVersion:"",
+			versionTitle:"",
+			versionRemark:"",
+			lastVersion:""
+	}
 	$rootScope.files = (function() {
 		var _icons = {
 			"工程简介": "icon-4",
@@ -744,6 +751,17 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				params: { parentId: parentId }
 			}, angular.isFunction(c) ? c : angular.noop);
 		},
+		setting:{
+			getVersion:function(p, c){
+				_req({
+					method: "get",
+					url: "version/getVersion.jo",
+					params: { 
+						platform:p 
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			}
+		},
 		uploadFile: function(url, fileData, callback, progress) {
 			$timeout(function() {
 				$rootScope.loading = true;
@@ -780,7 +798,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	};
 }])
-.controller("cLoading", ["$scope", "$document", "$rootScope", function($scope, $document, $rootScope) {
+.controller("cLoading", ["$scope", "$document", "$rootScope","model", function($scope, $document, $rootScope, model) {
 	$rootScope.myHeaderPosition = "fixed";
 	$scope.displayLoading = function() {
 		if($scope.loading ){
@@ -982,6 +1000,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	//Get latest data
 	model.notice.get($scope.notice.current.id, function(d) {
 		if(d) {
+			d.content = d.content
+			.replace(/img src="\/bims-test/g, "img src=\"" + uri)
+			.replace(/img src="\/bims/g, "img src=\"" + uri);
 			$scope.notice.current = d;
 			$scope.voteMembers = (isBlankString($scope.notice.current.voteUsersX))? [] : $scope.notice.current.voteUsersX.split(",");
 		    if($scope.voteMembers.length > 0){
@@ -1417,6 +1438,48 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 }])
 .controller("cWode", ["$scope", "$timeout", "model","transferCache", function($scope, $timeout, model, transferCache) {
 	switch($scope.$location.path()) {
+	case '/shezhi':
+		//Get latest version
+		$scope.hasNewVersion = false;
+//		var device ={
+//				platform :"1"
+//		};
+		$scope.setting = {
+				currentVersion:"",
+				versionTitle:"",
+				versionRemark:"",
+				lastVersion:""
+		}
+		if(device){
+			var platform = 1;
+			switch(window.device.platform){
+			case 'iPhone':
+				platform = 1;
+				break;
+			case 'Android':
+				platform = 2;
+				break;
+			}
+		
+			model.setting.getVersion(platform, function(d){
+				if(d){//
+					$scope.setting.currentVersion = d.version;
+					$scope.setting.versionTitle = d.title;
+					$scope.setting.versionRemark = d.remark;
+					$scope.setting.lastVersion = localStorage["_version"];
+					if(!$scope.setting.lastVersion){
+						$scope.setting.lastVersion = "0.0.1beta";
+					}
+					if($scope.setting.currentVersion != $scope.setting.lastVersion){
+						$scope.hasNewVersion = true;
+					}
+				}
+			});
+		}else{
+			$rootScope.setting.lastVersion = "0.0.1";
+		}
+		
+		break;
 	case '/shezhi-guanyuwomen':
 		$scope.onepage.id = "about";
 		$scope.$location.path('/onepage');
