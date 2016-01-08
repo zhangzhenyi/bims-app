@@ -9,14 +9,16 @@
 </header>
 
 <section class="mt10 mlr10 bg2 pb75">
+<form name="form">
 	<ul class="list-3">
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-12.jpg"/>验收意见</span><span class="r">
 			<label for="iHandleDesc" style="color:#aaa;">您还可输入{{remain}}个字符</label>
-			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged()" id="iHandleDesc" ng-model="issueItem.acceptDesc"></textarea>
+			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged()" id="iHandleDesc" ng-model="issueItem.acceptDesc" required ng-maxlength="150" maxlength="150"></textarea>
 			</span>
 		</li>
 	</ul>
+	</form>
 </section>
 
 

@@ -3,8 +3,19 @@
 	<img src="img/img-720.jpg" class="new-pic"/>
 </section>
 <section class="loginblock" >
-	<div class="i-f"><img src="img/icon-user.png"/><input ng-model="username" type="text" placeholder="用户名"/></div>
-	<div class="i-f"><img src="img/icon-password.png"/><input ng-model="password" type="password" placeholder="密码"/></div>
+<form name="userForm" novalidate="novalidate">
+	<div class="i-f"><img src="img/icon-user.png"/>
+	<input name="username" ng-model="username" type="text" placeholder="用户名" required/>
+	</div>
+	<div><p style="color:red;" ng-show="userForm.username.$error.required" class="help-block">用户名不能为空</p>
+	</div>
+	
+	<div class="i-f"><img src="img/icon-password.png"/>
+	<input name="password" ng-model="password" type="password" placeholder="密码" required/>
+	</div>
+	<div><p style="color:red;" ng-show="userForm.password.$error.required" class="help-block">密码不能为空</p></div>
+	
+</form>
 	<p class="txt-3 clearfix"><a ng-click="$location.path('/zhuce')" href="" class="l">注册</a><a href="javascript:tipmessage('请联系');" class="r">忘记密码</a></p>
 	<a ng-click="login()" href="" class="abtn-login">登陆</a>
 	<p class="txt-4">www.gdcg.com.cn<br/>广东交通集团有限公司</p>

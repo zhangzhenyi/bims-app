@@ -766,8 +766,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		$scope.password = localStorage["password"];
 	}
 	$scope.login = function() {
+		if(!$scope.userForm.$valid){
+        	tipmessage("请输入用户名和密码");
+        	return;
+        }
 		model.user.login($scope.username, $scope.password, function(d) {
 			if (d) {
+				
 				$scope.user.original = d;
 				if (window.localStorage) {
 					localStorage["username"] = $scope.username;
@@ -794,6 +799,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			gender: 1
 		},
 		register: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			if ($scope.user.password != $scope.password0) {
 				tipmessage("请输入正确的密码！", "wrongPwd");
 				return;
@@ -1172,6 +1181,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			e.outerHTML = e.outerHTML;
 		},
 		submit: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			var _item = {
 				id:$scope.newItem.id,
 				title: $scope.newItem.title,
@@ -1258,6 +1271,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			e.outerHTML = e.outerHTML;
 		},
 		submit: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			var _item = {
 				title: $scope.newItem.title,
 				content: $scope.newItem.content,
@@ -1695,6 +1712,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		//TODO change by biz
 	};
 	$scope.submit = function(i){
+		if(!$scope.form.$valid){
+        	tipmessage("请检查输入内容是否正确");
+        	return;
+        }
 //		$scope.newIssue.issueType = $scope.issues.currentIssueType;
 //		$scope.newIssue.sectionId = $scope.issues.currentSectId;
 		var _item = {
@@ -1808,6 +1829,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		//TODO change by biz
 	};
 	$scope.submit = function(i){
+		if(!$scope.form.$valid){
+        	tipmessage("请检查输入内容是否正确");
+        	return;
+        }
 		$scope.newIssue.issueType = $scope.issues.currentIssueType;
 		$scope.newIssue.sectionId = $scope.issues.currentSectId;
 		var _item = {
@@ -1876,6 +1901,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}
 		},
 		submit: function(i){
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			var _item = {
 					id: $scope.issueItem.id,
 					acceptDesc:$scope.issueItem.acceptDesc
@@ -1960,7 +1989,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			e.outerHTML = e.outerHTML;
 	    },
 	    submit: function(i){
-
+	    	if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			var _item = {
 					id: $scope.issueItem.id,
 					handleDesc: $scope.issueItem.handleDesc,

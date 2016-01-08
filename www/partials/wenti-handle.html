@@ -9,11 +9,12 @@
 </header>
 
 <section class="mt10 mlr10 bg2 pb75">
+<form name="form">
 	<ul class="list-3 list-3-1">
 		<li class="clearfix">
 			<span class="l l1"><img src="img/i-xq-12.jpg"/>整改落实<br/>情况</span><span class="r r1">
 			<label for="iHandleDesc" style="color:#aaa;">您还可输入{{remain}}个字符</label>
-			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged(0)" id="iHandleDesc" ng-model="issueItem.handleDesc" placeholder="点此输入"></textarea>
+			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged(0)" id="iHandleDesc" ng-model="issueItem.handleDesc" placeholder="点此输入" required ng-maxlength="150" maxlength="150"></textarea>
 			</span>
 		</li>
 		<li class="clearfix">
@@ -26,7 +27,7 @@
 			<span class="l l1"><img src="img/i-xq-8.jpg"/>人员教育<br/>情况</span>
 			<span class="r r1">
 			<label for="iLessonDesc" style="color:#aaa;">您还可输入{{remain1}}个字符</label>
-			<textarea cols="" rows="" class="fromarea"  ng-change="contentChanged(1)" id="iLessonDesc" ng-model="issueItem.lessonDesc" placeholder="点此输入"></textarea>
+			<textarea cols="" rows="" class="fromarea"  ng-change="contentChanged(1)" id="iLessonDesc" ng-model="issueItem.lessonDesc" placeholder="点此输入" required ng-maxlength="150" maxlength="150"></textarea>
 			</span>
 		</li>
 
@@ -34,16 +35,17 @@
 			<span class="l l1"><img src="img/i-xq-9.jpg"/>同类问题<br/>防治措施</span>
 			<span class="r r1">
 			<label for="iPreventionDesc" style="color:#aaa;">您还可输入{{remain2}}个字符</label>
-			<textarea ng-model="issueItem.preventionDesc" id="iPreventionDesc" cols="" rows="" class="fromarea" placeholder="" ng-change="contentChanged(2)" placeholder="点此输入"></textarea></span>
+			<textarea ng-model="issueItem.preventionDesc" id="iPreventionDesc" cols="" rows="" class="fromarea" placeholder="" ng-change="contentChanged(2)" placeholder="点此输入" required ng-maxlength="150" maxlength="150"></textarea></span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-10.jpg"/>隐患类型</span><span class="r">
 			<select ng-model="issueItem.issueCategory" ng-change="selectAction()"  ng-options="cat.id as cat.name for cat in issueCats"></select>
-			<span class="r" ng-if="issueItem.issueCategory==4" ><input ng-model="issueItem.issueCategoryRemark" type="text" class="fromtxt" placeholder="请输入其他隐患类型" placeholder="点此输入"/></span>
+			<span class="r" ng-if="issueItem.issueCategory==4" ><input ng-model="issueItem.issueCategoryRemark" type="text" class="fromtxt" placeholder="请输入其他隐患类型" placeholder="点此输入" maxlength="10"/></span>
 			</span>
 			  
 		</li>
 	</ul>
+	</form>
 </section>
 
 
