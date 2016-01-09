@@ -8,8 +8,8 @@ if (!window.jQuery) {
             classSelectorRE = /^\.([\w-]+)$/,
             idSelectorRE = /^#([\w-]+)$/,
             tagSelectorRE = /^[\w-]+$/,
-            rtable = /^t(?:able|d|h)$/i,
-            rroot = /^(?:body|html)$/i,
+           // rtable = /^t(?:able|d|h)$/i,
+           // rroot = /^(?:body|html)$/i,
             tempParent = document.createElement('div'),
             emptyArray = [],
             slice = emptyArray.slice,
@@ -17,39 +17,39 @@ if (!window.jQuery) {
             toString = class2type.toString;
 
         function type(obj) {
-            return obj == null ? String(obj) : class2type[toString.call(obj)] || "object"
+            return obj == null ? String(obj) : class2type[toString.call(obj)] || "object";
         }
 
         function isWindow(obj) {
-            return obj != null && obj == obj.window
+            return obj != null && obj == obj.window;
         }
 
         function isFunction(value) {
-            return type(value) == "function"
+            return type(value) == "function";
         }
 
         function isObject(obj) {
-            return type(obj) == "object"
+            return type(obj) == "object";
         }
 
         function isPlainObject(obj) {
-            return isObject(obj) && !isWindow(obj) && obj.__proto__ == Object.prototype
+            return isObject(obj) && !isWindow(obj) && obj.__proto__ == Object.prototype;
         }
 
         function isArray(value) {
-            return value instanceof Array
+            return value instanceof Array;
         }
 
         function extend(target, source, deep) {
             for (key in source)
                 if (deep && (isPlainObject(source[key]) || isArray(source[key]))) {
                     if (isPlainObject(source[key]) && !isPlainObject(target[key]))
-                        target[key] = {}
+                        target[key] = {};
                     if (isArray(source[key]) && !isArray(target[key]))
-                        target[key] = []
-                    extend(target[key], source[key], deep)
+                        target[key] = [];
+                    extend(target[key], source[key], deep);
                 } else if (source[key] !== undefined)
-                target[key] = source[key]
+                target[key] = source[key];
         }
 
         function isNumeric(n) {
@@ -69,15 +69,15 @@ if (!window.jQuery) {
             }
             // fall back to performing a selector:
             var match, parent = element.parentNode,
-                temp = !parent
-            if (temp)(parent = tempParent).appendChild(element)
-            match = ~qsa(parent, selector).indexOf(element)
-            temp && tempParent.removeChild(element)
-            return match
+                temp = !parent;
+            if (temp)(parent = tempParent).appendChild(element);
+            match = ~qsa(parent, selector).indexOf(element);
+            temp && tempParent.removeChild(element);
+            return match;
         }
 
         function qsa(element, selector) {
-            var found
+            var found;
             return (element === document && idSelectorRE.test(selector)) ?
                 ((found = element.getElementById(RegExp.$1)) ? [found] : emptyArray) :
                 (element.nodeType !== 1 && element.nodeType !== 9) ? emptyArray :
@@ -85,17 +85,17 @@ if (!window.jQuery) {
                     classSelectorRE.test(selector) ? element.getElementsByClassName(RegExp.$1) :
                     tagSelectorRE.test(selector) ? element.getElementsByTagName(selector) :
                     element.querySelectorAll(selector)
-                )
+                );
         }
 
         function camelize(str) {
             return str.replace(/-+(.)?/g, function (match, chr) {
-                return chr ? chr.toUpperCase() : ''
+                return chr ? chr.toUpperCase() : '';
             });
         }
 
         $.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function (i, name) {
-            class2type["[object " + name + "]"] = name.toLowerCase()
+            class2type["[object " + name + "]"] = name.toLowerCase();
         });
 
         ['width', 'height'].forEach(function (dimension) {
@@ -103,22 +103,22 @@ if (!window.jQuery) {
                 var body = document.body,
                     html = document.documentElement,
                     offset, Dimension = dimension.replace(/./, function (m) {
-                        return m[0].toUpperCase()
-                    })
+                        return m[0].toUpperCase();
+                    });
                 if (value === undefined) return this[0] == window ? document.documentElement['client' + Dimension] :
                     this[0] == document ?
                     Math.max(body['scroll' + Dimension], body['offset' + Dimension], html['client' + Dimension], html['scroll' + Dimension], html['offset' + Dimension]) :
-                    (offset = this.offset()) && offset[dimension]
+                    (offset = this.offset()) && offset[dimension];
                 else return this.each(function (idx) {
-                    var el = $(this)
-                    el.css(dimension, value)
-                })
-            }
+                    var el = $(this);
+                    el.css(dimension, value);
+                });
+            };
         });
 
         ['width', 'height'].forEach(function (dimension) {
-            var offset, Dimension = dimension.replace(/./, function (m) {
-                return m[0].toUpperCase()
+            var Dimension = dimension.replace(/./, function (m) {
+                return m[0].toUpperCase();
             });
             $.fn['outer' + Dimension] = function (margin) {
                 var elem = this;
@@ -141,7 +141,7 @@ if (!window.jQuery) {
         });
 
         ['width', 'height'].forEach(function (dimension) {
-            var offset, Dimension = dimension.replace(/./, function (m) {
+            var Dimension = dimension.replace(/./, function (m) {
                 return m[0].toUpperCase();
             });
             $.fn['inner' + Dimension] = function () {
@@ -199,23 +199,19 @@ if (!window.jQuery) {
                         this[method] = val;
                     }
                 });
-            }
+            };
         });
 
         $.fn.focus = function (handler) {
-            if (handler === undefined) {
+            if (handler === undefined)
                 return $(this).trigger('focus');
-            } else {
-                return $(this).bind('focus', handler);
-            }
+             return $(this).bind('focus', handler);
         };
 
         $.fn.blur = function (handler) {
-            if (handler === undefined) {
+            if (handler === undefined)
                 return $(this).trigger('blur');
-            } else {
-                return $(this).bind('blur', handler);
-            }
+            return $(this).bind('blur', handler);
         };
 
         $.fn.slice = function () {
@@ -303,9 +299,8 @@ if (!window.jQuery) {
                     $(this)._css(i, isNumeric(attr[i]) ? attr[i] + 'px' : attr[i], obj);
                 }
                 return this;
-            } else {
-                return $(this)._css(attr, isNumeric(val) ? val + 'px' : val, obj);
             }
+            return $(this)._css(attr, isNumeric(val) ? val + 'px' : val, obj);
         };
 
         $.fn._filter = $.fn.filter;
@@ -314,7 +309,7 @@ if (!window.jQuery) {
             if (isFunction(selector)) {
                 this.each(function (idx) {
                     if (selector.call(this, idx)) {
-                        nodes.push(this)
+                        nodes.push(this);
                     }
                 });
                 return $(nodes);
@@ -326,22 +321,22 @@ if (!window.jQuery) {
         // objects to the `target` object.
         $.extend = function (target) {
             arguments[0] = arguments[0] || {};
-            var deep, args = slice.call(arguments, 1)
+            var deep, args = slice.call(arguments, 1);
             if (typeof target == 'boolean') {
-                deep = target
-                target = args.shift()
+                deep = target;
+                target = args.shift();
             }
             args.forEach(function (arg) {
-                extend(target, arg, deep)
-            })
-            return target
-        }
+                extend(target, arg, deep);
+            });
+            return target;
+        };
 
         if (!$.fn.contents) {
             $.fn.contents = function () {
                 return this.map(function (i, v) {
-                    return slice.call(v.childNodes)
-                })
+                    return slice.call(v.childNodes);
+                });
             };
         }
 
