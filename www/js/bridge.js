@@ -1145,6 +1145,7 @@ $rootScope.files = (function() {
 	//Get latest data
 	model.notice.get($scope.notice.current.id, function(d) {
 		if(d) {
+			var uri = model.base();
 			d.content = d.content
 			.replace(/img src="\/bims-test/g, "img src=\"" + uri)
 			.replace(/img src="\/bims/g, "img src=\"" + uri);
@@ -1667,7 +1668,7 @@ $rootScope.files = (function() {
 				versionRemark:"",
 				lastVersion:""
 		};
-		if(device){
+		if(window.device) {
 			var platform = 1;
 			switch(window.device.platform){
 			case 'iPhone':
@@ -1693,7 +1694,7 @@ $rootScope.files = (function() {
 				}
 			});
 		}else{
-			$rootScope.setting.lastVersion = "0.0.1";
+			$scope.setting.lastVersion = "0.0.1";
 		}
 		
 		break;
