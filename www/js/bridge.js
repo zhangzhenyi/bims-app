@@ -389,12 +389,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		remove: function(item) {
 			for (var i = 0; i < _value.list.length; i++) {
 				if (_value.list[i]._index == item._index) {
-					value.list.splice(i, 1);
+					_value.list.splice(i, 1);
 					_ls[_key] = JSON.stringify(_value);
 					if (window.resolveLocalFileSystemURI) {
 						var uris = item.picAttachmentList.concat(item.videoAttachmentList), j;
 						for (j = 0; j < uris.length; j++) {
-							window.resolveLocalFileSystemURI(uris[j], function (file) {
+							window.resolveLocalFileSystemURI(uris[j].fileUrl, function (file) {
 								file.remove(angular.noop, angular.noop);
 							});
 						}
@@ -504,6 +504,57 @@ $rootScope.files = (function() {
 		.error(function() {
 			$rootScope.loading = false;
 			c(false);
+		});
+	}
+	
+	function _transfer(fileURI, fileType, topicType, callback) {
+		var url = "attachment/upload.jo?fileType=" + fileType + "&topicType=" + topicType + ";jsessionid=" + _sessionId,
+		ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop},
+		opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
+		opt.fileKey = "file";
+		opt.fileName = fileURI.substr(fileURI.lastIndexOf('/') + 1);
+		opt.mimeType = "multipart/form-data";
+		opt.chunkedMode = false;
+		opt.params = {
+			fileType: fileType,
+			topicType: topicType
+		};
+		
+		ft.upload(fileURI, url, function(r) {
+			callback(JSON.parse(r.response));
+		}, function() {
+			callback(false);
+		}, opt);
+	}
+	
+	function _uploadAttachments(item, callback) {
+		var o = angular.extend({}, item),
+		total = item.picAttachmentList.length + item.videoAttachmentList.length,
+		counter = 0, i;
+		o.attachments = [];
+		o.picAttachmentList = [];
+		o.videoAttachmentList = [];
+		for (i = 0; i < item.picAttachmentList.length; i++) {
+			_transfer(item.picAttachmentList[i].fileUrl, 2, item.topicType, function(d) {
+				if (d) {
+					o.attachments.push(d);
+					o.picAttachmentList.push(d);
+				}
+				counter++;
+			});
+		}
+		for (i = 0; i < item.videoAttachmentList.length; i++) {
+			_transfer(item.videoAttachmentList[i].fileUrl, 3, item.topicType, function(d) {
+				if (d) {
+					o.attachments.push(d);
+					o.videoAttachmentList.push(d);
+				}
+				counter++;
+			});
+		}
+		$timeout(function _fn_waiting_attachment() {
+			if (counter < total) $timeout(_fn_waiting_attachment, 200);
+			else (callback || angular.noop)(o);
 		});
 	}
 
@@ -654,11 +705,11 @@ $rootScope.files = (function() {
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
-			update: function(i, c) {
+			update: function(d, c) {
 				_req({
 					method: "post",
 					url: "hotfocus/update.jo",
-					data: i
+					data: d
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
 			//id is issue ID
@@ -871,7 +922,7 @@ $rootScope.files = (function() {
 		removeFiles: function(fileURIs) {
 			if (window.resolveLocalFileSystemURI) {
 				for (var i = 0; i < fileURIs.length; i++) {
-					window.resolveLocalFileSystemURI(fileURIs[i], function (file) {
+					window.resolveLocalFileSystemURI(fileURIs[i].fileUrl, function (file) {
 						file.remove(angular.noop, angular.noop);
 					});
 				}
@@ -888,25 +939,8 @@ $rootScope.files = (function() {
 				}, angular.isFunction(c) ? c : angular.noop);
 			}
 		},
-		transfer: function(fileURI, fileType, topicType, callback) {
-			var url = "attachment/upload.jo?fileType=" + fileType + "&topicType=" + topicType + ";jsessionid=" + _sessionId,
-			ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop},
-			opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
-			opt.fileKey = "file";
-			opt.fileName = fileURI.substr(fileURI.lastIndexOf('/') + 1);
-			opt.mimeType = "multipart/form-data";
-			opt.chunkedMode = false;
-			opt.params = {
-				fileType: fileType,
-				topicType: topicType
-			};
-			
-			ft.upload(fileURI, url, function(r) {
-				callback(JSON.parse(r.response));
-			}, function() {
-				callback(false);
-			}, opt);
-		},
+		transfer: _transfer,
+		uploadAttachments: _uploadAttachments,
 		uploadFile: function(url, fileData, callback, progress) {
 			$timeout(function() {
 				$rootScope.loading = true;
@@ -982,7 +1016,6 @@ $rootScope.files = (function() {
         }
 		model.user.login($scope.username, $scope.password, function(d) {
 			if (d) {
-				
 				$scope.user.original = d;
 				if (window.localStorage) {
 					localStorage["username"] = $scope.username;
@@ -1126,7 +1159,6 @@ $rootScope.files = (function() {
 					});
 				}
 			}
-			
 		},
 		search:function(){
 			$scope.filterChanged = $scope.filterTitle.length == 0? false:true;
@@ -1177,20 +1209,23 @@ $rootScope.files = (function() {
 		}
 	});
 	angular.extend($scope, {
+		_page: 0,
 		page: 1,
 		comments: [],
 		isVote:false,
 		voteMembers:[],
 		voteMemberStr:"",
 		load: function() {
-			model.comment.list($scope.notice.current.id, $scope.notice.current.topicType, $scope.page, function(d) {
-				if (d && d.length > 0) {
-					for (var i = 0; i < d.length; i++)
-						$scope.comments.push(d[i]);
-					$scope.page++;
-				}
-			});
-			
+			if ($scope._page != $scope.page) {
+				$scope._page = $scope.page;
+				model.comment.list($scope.notice.current.id, $scope.notice.current.topicType, $scope.page, function(d) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.comments.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
 		},
 		
 		newComment: "",
@@ -1268,7 +1303,6 @@ $rootScope.files = (function() {
 				});
 			}
 		}
-			
 		},
 		search:function(){
 			$scope.filterChanged = true;
@@ -1284,68 +1318,55 @@ $rootScope.files = (function() {
 	});
 }])
 .controller("cRedianxiangqing", ["$scope", "model", function($scope, model) {
-	model.hotfocus.get($scope.hotfocus.current.id, function(d) {
-		if(d) {
-			$scope.hotfocus.current = d;
-			//更新点赞状态
-			$scope.voteMembers = (isBlankString($scope.hotfocus.current.voteUsersX))? [] : $scope.hotfocus.current.voteUsersX.split(",");
-		    if($scope.voteMembers.length > 0){
-		    	$scope.voteMemberStr = $scope.voteMembers.join("，"); 
-		    	if($scope.voteMembers.length > 0){
-			    	$scope.voteMemberStr = $scope.voteMembers.join("，"); 
-			    	for (x in $scope.voteMembers){
-			    		if($scope.voteMembers[x] == $scope.user.name){
-							$scope.isVote = true;
-							break;
-						}
-			    	}
-			    }
-			    
-			    if($scope.isVote){
-			    		//Judge whether is voted or not
-				    	model.vote.isVoted($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, function(d){
-				    		if(d){
-				    			$scope.isVote = true;
-				    		}else{
-				    			$scope.isVote = false;
-				    		}
-				    	});
-			    }
-		    	
-		    }
+	$scope.voteMembers = (isBlankString($scope.hotfocus.current.voteUsersX))? [] : $scope.hotfocus.current.voteUsersX.split(",");
+	if($scope.voteMembers.length > 0) {
+		$scope.voteMemberStr = $scope.voteMembers.join("，"); 
+		if($scope.voteMembers.length > 0) {
+			$scope.voteMemberStr = $scope.voteMembers.join("，"); 
+			for (var x in $scope.voteMembers) {
+				if($scope.voteMembers[x] == $scope.user.name) {
+					$scope.isVote = true;
+					break;
+				}
+			}
 		}
-		
-	});
+		if($scope.isVote) {
+			//Judge whether is voted or not
+			model.vote.isVoted($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, function(d) {
+				if(d) $scope.isVote = true;
+				else $scope.isVote = false;
+			});
+		}
+	}
 	angular.extend($scope, {
+		_page: 0,
 		page: 1,
 		comments: [],
 		isVote:false,
 		voteMembers:[],
 		voteMemberStr:"",
 		load: function() {
-			model.comment.list($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, $scope.page, function(d) {
-				if (d && d.length > 0) {
-					for (var i = 0; i < d.length; i++)
-						$scope.comments.push(d[i]);
-					$scope.page++;
-				}
-				
-			});
-			
+			if ($scope._page != $scope.page) {
+				$scope._page = $scope.page;
+				model.comment.list($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, $scope.page, function(d) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.comments.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
 		},	
-		topicId:$scope.hotfocus.current.id,
-		topicType:$scope.hotfocus.current.topicType,
-
+		topicId: $scope.hotfocus.current.id,
+		topicType: $scope.hotfocus.current.topicType,
 		doLike:function(){
 			if(!$scope.isVote){
 				model.vote.doLike($scope.topicId, $scope.topicType, function(d){
-					console.log("Click vote true");
 					$scope.voteMembers.push($scope.user.name);
 					$scope.isVote = true;
 					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
 				});
-				
-			}else{
+			} else {
 				if($scope.voteMembers.length <=0) return;
 				model.vote.disLike($scope.topicId, $scope.topicType, function(d){
 					console.log("unselect vote true");
@@ -1359,7 +1380,6 @@ $rootScope.files = (function() {
 					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
 				});
 			}
-			
 		},
 		newComment: "",
 		save: function() {
@@ -1478,101 +1498,7 @@ $rootScope.files = (function() {
 				if (counter >= total) {
 					model.hotfocus.update(_item, function(d) {
 						if (d) {
-//							$scope.tipVisibility = "block";
 							tipmessage("修改成功");
-							$timeout(function() {
-								$scope.$location.back();
-							}, 1000);
-						}
-					});
-				} else $timeout(_fn_create, 200);
-			});
-		},
-		save: function() {
-			
-		}
-	});
-}])
-.controller("cRedianEdit", ["$scope", "$timeout", "model","transferCache", function($scope, $timeout, model,transferCache) {
-	function _upload(file, blob, c) {
-		var formData = new FormData();
-		formData.append("file", file);
-		formData.append("attachment", blob);
-		model.uploadFile("attachment/upload.jo", formData, c);
-	}
-	$scope.newItem = {};
-	model.hotfocus.get($scope.hotfocus.current.id, function(d) {
-		if(d) {
-			$scope.hotfocus.current = d;
-			$scope.newItem = d;
-			
-			$scope.changed();
-		}
-	});
-	angular.extend($scope, {
-		tipVisibility: "none",
-		remain: 150,
-		changed: function() {
-			$scope.remain = 150 - $scope.newItem.content.length;
-		},
-		imgChanged: function(e) {
-			var file = (angular.element(e))[0].files[0];
-			$scope.newItem.picAttachmentList.push({
-				file: file,
-				thumbnailUrl: URL.createObjectURL(file)
-			});
-			$scope.$apply();
-			e.outerHTML = e.outerHTML;
-		},
-		videoChanged: function(e) {
-			var file = angular.element(e)[0].files[0];
-			$scope.newItem.videoAttachmentList.push({
-				file: file,
-				thumbnailUrl: URL.createObjectURL(file)
-			});
-			$scope.$apply();
-			e.outerHTML = e.outerHTML;
-		},
-		submit: function() {
-			if(!$scope.form.$valid){
-	        	tipmessage("请检查输入内容是否正确");
-	        	return;
-	        }
-			var _item = {
-				id:$scope.newItem.id,
-				title: $scope.newItem.title,
-				content: $scope.newItem.content,
-				attachments: [],
-				picAttachmentList:[],
-				videoAttachmentList: []
-			},
-			total = $scope.newItem.picAttachmentList.length + $scope.newItem.videoAttachmentList.length,
-			counter = 0,
-			picBlob = new Blob(['{"fileType":2,"topicType":2}'], { type: "application/json"}),
-			vidBlob = new Blob(['{"fileType":3,"topicType":2}'], { type: "application/json"}), i;
-			for (i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
-				_upload($scope.newItem.picAttachmentList[i].file, picBlob, function(d) {
-					if (d) {
-						_item.attachments.push(d);
-						_item.picAttachmentList.push(d);
-					}
-					counter++;
-				});
-			}
-			for (i = 0; i < $scope.newItem.videoAttachmentList.length; i++) {
-				_upload($scope.newItem.videoAttachmentList[i].file, vidBlob, function(d) {
-					if (d) {
-						_item.attachments.push(d);
-						_item.videoAttachmentList.push(d);
-					}
-					counter++;
-				});
-			}
-			$timeout(function _fn_create() {
-				if (counter >= total) {
-					model.hotfocus.update(_item, function(d) {
-						if (d) {
-							tipmessage("创建成功");
 							$timeout(function() {
 								$scope.$location.back();
 							}, 1000);
@@ -1590,6 +1516,7 @@ $rootScope.files = (function() {
 	angular.extend($scope, {
 		tipVisibility: "none",
 		newItem: {
+			topicType: 2,
 			picAttachmentList: [],
 			videoAttachmentList: []
 		},
@@ -1598,55 +1525,32 @@ $rootScope.files = (function() {
 			$scope.remain = 150 - $scope.newItem.content.length;
 		},
 		imageChanged: function(uri) {
-			$scope.newItem.picAttachmentList.push(uri);
+			$scope.newItem.picAttachmentList.push({
+				fileUrl: uri,
+				thumbnailUrl: uri
+			});
 		},
 		videoChanged: function(uri) {
-			$scope.newItem.videoAttachmentList.push(uri);
+			$scope.newItem.videoAttachmentList.push({
+				fileUrl: uri,
+				thumbnailUrl: uri
+			});
 		},
 		submit: function() {
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
-			var _item = {
-				title: $scope.newItem.title,
-				content: $scope.newItem.content,
-				attachments: [],
-				picAttachmentList:[],
-				videoAttachmentList: []
-			},
-			total = $scope.newItem.picAttachmentList.length + $scope.newItem.videoAttachmentList.length,
-			counter = 0, i;
-			for (i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
-				model.transfer($scope.newItem.picAttachmentList[i], 2, 2, function(d) {
+			model.uploadAttachments($scope.newItem, function(item) {
+				model.hotfocus.create(item, function(d) {
 					if (d) {
-						_item.attachments.push(d);
-						_item.picAttachmentList.push(d);
+						model.removeFiles($scope.newItem.picAttachmentList.concat($scope.newItem.videoAttachmentList));
+						tipmessage("创建成功");
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
 					}
-					counter++;
 				});
-			}
-			for (i = 0; i < $scope.newItem.videoAttachmentList.length; i++) {
-				model.transfer($scope.newItem.videoAttachmentList[i], 3, 2, function(d) {
-					if (d) {
-						_item.attachments.push(d);
-						_item.videoAttachmentList.push(d);
-					}
-					counter++;
-				});
-			}
-			$timeout(function _fn_create() {
-				if (counter >= total) {
-					model.hotfocus.create(_item, function(d) {
-						if (d) {
-							model.removeFiles($scope.newItem.picAttachmentList.concat($scope.newItem.videoAttachmentList));
-							tipmessage("创建成功");
-							$timeout(function() {
-								$scope.$location.back();
-							}, 1000);
-						}
-					});
-				} else $timeout(_fn_create, 200);
 			});
 		},
 		save: function() {
@@ -1659,9 +1563,6 @@ $rootScope.files = (function() {
 	case '/shezhi':
 		//Get latest version
 		$scope.hasNewVersion = false;
-//		var device ={
-//				platform :"1"
-//		};
 		$scope.setting = {
 				currentVersion:"",
 				versionTitle:"",
@@ -1783,13 +1684,44 @@ $rootScope.files = (function() {
 			loadedClass: "",
 			tasks: transferCache.list(),
 			xiangqing: function() {
-				
+				$scope.closeDetail();
+				$scope.current.id = 0;
+				$scope.current.createTime = $scope.current._time;
+				$scope.current.publisherName = $scope.user.name;
+				if ($scope.current._type == "redian") {
+					if (!($scope.current.topicType)) $scope.current.topicType = 2;
+					$scope.hotfocus.current = $scope.current;
+					$scope.$location.path("/redianxiangqing");
+				}
 			},
 			transfer: function() {
-				
+				$scope.closeDetail();
+				$scope.current._status = "o2";
+				$scope.current._statusText = "上传中";
+				model.uploadAttachments($scope.current, function(item) {
+					var op;
+					switch($scope.current._type) {
+						case "redian":
+							op = model.hotfocus.create;
+							break;
+						default:
+							op = angular.noop;
+					}
+					op(item, function(d) {
+						if (d) {
+							model.removeFiles($scope.current.picAttachmentList.concat($scope.current.videoAttachmentList));
+							tipmessage("上传成功");
+							transferCache.remove($scope.current);
+							$timeout(function() {
+								$scope.tipVisibility = "none";
+							}, 1000);
+						}
+					});
+				});
 			},
 			remove: function() {
-				
+				$scope.closeDetail();
+				transferCache.remove($scope.current);
 			},
 			detail: function(task) {
 				$scope.current = task;
@@ -1949,22 +1881,20 @@ $rootScope.files = (function() {
 		}
 	});
 	
+	$scope._page = 0;
 	$scope.page = 1;
 	$scope.comments =[];
 	$scope.load = function() {
-		model.comment.list($scope.issueItem.id,$scope.Constants.TOPICTYPE_ISSUE, $scope.page, function(d) {
-			if (d && d.length > 0) {
-				for (var i = 0; i < d.length; i++)
-					$scope.comments.push(d[i]);
-				$scope.page++;
-			}else{
-//				$scope.tipContent = "没有数据了";
-//				$scope.tipVisibility = "block";
-//				$timeout(function(){
-//					$scope.tipVisibility = "none";
-//				} ,1000);
-			}
-		});
+		if ($scope._page != $scope.page) {
+			$scope._page = $scope.page;
+			model.comment.list($scope.issueItem.id,$scope.Constants.TOPICTYPE_ISSUE, $scope.page, function(d) {
+				if (d && d.length > 0) {
+					for (var i = 0; i < d.length; i++)
+						$scope.comments.push(d[i]);
+					$scope.page++;
+				}
+			});
+		}
 	};
 	
 	angular.extend($scope, {
@@ -2002,21 +1932,18 @@ $rootScope.files = (function() {
 			$scope.$location.path("/onefile");
 		}
 	});
-	
+	$scope._page = 0;
 	$scope.load = function() {
-		model.comment.list($scope.issueItem.id,$scope.Constants.TOPICTYPE_ISSUE, $scope.page, function(d) {
-			if (d && d.length > 0) {
-				for (var i = 0; i < d.length; i++)
-					$scope.comments.push(d[i]);
-				$scope.page++;
-			}else{
-//				$scope.tipContent = "没有数据了";
-//				$scope.tipVisibility = "block";
-//				$timeout(function(){
-//					$scope.tipVisibility = "none";
-//				} ,1000);
-			}
-		});
+		if ($scope._page != $scope.page) {
+			$scope._page = $scope.page;
+			model.comment.list($scope.issueItem.id,$scope.Constants.TOPICTYPE_ISSUE, $scope.page, function(d) {
+				if (d && d.length > 0) {
+					for (var i = 0; i < d.length; i++)
+						$scope.comments.push(d[i]);
+					$scope.page++;
+				}
+			});
+		}
 	};
 	$scope.load();
 	$scope.newComment = "";
@@ -2558,12 +2485,17 @@ $rootScope.files = (function() {
 	});
 }])
 .controller("cOneFile", ["$scope", "model", function($scope, model) {
-	var len = $scope.files.filepath.length - $scope.files.filepath.lastIndexOf(".")-1;
-	var ext = $scope.files.filepath.substr($scope.files.filepath.lastIndexOf(".") + 1, len).toLowerCase();
-	$scope.img = (ext == 'png' || ext == 'jpg' || ext == 'gif' || ext == 'jpeg');
-	$scope.pdf = ext == 'pdf';
-	$scope.video = (ext == "mp4" || ext =="ogg" || ext == "3gp" || ext == "mov");
-	if ($scope.files.filename.length > 8) $scope.files.filename = $scope.files.filename.substring(0, 8) + " ...";
+	if ($scope.files) {
+		if ($scope.files.filepath) {
+			var len = $scope.files.filepath.length - $scope.files.filepath.lastIndexOf(".") - 1;
+			var ext = $scope.files.filepath.substr($scope.files.filepath.lastIndexOf(".") + 1, len).toLowerCase();
+			$scope.img = (ext == 'png' || ext == 'jpg' || ext == 'gif' || ext == 'jpeg' || $scope.files.filepath.indexOf("image/") > 0);
+			$scope.pdf = ext == 'pdf';
+			$scope.video = (ext == "mp4" || ext =="ogg" || ext == "3gp" || ext == "mov");
+		}
+		if ($scope.files.filename && $scope.files.filename.length > 8)
+			$scope.files.filename = $scope.files.filename.substring(0, 8) + " ...";
+	}
 }])
 .config(["myRouteProvider", function(myRouteProvider) {
 	myRouteProvider
