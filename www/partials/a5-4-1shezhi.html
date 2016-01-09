@@ -6,11 +6,12 @@
 <section class="mt15 mlr10">
 	<ul class="list-8">
 		<li><a ng-click="onepage.id='about';$location.path('/onepage')" href="" class="clearfix"><span class="l">关于我们</span></a></li>
-		<li class="nojian"><a class="clearfix"><span class="l">版本信息</span><span class="r">{{setting.lastVersion}}
+		<li class="nojian">
+		<a class="clearfix" href="" ng-click="onInstall()"><span class="l">版本信息</span><span class="r">{{setting.lastVersion}}
 		<span style="width:70px;height:30px; background: red;margin-left:15px;-moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius:5px;vertial-align:center;color:white" ng-if="hasNewVersion">New</span></span>
 		</a></li>
-		<!--  li class="nojian"><a class="clearfix"><span class="l">新消息提示</span><span class="r">1</span></a></li-->
-		<li class="nojian"><a href="" class="clearfix"><span class="l">WIFI自动上传</span><span class="r r1"><img src="img/i-wifiopen.jpg" class="i2"/></span></a></li>
+		<!--  li class="nojian"><a class="clearfix"><span class="l">新消息提示</span><span class="r">1</span></a></li>
+		<li class="nojian"><a href="" class="clearfix"><span class="l">WIFI自动上传</span><span class="r r1"><img src="img/i-wifiopen.jpg" class="i2"/></span></a></li-->
 	</ul>
 </section>
 <script type="text/javascript">

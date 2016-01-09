@@ -1,0 +1,36 @@
+<div class="pb75 pt60 ng-scope">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">修改议题</p>
+	<span class="txt1" style=""><a ng-click="save()" href=""><span style="display:none">保存</span></a></span><span class="nochoose"><a ng-click="submit()" href="">提交</a></span>
+</header>
+<section class="mt10 mlr10 bg2 pb75">
+<form name="form">
+	<ul class="list-3">
+		<li class="clearfix">
+			<span class="l"><img src="img/icon-23.png"/>标题</span><span class="r"><input ng-model="newItem.title"  type="text" class="fromtxt" placeholder="不超过10个字符" required ng-maxlength="10"/></span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r pr"><span ng-repeat="pic in newItem.picAttachmentList" class="pic" style="margin-right:5px;"><img ng-src="{{pic.thumbnailUrl}}" style="width:100%;"/></span><img src="img/i-jia.jpg" class="pic"/><input type="file" accept="image/*" class="file" onchange="angular.element(this).scope().imgChanged(this)"/></span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r pr"><span ng-repeat="vid in newItem.videoAttachmentList" class="vid" style="margin-right:5px;"><my-video src="vid.thumbnailUrl" height="50px"></my-video></span><img src="img/i-jia.jpg" class="pic"/><input type="file" accept="video/*" class="file" onchange="angular.element(this).scope().videoChanged(this)"/></span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-3.jpg"/>内容</span>
+			<span class="r"><label style="color:#aaa;">您还可输入{{remain}}个字符</label>
+			<textarea ng-model="newItem.content" ng-maxlength="150" ng-change="changed()" class="fromarea" placeholder="点此输入" required ng-maxlength="150" maxlength="150"></textarea></span>
+		</li>
+	</ul>
+	</form>
+</section>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".ztblock span").click(function(){
+		$(".ztblock span").removeClass("on");
+		$(this).addClass("on");
+	})
+})
+</script>
+</div>

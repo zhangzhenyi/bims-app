@@ -311,6 +311,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	$rootScope.formatDate = function(time) {
 		return (new Date(time)).format("yyyy-MM-dd hh:mm");
 	};
+	
+	$rootScope.origionVersion = "0.0.4.0109_beta";
+	$rootScope.hasChecked = false;
+	$rootScope.videoThumbnail = "http://101.201.141.1/bims-test/images/default_play.jpg";
 	$rootScope.Constants = {
 			ISSUETYPE_QUALITY:1,
 			ISSUETYPE_SECURITY:2,
@@ -337,6 +341,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			ISSUE_PUBLISHER_CATEGORY_JIAN_LI:2,
 			ISSUE_PUBLISHER_CATEGORY_OTHER:3
 	};
+	
 
 	$rootScope.user = {};
 	$rootScope.notice = {};
@@ -346,13 +351,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	$rootScope.issues = {};
 	$rootScope.issue = {};
 	$rootScope.onepage = {id: "about"};
-	$rootScope.setting ={
-			installer : "http://101.201.141.1/test/install.html",
-			currentVersion:"",
-			versionTitle:"",
-			versionRemark:"",
-			lastVersion:""
-	}
+	
 	$rootScope.files = (function() {
 		var _icons = {
 			"工程简介": "icon-4",
@@ -895,7 +894,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	});
 }])
-.controller("cMain", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
+.controller("cMain", ["$scope", "$rootScope","$timeout", "model", function($scope, $rootScope, $timeout, model) {
 	angular.extend($scope, {
 		items: [],
 		itemClass: function(item) {
@@ -905,6 +904,30 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		},
 		redianClick: function() {
 			$scope.$location.path("/redian");
+		},
+		setting:{
+			installer : "http://101.201.141.1/test/install.html",
+			currentVersion:"",
+			versionTitle:"",
+			versionRemark:"",
+			lastVersion:""
+		},
+		onInstall:function(){
+			if($scope.hasNewVersion){
+				//post to outside browser to open url
+				window.open($scope.setting.installer,"_system");
+			}
+			
+		},
+		popUpdateWin:function(){
+			$("#zoomscroll").addClass("loaded").animate({opacity:1},200);
+			$(document.body).addClass("noscroll");
+			$(".txt-25 a").click(function(){
+				$(".pop-window1").animate({height:0},50);
+				$("#zoomscroll").animate({opacity:0},200);
+				setTimeout(function(){$('#zoomscroll').removeClass('loaded');$(document.body).removeClass("noscroll");$("#zoom").html("");},400);
+				onInstall();
+			});
 		}
 	});
 	$scope.notice.itemClick = function(item) {
@@ -949,6 +972,38 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			if (d.length > 1) $scope.issues.second = d[1];
 		}
 	});
+
+	if(!$rootScope.hasChecked && window.device){
+		var platform = 1;
+		switch(window.device.platform){
+		case 'iPhone':
+			platform = 1;
+			break;
+		case 'Android':
+			platform = 2;
+			break;
+		}
+		model.setting.getVersion(platform, function(d){
+		if(d){//
+			$rootScope.hasChecked = true;
+			$scope.setting.currentVersion = d.version;
+			$scope.setting.versionTitle = d.title;
+			$scope.setting.versionRemark = d.remark;
+			if(d.url){
+				$scope.setting.installer = d.url;
+			}
+			
+			$scope.setting.lastVersion = $scope.origionVersion;
+			if(d.version != $scope.setting.lastVersion){
+				$scope.hasNewVersion = true;
+				$scope.popUpdateWin();
+			}
+		}
+	  });
+	}else{
+		$scope.setting.lastVersion = "0.0.1";
+	}
+	
 }])
 .controller("cGonggao", ["$scope", "model", function($scope, model) {
 	var _page = 0;
@@ -1444,13 +1499,25 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 //		var device ={
 //				platform :"1"
 //		};
-		$scope.setting = {
+		
+		angular.extend($scope, {
+			setting:{
+				installer : "http://101.201.141.1/test/install.html",
 				currentVersion:"",
 				versionTitle:"",
 				versionRemark:"",
 				lastVersion:""
-		}
-		if(device){
+			},
+			onInstall:function(){
+				if($scope.hasNewVersion){
+					//post to outside browser to open url
+					window.open($scope.setting.installer,"_system");
+				}
+				
+			}
+		});
+
+		if(window.device){
 			var platform = 1;
 			switch(window.device.platform){
 			case 'iPhone':
@@ -1466,18 +1533,21 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					$scope.setting.currentVersion = d.version;
 					$scope.setting.versionTitle = d.title;
 					$scope.setting.versionRemark = d.remark;
-					$scope.setting.lastVersion = localStorage["_version"];
-					if(!$scope.setting.lastVersion){
-						$scope.setting.lastVersion = "0.0.1beta";
+					if(d.url){
+						$scope.setting.installer = d.url;
 					}
+					
+					$scope.setting.lastVersion = $scope.origionVersion;
 					if($scope.setting.currentVersion != $scope.setting.lastVersion){
 						$scope.hasNewVersion = true;
 					}
 				}
 			});
 		}else{
-			$rootScope.setting.lastVersion = "0.0.1";
+			$scope.setting.lastVersion = "0.0.1";
 		}
+		
+		
 		
 		break;
 	case '/shezhi-guanyuwomen':
@@ -2323,6 +2393,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	});
 }])
+.controller("cHenji", ["$scope", function($scope){
+	angular.extend($scope, {
+		popTempTip:function(){
+			tipmessage("攻城师努力建设中...");
+		}
+	});
+}])
 .controller("cOneFile", ["$scope", "model", function($scope, model) {
 	var len = $scope.files.filepath.length - $scope.files.filepath.lastIndexOf(".")-1;
 	var ext = $scope.files.filepath.substr($scope.files.filepath.lastIndexOf(".") + 1, len).toLowerCase();
@@ -2374,7 +2451,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		controller: "cSousuo"
 	})
 	.when("/henji", {
-		templateUrl: "partials/a1-1-1henji.html"
+		templateUrl: "partials/a1-1-1henji.html",
+		controller: "cHenji"
 	})
 	.when("/faxian", {
 		templateUrl: "partials/a1-1-1faxian.html"
