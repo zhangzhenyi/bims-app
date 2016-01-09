@@ -1,9 +1,9 @@
 (function ($, undefined) {
 
     var ms = $.mobiscroll,
-        datetime = ms.datetime,
+    /* datetime = ms.datetime,
         date = new Date(),
-        defaults = {
+       defaults = {
             startYear: date.getFullYear() - 100,
             endYear: date.getFullYear() + 1,
             separator: ' ',
@@ -20,7 +20,7 @@
             ampmText: '&nbsp;',
             secText: 'Seconds',
             nowText: 'Now'
-        },
+        },*/
         /**
          * @class Mobiscroll.datetime
          * @extends Mobiscroll
