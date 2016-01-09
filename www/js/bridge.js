@@ -134,7 +134,142 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		    return value + (tail || ' …');
 	  };
 }])
+.directive("myMediaSelector", ["$window", "$parse", "$timeout", function($window, $parse, $timeout) {
+	var _pane = angular.element("<div></div>")
+	.css({
+		"background-color": "rgba(204,204,204,.35)",
+		"width": "100%",
+		"height": "80px",
+		"position": "fixed",
+		"top": angular.element($window).height() + 1
+	})
+	.append(angular.element("<p></p>").css("margin", 0).append(
+		angular.element("<button>拍摄</button>")
+		.css({
+			"margin-top": "2px",
+			"width": "100%"
+		})
+		.bind("click", function() {_select(1);}))
+	)
+	.append(angular.element("<p></p>").css("margin", 0).append(
+		angular.element("<button>从相册选择</button>")
+		.css("width", "100%")
+		.bind("click", function() {_select(2);}))
+	)
+	.append(angular.element("<p></p>").css("margin", 0).append(
+		angular.element("<button>取消</button>")
+		.css({
+			"width": "100%",
+			"margin-top": "3px"
+		})
+		.bind("click", function() {_select(0);}))
+	)
+	.appendTo("body"),
+	_selected, _dir;
+	
+	function _error(error) {
+		console.log(error);
+	}
+	
+	if ($window.requestFileSystem) {
+		$window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
+			fileSystem.root.getDirectory(".bims.h5.cache", {create: true, exclusive: false}, function(dirEntry) {
+				_dir = dirEntry;
+			}, _error);
+		}, _error);
+	}
+	
+	function _select(n) {
+		_pane.css("top", angular.element($window).height() + 1);
+		_selected(n);
+	}
+	
+	function _show(c) {
+		_selected = c || angular.noop;
+		_pane.animate({top: angular.element($window).height() - 80}, {
+			speed: "slow",
+			queue: false
+		});
+	}
 
+	function _captureVideo(files, scope, change) {
+		function _s(f) {
+			change(scope, {$uri: f.fullPath});
+		}
+		for (var i = 0; i < files.length; i++)
+			files[i].moveTo(_dir, files[i].name, _s, _error);
+	}
+	
+	function _selectMedia(uri, scope, change) {
+		$window.resolveLocalFileSystemURI(uri, function (file) {
+			file.moveTo(_dir, file.name, function (f) {
+				change(scope, {$uri: f.fullPath});
+			}, _error);
+		});
+	}
+	
+	return {
+		restrict: "AE",
+		transclude: true,
+		replace: true,
+		template: "<span></span>",
+		compile: function(t, a) {
+			var data = {};
+			angular.element("<img/>")
+			.attr({
+				"src": a["src"],
+				"class": a["class"]
+			})
+			.css("cursor", "pointer")
+			.appendTo(t);
+			t.removeAttr("src class type change");
+			return {
+				post: function(scope, element, attrs) {
+					element.bind("click", function() {
+						_show(function(n) {
+							if (n != 0) {
+								if ( (attrs.type || "img").toLowerCase() == "video") {
+									if (n == 1) {
+										data.op = (navigator && navigator.device) ? navigator.device.capture.captureVideo : angular.noop;
+										data.opt = {limit: 1};
+										data.success = function(files) {
+											_captureVideo(files, scope, $parse(attrs.change));
+										};
+									} else {
+										data.op = (navigator && navigator.camera) ? navigator.camera.getPicture : angular.noop;
+										data.opt = {
+											quality: 50,
+											destinationType: 1,	//Camera.DestinationType.FILE_URI
+											sourceType: 0,	//PHOTOLIBRARY
+											MediaType: 1	//VIDEO
+										};
+										data.success = function(uri) {
+											_selectMedia(uri, scope, $parse(attrs.change));
+										};
+									}
+								} else {
+									data.op = (navigator && navigator.camera) ? navigator.camera.getPicture : angular.noop;
+									data.opt = {
+										quality: 50,
+										destinationType: 1,
+										sourceType: n == 1 ? 1 : 0,
+										targetWidth: 800,
+										targetHeight: 600,
+										MediaType: 0
+									};
+									data.success = function(uri) {
+										_selectMedia(uri, scope, $parse(attrs.change));
+									};
+								}
+								data.op(data.success, _error, data.opt);
+							}
+						});
+					});
+				}
+			};
+		}
+	};
+}])
 .directive("myDatetimePicker", ["$parse", function($parse) {
 	return {
 		restrict: "E",
@@ -218,76 +353,58 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	};
 }])
-.factory("transferCache", ["$timeout", function($timeout) {
-	var key = "transferQ", value = {list: []};
+.factory("transferCache", function() {
+	var _key = "transferQ", _value = {list: [], count: 0}, _ls = window.localStorage || {};
 	 
-	 (function() {
-	  var v = window.localStorage ? localStorage[key] : null;
-	  if (v) value = JSON.parse(v);
-	 })();
+	(function() {
+		var v = _ls[_key];
+		if (v) {
+			_value = JSON.parse(v);
+			if (angular.isArray(_value.list)) {
+				if (_value.list.length == 0)
+					_value.count = 0;
+			} else {
+				_value.list = [];
+				_value.count = 0;
+			}
+		}
+	})();
 	 
-	function _save() {
-		 if (window.localStorage)
-			 localStorage[key] = JSON.stringify(value);
-	 }
-	 
-	 function _read(file, callback) {
-	  var reader = new FileReader();
-	  reader.onloadend = function() {
-	   if (reader.error) callback(false);
-	   else callback(reader.result);
-	  };
-	  //reader.readAsBinaryString(file);
-	  //reader.readAsArrayBuffer(file);
-	  reader.readAsDataURL(file);
-	 }
-	 
-	 return {
-	  list: function() {
-	   return value.list;
-	  },
-	  push: function(item, type) {
-	   var e = angular.extend({
-	    _index: value.list.length,
-	    _type: type || 'redian',
-	_status: "o1",
-	_statusText: "未上传",
-	    _time: new Date(),   
-	   }, item), i, counter = 0, total = item.picAttachmentList.length + item.videoAttachmentList.length;
-	   e.picAttachmentList = [];
-	   e.videoAttachmentList = [];
-	   
-	   for (i = 0; i < item.picAttachmentList.length; i++) {
-	    _read(item.picAttachmentList[i].file, function(r) {
-	     if (r) e.picAttachmentList.push({ file: r });
-	     counter++;
-	    });
-	   }
-	   for (i = 0; i < item.videoAttachmentList.length; i++) {
-	    _read(item.videoAttachmentList[i].file, function(r) {
-	     if (r) e.videoAttachmentList.push({ file: r });
-	     counter++;
-	    });
-	   }
-	   
-	   $timeout(function _fn_reading() {
-	    if (counter >= total) {
-	     value.list.push(e);
-	     _save();
-	    } else $timeout(_fn_reading, 200);
-	   });
-	  },
-	  remove: function(item) {
-	   for (var i = 0; i < value.list.length; i++) {
-	    if (value.list[i]._index == item._index) {
-	     value.list.splice(i, 1);
-	     _save();
-	     break;
-	    }
-	   }
-	  }
-	 };
-}])
+	return {
+		list: function() {
+			return _value.list;
+		},
+		push: function(item, type) {
+			var e = angular.extend(item, {
+				_index: _value.count++,
+				_type: type || 'redian',
+				_status: "o1",
+				_statusText: "未上传",
+				_time: new Date()
+			});
+			_value.list.push(e);
+			_ls[_key] = JSON.stringify(_value);
+			return e;
+		},
+		remove: function(item) {
+			for (var i = 0; i < _value.list.length; i++) {
+				if (_value.list[i]._index == item._index) {
+					value.list.splice(i, 1);
+					_ls[_key] = JSON.stringify(_value);
+					if (window.resolveLocalFileSystemURI) {
+						var uris = item.picAttachmentList.concat(item.videoAttachmentList), j;
+						for (j = 0; j < uris.length; j++) {
+							window.resolveLocalFileSystemURI(uris[j], function (file) {
+								file.remove(angular.noop, angular.noop);
+							});
+						}
+					}
+					break;
+				}
+			}
+		}
+	};
+})
 .factory("model", ["$rootScope", "$http", "$interval", "$timeout", "myRoute", function($rootScope, $http, $interval, $timeout, myRoute) {
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
 	function _fn() {
@@ -352,8 +469,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			versionTitle:"",
 			versionRemark:"",
 			lastVersion:""
-	}
-	$rootScope.files = (function() {
+	};
+$rootScope.files = (function() {
 		var _icons = {
 			"工程简介": "icon-4",
 			"项目简介": "icon-4",
@@ -751,6 +868,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				params: { parentId: parentId }
 			}, angular.isFunction(c) ? c : angular.noop);
 		},
+		removeFiles: function(fileURIs) {
+			if (window.resolveLocalFileSystemURI) {
+				for (var i = 0; i < fileURIs.length; i++) {
+					window.resolveLocalFileSystemURI(fileURIs[i], function (file) {
+						file.remove(angular.noop, angular.noop);
+					});
+				}
+			}
+		},
 		setting:{
 			getVersion:function(p, c){
 				_req({
@@ -761,6 +887,25 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
 			}
+		},
+		transfer: function(fileURI, fileType, topicType, callback) {
+			var url = "attachment/upload.jo?fileType=" + fileType + "&topicType=" + topicType + ";jsessionid=" + _sessionId,
+			ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop},
+			opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
+			opt.fileKey = "file";
+			opt.fileName = fileURI.substr(fileURI.lastIndexOf('/') + 1);
+			opt.mimeType = "multipart/form-data";
+			opt.chunkedMode = false;
+			opt.params = {
+				fileType: fileType,
+				topicType: topicType
+			};
+			
+			ft.upload(fileURI, url, function(r) {
+				callback(JSON.parse(r.response));
+			}, function() {
+				callback(false);
+			}, opt);
 		},
 		uploadFile: function(url, fileData, callback, progress) {
 			$timeout(function() {
@@ -1017,17 +1162,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			    	}
 			    }
 			    
-			    if($scope.isVote){
+			    if($scope.isVote) {
 			    		//Judge whether is voted or not
-				    	model.vote.isVoted($scope.notice.current.id, $scope.notice.current.topicType, function(d){
-				    		if(d){
+				    	model.vote.isVoted($scope.notice.current.id, $scope.notice.current.topicType, function(d) {
+				    		if(d) {
 				    			$scope.isVote = true;
-				    		}else{
+				    		} else {
 				    			$scope.isVote = false;
 				    		}
-				    	})
+				    	});
 			    }
-		    	
 		    }
 		}
 	});
@@ -1348,20 +1492,24 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	});
 }])
-.controller("cRediantianjia", ["$scope", "$timeout", "model","transferCache", function($scope, $timeout, model,transferCache) {
+.controller("cRedianEdit", ["$scope", "$timeout", "model","transferCache", function($scope, $timeout, model,transferCache) {
 	function _upload(file, blob, c) {
 		var formData = new FormData();
 		formData.append("file", file);
 		formData.append("attachment", blob);
 		model.uploadFile("attachment/upload.jo", formData, c);
 	}
-	
+	$scope.newItem = {};
+	model.hotfocus.get($scope.hotfocus.current.id, function(d) {
+		if(d) {
+			$scope.hotfocus.current = d;
+			$scope.newItem = d;
+			
+			$scope.changed();
+		}
+	});
 	angular.extend($scope, {
 		tipVisibility: "none",
-		newItem: {
-			picAttachmentList: [],
-			videoAttachmentList: []
-		},
 		remain: 150,
 		changed: function() {
 			$scope.remain = 150 - $scope.newItem.content.length;
@@ -1390,6 +1538,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	        	return;
 	        }
 			var _item = {
+				id:$scope.newItem.id,
 				title: $scope.newItem.title,
 				content: $scope.newItem.content,
 				attachments: [],
@@ -1420,7 +1569,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}
 			$timeout(function _fn_create() {
 				if (counter >= total) {
-					model.hotfocus.create(_item, function(d) {
+					model.hotfocus.update(_item, function(d) {
 						if (d) {
 							tipmessage("创建成功");
 							$timeout(function() {
@@ -1436,7 +1585,75 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	});
 }])
-.controller("cWode", ["$scope", "$timeout", "model","transferCache", function($scope, $timeout, model, transferCache) {
+.controller("cRediantianjia", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
+	angular.extend($scope, {
+		tipVisibility: "none",
+		newItem: {
+			picAttachmentList: [],
+			videoAttachmentList: []
+		},
+		remain: 150,
+		changed: function() {
+			$scope.remain = 150 - $scope.newItem.content.length;
+		},
+		imageChanged: function(uri) {
+			$scope.newItem.picAttachmentList.push(uri);
+		},
+		videoChanged: function(uri) {
+			$scope.newItem.videoAttachmentList.push(uri);
+		},
+		submit: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
+			var _item = {
+				title: $scope.newItem.title,
+				content: $scope.newItem.content,
+				attachments: [],
+				picAttachmentList:[],
+				videoAttachmentList: []
+			},
+			total = $scope.newItem.picAttachmentList.length + $scope.newItem.videoAttachmentList.length,
+			counter = 0, i;
+			for (i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
+				model.transfer($scope.newItem.picAttachmentList[i], 2, 2, function(d) {
+					if (d) {
+						_item.attachments.push(d);
+						_item.picAttachmentList.push(d);
+					}
+					counter++;
+				});
+			}
+			for (i = 0; i < $scope.newItem.videoAttachmentList.length; i++) {
+				model.transfer($scope.newItem.videoAttachmentList[i], 3, 2, function(d) {
+					if (d) {
+						_item.attachments.push(d);
+						_item.videoAttachmentList.push(d);
+					}
+					counter++;
+				});
+			}
+			$timeout(function _fn_create() {
+				if (counter >= total) {
+					model.hotfocus.create(_item, function(d) {
+						if (d) {
+							model.removeFiles($scope.newItem.picAttachmentList.concat($scope.newItem.videoAttachmentList));
+							tipmessage("创建成功");
+							$timeout(function() {
+								$scope.$location.back();
+							}, 1000);
+						}
+					});
+				} else $timeout(_fn_create, 200);
+			});
+		},
+		save: function() {
+			transferCache.push($scope.newItem, "redian");
+		}
+	});
+}])
+.controller("cWode", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
 	switch($scope.$location.path()) {
 	case '/shezhi':
 		//Get latest version
@@ -1449,7 +1666,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				versionTitle:"",
 				versionRemark:"",
 				lastVersion:""
-		}
+		};
 		if(device){
 			var platform = 1;
 			switch(window.device.platform){
@@ -1559,17 +1776,33 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		});
 		break;
 	case '/shangchuanguanli':
-		  angular.extend($scope, {
-		   tipVisibility: "none",
-		   tasks: transferCache.list(),
-		   transfer: function() {
-		    
-		   },
-		   detail: function(task) {
-		    
-		   }
-		  });
-		  break;
+		angular.extend($scope, {
+			tipVisibility: "none",
+			detailVisibility: "none",
+			loadedClass: "",
+			tasks: transferCache.list(),
+			xiangqing: function() {
+				
+			},
+			transfer: function() {
+				
+			},
+			remove: function() {
+				
+			},
+			detail: function(task) {
+				$scope.current = task;
+				$scope.loadedClass = "loaded";
+				angular.element(document.body).addClass("noscroll");
+				$scope.detailVisibility = "block";
+			},
+			closeDetail: function() {
+				$scope.loadedClass = "";
+				angular.element(document.body).removeClass("noscroll");
+				$scope.detailVisibility = "none";
+			}
+		});
+		break;
 	}
 }])
 .controller("cOnePage", ["$scope", "model", function($scope, model) {
