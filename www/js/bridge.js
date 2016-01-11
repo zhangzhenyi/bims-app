@@ -1591,7 +1591,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			$scope.remain = 150 - $scope.newItem.content.length;
 		},
 		imageChanged: function(uri, path) {
-			alert(uri);
 			$scope.newItem.picAttachmentList.push({
 				fileUrl: path,
 				thumbnailUrl: uri
