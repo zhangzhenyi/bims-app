@@ -5,7 +5,7 @@
 </header>
 <section class="mt10 mlr10">
 	<ul class="list-9">
-		<li class="clearfix" ng-repeat="task in tasks">
+		<li class="clearfix" ng-repeat="task in tasks | orderBy:'-_time'">
 		<a ng-click="detail(task)" href="">
 			<span class="title">{{::task.title}}<i class="{{(task._status || 'o1')}}">{{(task._statusText || '未上传')}}</i></span>
 			<span class="txt" style="word-break:break-all;">{{::task.content}}</span>

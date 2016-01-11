@@ -135,38 +135,50 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	  };
 }])
 .directive("myMediaSelector", ["$window", "$parse", "$timeout", function($window, $parse, $timeout) {
-	var _pane = angular.element("<div></div>")
-	.css({
-		"background-color": "rgba(204,204,204,.35)",
+	var _pane = angular.element("<div></div>").css({
 		"width": "100%",
-		"height": "93px",
-		"position": "fixed",
+		"height": "100%",
+		"position":"absolute",
+		"top":"0",
+		"left":"0",
+		"background":"rgba(0,0,0,0.4)",
+		"z-index":"999",
+		"display":"none"
+	}).bind("click", function(){_select(0);}).appendTo("body")
+	
+	var btns = angular.element("<div></div>").css({
+		"background-color": "rgba(204,204,204,.5)",
+		"width": "100%",
+		"height": "120px",
+		"position": "absolute",
 		"top": angular.element($window).height() + 1
 	})
 	.append(angular.element("<p></p>").css("margin", 0).append(
 		angular.element("<button>拍摄</button>")
 		.css({
-			"margin-top": "2px",
-			"width": "100%"
+			"margin-top": "5px",
+			"width": "100%",
+			"height":"30px"
 		})
 		.bind("click", function() {_select(1);}))
 	)
 	.append(angular.element("<p></p>").css("margin", 0).append(
 		angular.element("<button>从相册选择</button>")
-		.css("width", "100%")
+		.css({"width":"100%", "margin-top":"5px","height":"30px"})
 		.bind("click", function() {_select(2);}))
 	)
 	.append(angular.element("<p></p>").css("margin", 0).append(
 		angular.element("<button>取消</button>")
 		.css({
 			"width": "100%",
-			"margin-top": "3px"
+			"margin-top": "5px",
+			"height":"30px"
 		})
 		.bind("click", function() {_select(0);}))
 	)
-	.appendTo("body"),
+	,
 	_selected, _dir;
-	
+	_pane.append(btns);
 	function _error(error) {
 		alert("error: " + JSON.stringify(error));
 	}
@@ -180,13 +192,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 	
 	function _select(n) {
-		_pane.css("top", angular.element($window).height() + 1);
+		btns.css("top", angular.element($window).height() + 1);
+		_pane.css("display", "none");
 		_selected(n);
 	}
 	
 	function _show(c) {
+		_pane.css("display", "block");
 		_selected = c || angular.noop;
-		_pane.animate({top: angular.element($window).height() - 93}, {
+		btns.animate({top: angular.element($window).height() -120}, {
 			speed: "slow",
 			queue: false
 		});
@@ -351,7 +365,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				"autoplay": (attrs.autoplay && "true" == attrs.autoplay.toLowerCase()) ? "autoplay" : null,
 				"width": (attrs.width) ? attrs.width : null,
 				"height": (attrs.height) ? attrs.height : null
-			}).appendTo(element);
+			})
+			.css({"margin-top":"5px","vertical-align":"bottom"})
+			.appendTo(element);
 		}
 	};
 }])
@@ -433,6 +449,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	
 	$rootScope.origionVersion = "0.0.4.0109_beta";
 	$rootScope.hasChecked = false;
+	$rootScope.autoUpdateOnWiffi = false;
 	$rootScope.videoThumbnail = "http://101.201.141.1/bims-test/images/default_play.jpg";
 	$rootScope.Constants = {
 			ISSUETYPE_QUALITY:1,
@@ -1616,6 +1633,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		},
 		save: function() {
 			transferCache.push($scope.newItem, "redian");
+			tipmessage("保存成功");//是否需要返回值？
+			$timeout(function() {
+				$scope.$location.back();
+			}, 1000);
 		}
 	});
 }])
@@ -1627,6 +1648,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 //		var device ={
 //				platform :"1"
 //		};
+		if (window.localStorage) {
+			$scope.autoUpdateOnWiffi = localStorage["autoUpdateOnWiffi"];
+			if(!$scope.autoUpdateOnWiffi){
+				$scope.autoUpdateOnWiffi = false;
+			}
+		}
 		
 		angular.extend($scope, {
 			setting:{
@@ -1642,6 +1669,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					window.open($scope.setting.installer,"_system");
 				}
 				
+			},
+			setAutoUpload:function(){
+				$scope.autoUpdateOnWiffi = !$scope.autoUpdateOnWiffi;
+				localStorage["autoUpdateOnWiffi"] = $scope.autoUpdateOnWiffi;
 			}
 		});
 
