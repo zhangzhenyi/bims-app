@@ -517,7 +517,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 	
 	function _transfer(fileURI, fileType, topicType, callback) {
-		var url = "attachment/upload.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType,
+		var url = _base + "attachment/upload.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType,
 		ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop},
 		opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
 		opt.fileKey = "file";
