@@ -196,7 +196,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 
 	function _captureVideo(files, scope, change) {
 		function _s(f) {
-			scope.$apply(change(scope, {$uri: f.fullPath}));
+			scope.$apply(change(scope, {$uri: f.toURL(), $path: f.fullPath}));
 		}
 		for (var i = 0; i < files.length; i++)
 			files[i].copyTo(_dir, files[i].name, _s, _error);
@@ -205,7 +205,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	function _selectMedia(uri, scope, change) {
 		$window.resolveLocalFileSystemURL(uri, function (file) {
 			file.copyTo(_dir, file.name, function (f) {
-				scope.$apply(change(scope, {$uri: f.toURL()}));
+				scope.$apply(change(scope, {$uri: f.toURL(), $path: f.fullPath}));
 			}, _error);
 		});
 	}
@@ -517,7 +517,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 	
 	function _transfer(fileURI, fileType, topicType, callback) {
-		var url = "attachment/upload.jo?fileType=" + fileType + "&topicType=" + topicType + ";jsessionid=" + _sessionId,
+		var url = "attachment/upload.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType,
 		ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop},
 		opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
 		opt.fileKey = "file";
@@ -1590,16 +1590,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		changed: function() {
 			$scope.remain = 150 - $scope.newItem.content.length;
 		},
-		imageChanged: function(uri) {
+		imageChanged: function(uri, path) {
 			alert(uri);
 			$scope.newItem.picAttachmentList.push({
-				fileUrl: uri,
+				fileUrl: path,
 				thumbnailUrl: uri
 			});
 		},
-		videoChanged: function(uri) {
+		videoChanged: function(uri, path) {
 			$scope.newItem.videoAttachmentList.push({
-				fileUrl: uri,
+				fileUrl: path,
 				thumbnailUrl: uri
 			});
 		},
