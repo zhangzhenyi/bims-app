@@ -139,7 +139,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	.css({
 		"background-color": "rgba(204,204,204,.35)",
 		"width": "100%",
-		"height": "80px",
+		"height": "93px",
 		"position": "fixed",
 		"top": angular.element($window).height() + 1
 	})
@@ -168,12 +168,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	_selected, _dir;
 	
 	function _error(error) {
-		console.log(error);
+		//console.log(error);
+		alert("error: " + JSON.stringify(error));
 	}
 	
 	if ($window.requestFileSystem) {
 		$window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
-			fileSystem.root.getDirectory(".bims.h5.cache", {create: true, exclusive: false}, function(dirEntry) {
+			alert(JSON.stringify(fileSystem)); 
+			fileSystem.root.getDirectory("bimsh5cache", {create: true, exclusive: false}, function(dirEntry) {
 				_dir = dirEntry;
 			}, _error);
 		}, _error);
@@ -186,7 +188,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	
 	function _show(c) {
 		_selected = c || angular.noop;
-		_pane.animate({top: angular.element($window).height() - 80}, {
+		_pane.animate({top: angular.element($window).height() - 93}, {
 			speed: "slow",
 			queue: false
 		});
@@ -194,16 +196,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 
 	function _captureVideo(files, scope, change) {
 		function _s(f) {
-			change(scope, {$uri: f.fullPath});
+			scope.$apply(change(scope, {$uri: f.fullPath}));
 		}
 		for (var i = 0; i < files.length; i++)
-			files[i].moveTo(_dir, files[i].name, _s, _error);
+			files[i].copyTo(_dir, files[i].name, _s, _error);
 	}
 	
 	function _selectMedia(uri, scope, change) {
-		$window.resolveLocalFileSystemURI(uri, function (file) {
-			file.moveTo(_dir, file.name, function (f) {
-				change(scope, {$uri: f.fullPath});
+		$window.resolveLocalFileSystemURL(uri, function (file) {
+			file.copyTo(_dir, file.name, function (f) {
+				scope.$apply(change(scope, {$uri: f.toURL()}));
 			}, _error);
 		});
 	}
@@ -528,6 +530,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		};
 		
 		ft.upload(fileURI, url, function(r) {
+			alert(r);
 			callback(JSON.parse(r.response));
 		}, function() {
 			callback(false);
@@ -1588,6 +1591,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			$scope.remain = 150 - $scope.newItem.content.length;
 		},
 		imageChanged: function(uri) {
+			alert(uri);
 			$scope.newItem.picAttachmentList.push({
 				fileUrl: uri,
 				thumbnailUrl: uri

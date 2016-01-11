@@ -7,7 +7,7 @@
 		<div class="sliderbanner">
 			<div id="owl-demo" class="owl-carousel owl-theme">
 				<div ng-repeat="item in items" class="item">
-					<a ng-click="notice.itemClick(item)" href=""><span class="{{::itemClass(item)}}">{{::(item.important || '普通')}}</span><span class="txt">{{::item.title}}</span><span class="com"><img src="img/i-commend.png" width="17" height="12"/>{{::item.totalCommentNum}}</span></a>
+					<a ng-click="notice.itemClick(item)" href=""><span class="{{::itemClass(item)}}">{{::(item.important || '普通')}}</span><span class="txt">{{::item.title|cutTail:false:10:" ..."}}</span><span class="com"><img src="img/i-commend.png" width="17" height="12"/>{{::item.totalCommentNum}}</span></a>
 				</div>
 			</div>
 		</div>
@@ -72,8 +72,8 @@
 		<span class="title-6">热点议事厅</span>
 		<span class="i-block-1 clearfix">
 		<img ng-src="{{hotfocus.first.publisherAvatarUrl}}"/>
-		<strong>{{hotfocus.first.title}}</strong>
-		<b>{{hotfocus.first.content}}</b>
+		<strong>{{hotfocus.first.title|cutTail:false:12:" ..."}}</strong>
+		<b>{{hotfocus.first.content|cutTail:false:12:" ..."}}</b>
 		<span class="cb"></span>
 		<span class="l">{{hotfocus.first.publisherName}}</span><span class="r">{{formatDate(hotfocus.first.createTime)}}</span>
 		</span>

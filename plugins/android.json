@@ -12,6 +12,12 @@
         },
         "cordova-plugin-device": {
             "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "cordova-plugin-camera": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "cordova-plugin-file-transfer": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
         }
     },
     "dependent_plugins": {}
