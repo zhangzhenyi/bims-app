@@ -393,10 +393,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				if (_value.list[i]._index == item._index) {
 					_value.list.splice(i, 1);
 					_ls[_key] = JSON.stringify(_value);
-					if (window.resolveLocalFileSystemURI) {
+					if (window.resolveLocalFileSystemURL) {
 						var uris = item.picAttachmentList.concat(item.videoAttachmentList), j;
 						for (j = 0; j < uris.length; j++) {
-							window.resolveLocalFileSystemURI(uris[j].fileUrl, function (file) {
+							window.resolveLocalFileSystemURL(uris[j].fileUrl, function (file) {
 								file.remove(angular.noop, angular.noop);
 							});
 						}
@@ -517,6 +517,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 	
 	function _transfer(fileURI, fileType, topicType, callback) {
+//		if ($window.requestFileSystem) {
+//			$window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
+//				alert(JSON.stringify(fileSystem)); 
+//				fileSystem.root.getDirectory("bimsh5cache", {create: true, exclusive: false}, function(dirEntry) {
+//					_dir = dirEntry;
+//				}, _error);
+//			}, _error);
+//		}
 		var url = _base + "attachment/upload.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType,
 		ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop},
 		opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
@@ -528,8 +536,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			fileType: fileType,
 			topicType: topicType
 		};
-		
-		ft.upload(fileURI, url, function(r) {
+		alert("upload file "+fileURI);
+		ft.upload(fileURI, encodeURI(url), function(r) {
 			alert(r);
 			callback(JSON.parse(r.response));
 		}, function() {
@@ -930,9 +938,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}, angular.isFunction(c) ? c : angular.noop);
 		},
 		removeFiles: function(fileURIs) {
-			if (window.resolveLocalFileSystemURI) {
+			if (window.resolveLocalFileSystemURL) {
 				for (var i = 0; i < fileURIs.length; i++) {
-					window.resolveLocalFileSystemURI(fileURIs[i].fileUrl, function (file) {
+					window.resolveLocalFileSystemURL(fileURIs[i].fileUrl, function (file) {
 						file.remove(angular.noop, angular.noop);
 					});
 				}
