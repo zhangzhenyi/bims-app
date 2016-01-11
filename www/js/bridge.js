@@ -168,14 +168,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	_selected, _dir;
 	
 	function _error(error) {
-		//console.log(error);
 		alert("error: " + JSON.stringify(error));
 	}
 	
 	if ($window.requestFileSystem) {
 		$window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
-			alert(JSON.stringify(fileSystem)); 
-			fileSystem.root.getDirectory("bimsh5cache", {create: true, exclusive: false}, function(dirEntry) {
+			fileSystem.root.getDirectory(".bims.h5.cache", {create: true, exclusive: false}, function(dirEntry) {
 				_dir = dirEntry;
 			}, _error);
 		}, _error);
@@ -195,17 +193,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 
 	function _captureVideo(files, scope, change) {
-		function _s(f) {
-			scope.$apply(change(scope, {$uri: f.toURL(), $path: f.fullPath}));
+		for (var i = 0; i < files.length; i++) {
+			$window.resolveLocalFileSystemURL("file:///" + files[i].fullPath, function (file) {
+				file.copyTo(_dir, (new Date()).getTime() + file.name.substr(file.name.lastIndexOf('.')), function(f) {
+					scope.$apply(change(scope, {$uri: f.toURL()}));
+				}, _error);
+			}, _error);
 		}
-		for (var i = 0; i < files.length; i++)
-			files[i].copyTo(_dir, files[i].name, _s, _error);
 	}
 	
 	function _selectMedia(uri, scope, change) {
 		$window.resolveLocalFileSystemURL(uri, function (file) {
 			file.copyTo(_dir, file.name, function (f) {
-				scope.$apply(change(scope, {$uri: f.toURL(), $path: f.fullPath}));
+				scope.$apply(change(scope, {$uri: f.toURL()}));
 			}, _error);
 		});
 	}
@@ -479,7 +479,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			lastVersion:""
 	};
 	$rootScope.files = (function() {
-
 		var _icons = {
 			"工程简介": "icon-4",
 			"项目简介": "icon-4",
@@ -517,28 +516,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 	
 	function _transfer(fileURI, fileType, topicType, callback) {
-//		if ($window.requestFileSystem) {
-//			$window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
-//				alert(JSON.stringify(fileSystem)); 
-//				fileSystem.root.getDirectory("bimsh5cache", {create: true, exclusive: false}, function(dirEntry) {
-//					_dir = dirEntry;
-//				}, _error);
-//			}, _error);
-//		}
-		var url = _base + "attachment/upload.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType,
+
+		var url = encodeURI(_base + "attachment/uploadForH5.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType + "&showName=&thumbnailUri=&title=&content="),
 		ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop},
 		opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
 		opt.fileKey = "file";
 		opt.fileName = fileURI.substr(fileURI.lastIndexOf('/') + 1);
 		opt.mimeType = "multipart/form-data";
 		opt.chunkedMode = false;
-		opt.params = {
-			fileType: fileType,
-			topicType: topicType
-		};
-		alert("upload file "+fileURI);
-		ft.upload(fileURI, encodeURI(url), function(r) {
-			alert(r);
+		
+		ft.upload(fileURI, url, function(r) {
 			callback(JSON.parse(r.response));
 		}, function() {
 			callback(false);
@@ -1598,15 +1585,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		changed: function() {
 			$scope.remain = 150 - $scope.newItem.content.length;
 		},
-		imageChanged: function(uri, path) {
+		imageChanged: function(uri) {
 			$scope.newItem.picAttachmentList.push({
-				fileUrl: path,
+				fileUrl: uri,
 				thumbnailUrl: uri
 			});
 		},
-		videoChanged: function(uri, path) {
+		videoChanged: function(uri) {
 			$scope.newItem.videoAttachmentList.push({
-				fileUrl: path,
+				fileUrl: uri,
 				thumbnailUrl: uri
 			});
 		},
