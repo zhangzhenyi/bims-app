@@ -144,7 +144,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		"background":"rgba(0,0,0,0.4)",
 		"z-index":"999",
 		"display":"none"
-	}).bind("click", function(){_select(0);}).appendTo("body")
+	}).bind("click", function(){_select(0);}).appendTo("body");
 	
 	var btns = angular.element("<div></div>").css({
 		"background-color": "rgba(204,204,204,.5)",
@@ -175,12 +175,17 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			"height":"30px"
 		})
 		.bind("click", function() {_select(0);}))
-	)
-	,
-	_selected, _dir;
+	), 	_selected, _dir;
 	_pane.append(btns);
+	
 	function _error(error) {
-		alert("error: " + JSON.stringify(error));
+		if (angular.isString(error)) {
+			if (error != "no image selected")
+				alert("error: " + error);
+		} else if(angular.isObject(error)) {
+			if (error.code != 3)
+				alert("error: " + JSON.stringify(error));
+		}
 	}
 	
 	if ($window.requestFileSystem) {
@@ -254,10 +259,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 									} else {
 										data.op = (navigator && navigator.camera) ? navigator.camera.getPicture : angular.noop;
 										data.opt = {
-											quality: 50,
 											destinationType: 1,	//Camera.DestinationType.FILE_URI
-											sourceType: 0,	//PHOTOLIBRARY
-											MediaType: 1	//VIDEO
+											sourceType: 2,	//SAVEDPHOTOALBUM
+											mediaType: 1	//VIDEO
 										};
 										data.success = function(uri) {
 											_selectMedia(uri, scope, $parse(attrs.change));
@@ -268,10 +272,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 									data.opt = {
 										quality: 50,
 										destinationType: 1,
-										sourceType: n == 1 ? 1 : 0,
+										sourceType: n == 1 ? 1 : 2,
 										targetWidth: 800,
 										targetHeight: 600,
-										MediaType: 0
+										mediaType: 0
 									};
 									data.success = function(uri) {
 										_selectMedia(uri, scope, $parse(attrs.change));
@@ -533,7 +537,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 	
 	function _transfer(fileURI, fileType, topicType, callback) {
-
 		var url = encodeURI(_base + "attachment/uploadForH5.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType + "&showName=&thumbnailUri=&title=&content="),
 		ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop},
 		opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
@@ -1009,22 +1012,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 		return $scope.loading ? "block" : "none";
 	};
-	
-//	$document.ready(function () 
-//		    {
-//		$document.bind("hidekeyboard", onHide, false);
-//		$document.bind("showkeyboard", onShow, false);
-//
-//		    });
-//	
 	$scope.onHide = function(){
-//		alert("show Keyboard");
 		$rootScope.myHeaderPosition = "fixed";
 	};
 	$scope.onShow = function(){
 		$rootScope.myHeaderPosition = "relative";
 	};
-	
 }])
 .controller("cLogin", ["$scope", "model", function($scope, model) {
 	if (window.localStorage) {
