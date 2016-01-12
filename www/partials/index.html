@@ -7,7 +7,7 @@
 		<div class="sliderbanner">
 			<div id="owl-demo" class="owl-carousel owl-theme">
 				<div ng-repeat="item in items" class="item">
-					<a ng-click="notice.itemClick(item)" href=""><span class="{{::itemClass(item)}}">{{::(item.important || '普通')}}</span><span class="txt">{{::item.title|cutTail:false:10:" ..."}}</span><span class="com"><img src="img/i-commend.png" width="17" height="12"/>{{::item.totalCommentNum}}</span></a>
+					<a ng-click="notice.itemClick(item)" href=""><span class="{{::itemClass(item)}}">{{::(item.important || '普通')}}</span><span class="txt">{{::item.title}}</span><span class="com"><img src="img/i-commend.png" width="17" height="12"/>{{::item.totalCommentNum}}</span></a>
 				</div>
 			</div>
 		</div>
@@ -113,7 +113,7 @@
 <div id="zoomscrollblock">
     <div id="zoomscroll" class="pop_catewindow" onclick="return false;">
         <div class="i-block20151214-6" style="width:300px;height:116px;margin-top:-58px;margin-left:-150px;padding-left:10px;padding-right:10px;">
-			<p class="txt-24">现在更到新版本{{setting.currentVersion}}了，现在安装新版本么？</p>
+			<p class="txt-24">发现新版本{{setting.currentVersion}}，点击确认安装</p>
 			<div class="line-1"></div>
 			<p class="txt-25" style="align:center;position:relative;width:100%;margin-left:25%;"><a href="" ng-click="onInstall()">确定</a></p>
 		</div>

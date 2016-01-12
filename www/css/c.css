@@ -311,11 +311,11 @@ nav a.on span.i5,nav a:hover span.i5{ background: url(../img/nav-i5on.png) no-re
 
 .sliderbanner{display:block;position:absolute;right:35px;bottom:10px;left:48px;}
 .sliderbanner .item a{padding-top:5px;padding-bottom:5px;border-bottom:1px solid #394533;display:block;position:relative;margin-bottom:20px;}
-.sliderbanner .item a .z1,.sliderbanner .item a .z2,.sliderbanner .item a .z3{font-size: 12px; line-height: 20px;background:#ff0000;padding-left:5px;padding-right:5px;margin-right:5px;border-radius:5px;height:20px;display:inline-block;color:#fff;}
+.sliderbanner .item a .z1,.sliderbanner .item a .z2,.sliderbanner .item a .z3{font-size: 12px; line-height: 20px;background:#ff0000;padding-left:5px;padding-right:5px;margin-right:5px;border-radius:5px;height:20px;display:inline-block;color:#fff;position:absolute;left:0;top:7px;}
 .sliderbanner .item a .z1{background:#ff0000;}
 .sliderbanner .item a .z2{background:#ff4ffd;}
 .sliderbanner .item a .z3{background:#ff9600;}
-.sliderbanner .item a .txt{font-size: 14px; line-height: 24px; color: #FFF; }
+.sliderbanner .item a .txt{font-size: 14px; line-height: 24px; color: #FFF; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display:block;margin-left:40px;}
 .sliderbanner .item a .com{ font-size: 12px; line-height: 14px; color: #4a9ab2; position:absolute; bottom:-20px; right:0; white-space: nowrap;}
 #owl-demo .item a .com img{width:17px;height:12px;display:inline-block;margin-right:5px;position:relative;top:-2px;}
 .sliderbanner .owl-theme .owl-controlls {text-align:left;position: absolute;height:10px;bottom:-5px;left: 0;width: 100%;}

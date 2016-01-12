@@ -1029,12 +1029,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	};
 }])
-.directive("myAutoTransfer", ["$interval", "$timeout", "transferCache", "model", function($interval, $timeout, transferCache, model) {
+.directive("myAutoTransfer", ["$rootScope","$interval", "$timeout", "transferCache", "model", function($rootScope, $interval, $timeout, transferCache, model) {
 	var  _transfers = {};
 	
 	function _transfer() {
+		tipmessage("upload checkinging...", "tiploading");
 		var item = transferCache.get();
 		if (item) {
+			alert("uploading");
+			tipmessage("uploading...", "tiploading");
 			item._status = "o2";
 			item._statusText = "上传中";
 			model.uploadAttachments(item, function(i) {
@@ -1060,7 +1063,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 	
 	function _check() {
-		if ( ((window.localStorage && localStorage["autoUpdateOnWiffi"]) || false) && ((navigator && navigator.network) ? navigator.network.connection.type == Connection.WIFI : false))
+		if(!$rootScope.user.name) return;
+
+		if ( ((window.localStorage && localStorage["autoUpdateOnWiffi"] == "true") || false) && ((navigator && navigator.network) ? navigator.network.connection.type == Connection.WIFI : false))
 			$timeout(_transfer);
 		else {
 			angular.forEach(_transfers, function(transfer) {
@@ -1171,6 +1176,17 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	});
 }])
 .controller("cMain", ["$scope", "$rootScope","$timeout", "model", function($scope, $rootScope, $timeout, model) {
+	//设置wiffi状态下是否自动上传。。。
+	if (window.localStorage) {
+		var wiffi = localStorage["autoUpdateOnWiffi"] || false;
+		if(wiffi == "true"){
+			$rootScope.autoUpdateOnWiffi = true;
+		}else{
+			$rootScope.autoUpdateOnWiffi = false;
+		}
+	}
+	else $rootScope.autoUpdateOnWiffi = false;
+	
 	angular.extend($scope, {
 		items: [],
 		itemClass: function(item) {
@@ -1720,9 +1736,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	case '/shezhi':
 		//Get latest version
 		$scope.hasNewVersion = false;
-		if (window.localStorage) $scope.autoUpdateOnWiffi = localStorage["autoUpdateOnWiffi"] || false;
+		if (window.localStorage) {
+			var wiffi = localStorage["autoUpdateOnWiffi"] || false;
+			if(wiffi == "true"){
+				$scope.autoUpdateOnWiffi = true;
+			}else{
+				$scope.autoUpdateOnWiffi = false;
+			}
+		}
 		else $scope.autoUpdateOnWiffi = false;
-		
 		angular.extend($scope, {
 			setting:{
 				installer : "http://101.201.141.1/test/install.html",
@@ -1738,7 +1760,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				}
 			},
 			setAutoUpload: function() {
-				$scope.autoUpdateOnWiffi = !$scope.autoUpdateOnWiffi;
+				if(true && $scope.autoUpdateOnWiffi){
+					$scope.autoUpdateOnWiffi = false;
+				}else{
+					$scope.autoUpdateOnWiffi = true;
+				}
 				if (window.localStorage) 
 					localStorage["autoUpdateOnWiffi"] = $scope.autoUpdateOnWiffi;
 			}
