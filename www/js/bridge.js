@@ -212,6 +212,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 
 	function _captureVideo(files, scope, change) {
+		tipmessage1(message="文件生成中",img="<img src='img/loading.gif';><br/>",id="tipimg");
 		for (var i = 0; i < files.length; i++) {
 			$window.resolveLocalFileSystemURL("file:///" + files[i].fullPath, function (file) {
 				file.copyTo(_dir, (new Date()).getTime() + file.name.substr(file.name.lastIndexOf('.')), function(f) {
@@ -219,6 +220,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				}, _error);
 			}, _error);
 		}
+		closetipmessage1("tipimg");
 	}
 	
 	function _selectMedia(uri, scope, change) {
@@ -544,7 +546,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		opt.fileName = fileURI.substr(fileURI.lastIndexOf('/') + 1);
 		opt.mimeType = "multipart/form-data";
 		opt.chunkedMode = false;
-		
 		ft.upload(fileURI, url, function(r) {
 			callback(JSON.parse(r.response));
 		}, function() {
@@ -559,7 +560,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		o.attachments = [];
 		o.picAttachmentList = [];
 		o.videoAttachmentList = [];
+		tipmessage1(message="文件上传中",img="<img src='img/loading.gif';><br/>",id="tipimg");
 		for (i = 0; i < item.picAttachmentList.length; i++) {
+			changeTipmessage(message="第"+counter+"个，<br/>共"+total+"个",id="tipimg");
 			_transfer(item.picAttachmentList[i].fileUrl, 2, item.topicType, function(d) {
 				if (d) {
 					o.attachments.push(d);
@@ -569,6 +572,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			});
 		}
 		for (i = 0; i < item.videoAttachmentList.length; i++) {
+			changeTipmessage(message="第"+counter+"个，<br/>共"+total+"个",id="tipimg");
 			_transfer(item.videoAttachmentList[i].fileUrl, 3, item.topicType, function(d) {
 				if (d) {
 					o.attachments.push(d);
@@ -579,7 +583,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 		$timeout(function _fn_waiting_attachment() {
 			if (counter < total) $timeout(_fn_waiting_attachment, 200);
-			else (callback || angular.noop)(o);
+			else {
+				(callback || angular.noop)(o);
+				closetipmessage1(id="tipimg");
+			}
 		});
 	}
 

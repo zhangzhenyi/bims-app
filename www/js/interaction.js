@@ -11,9 +11,14 @@ function tipmessage1(message,img,id){
 	$("#loadingContainer").append("<div class='tipmessage' id='"+id+"'><span>"+img+message+"</span></div>");
 	$("#loadingContainer").show();
 	$("#"+id).animate({opacity:1},300);
-
 }
-
+//改变提示内容，需要首先使用tipmessage1，结束时调用closetipmessage1
+function changeTipmessage(message,id){
+	$("#"+id).remove();
+	$("#loadingContainer").append("<div class='tipmessage' id='"+id+"'><span>"+message+"</span></div>");
+//	$("#loadingContainer").show();
+//	$("#"+id).animate({opacity:1},300);
+}
 function closetipmessage1(id){
 	setTimeout(function(){$("#"+id).animate({opacity:0},300);setTimeout(function(){$("#"+id).remove();
 	$("#loadingContainer").hide();
