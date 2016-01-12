@@ -17,7 +17,7 @@
 })($(document.head));
 
 /*列均分*/
-function thumbnailist(thumbblcok,thumbul){
+function thumbnailist(thumbblcok,thumbul) {
 	var listwidth = $(thumbblcok).width(),
 	listliamargin = $(thumbul+" li div").css("marginRight");
 	$(thumbul).css("width",listwidth+parseInt(listliamargin));
@@ -223,8 +223,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	
 	function _selectMedia(uri, scope, change) {
 		$window.resolveLocalFileSystemURL(uri, function (file) {
-			file.copyTo(_dir, file.name, function (f) {
+			file.copyTo(_dir, (new Date()).getTime() + file.name.substr(file.name.lastIndexOf('.')), function (f) {
 				scope.$apply(change(scope, {$uri: f.toURL()}));
+				if ($window.navigator && navigator.camera) navigator.camera.cleanup(angular.noop, angular.noop);
 			}, _error);
 		});
 	}
@@ -391,10 +392,21 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}
 		}
 	})();
+	
+	function _save() {
+		_ls[_key] = JSON.stringify(_value);
+	}
 	 
 	return {
 		list: function() {
 			return _value.list;
+		},
+		get: function() {
+			for (var i = 0; i < _value.list.length; i++) {
+				if (_value.list[i]._status == "o1")
+					return _value.list[i];
+			}
+			return false;
 		},
 		push: function(item, type) {
 			var e = angular.extend(item, {
@@ -405,14 +417,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				_time: new Date()
 			});
 			_value.list.push(e);
-			_ls[_key] = JSON.stringify(_value);
+			_save();
 			return e;
 		},
 		remove: function(item) {
 			for (var i = 0; i < _value.list.length; i++) {
 				if (_value.list[i]._index == item._index) {
 					_value.list.splice(i, 1);
-					_ls[_key] = JSON.stringify(_value);
+					_save();
 					if (window.resolveLocalFileSystemURL) {
 						var uris = item.picAttachmentList.concat(item.videoAttachmentList), j;
 						for (j = 0; j < uris.length; j++) {
@@ -424,7 +436,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					break;
 				}
 			}
-		}
+		},
+		save: _save
 	};
 })
 .factory("model", ["$rootScope", "$http", "$interval", "$timeout", "myRoute", function($rootScope, $http, $interval, $timeout, myRoute) {
@@ -482,7 +495,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			ISSUE_PUBLISHER_CATEGORY_OTHER:3
 	};
 	
-
 	$rootScope.user = {};
 	$rootScope.notice = {};
 	$rootScope.hotfocus = {};
@@ -538,7 +550,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	
 	function _transfer(fileURI, fileType, topicType, callback) {
 		var url = encodeURI(_base + "attachment/uploadForH5.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType + "&showName=&thumbnailUri=&title=&content="),
-		ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop},
+		ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop, abort: angular.noop},
 		opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
 		opt.fileKey = "file";
 		opt.fileName = fileURI.substr(fileURI.lastIndexOf('/') + 1);
@@ -546,38 +558,45 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		opt.chunkedMode = false;
 		
 		ft.upload(fileURI, url, function(r) {
-			callback(JSON.parse(r.response));
+			callback(JSON.parse(r.response), fileURI);
 		}, function() {
-			callback(false);
+			callback(false, fileURI);
 		}, opt);
+		
+		return ft;
 	}
 	
-	function _uploadAttachments(item, callback) {
+	function _uploadAttachments(item, callback, transferCallback) {
 		var o = angular.extend({}, item),
 		total = item.picAttachmentList.length + item.videoAttachmentList.length,
 		counter = 0, i;
 		o.attachments = [];
 		o.picAttachmentList = [];
 		o.videoAttachmentList = [];
+		transferCallback = transferCallback || angular.noop;
 		for (i = 0; i < item.picAttachmentList.length; i++) {
-			_transfer(item.picAttachmentList[i].fileUrl, 2, item.topicType, function(d) {
+			transferCallback(item.picAttachmentList[i].fileUrl, _transfer(item.picAttachmentList[i].fileUrl, 2, item.topicType, function(d, url) {
 				if (d) {
 					o.attachments.push(d);
 					o.picAttachmentList.push(d);
 				}
+				transferCallback(url, false);
 				counter++;
-			});
+			}));
 		}
 		for (i = 0; i < item.videoAttachmentList.length; i++) {
-			_transfer(item.videoAttachmentList[i].fileUrl, 3, item.topicType, function(d) {
+			transferCallback(item.videoAttachmentList[i].fileUrl, _transfer(item.videoAttachmentList[i].fileUrl, 3, item.topicType, function(d, url) {
 				if (d) {
 					o.attachments.push(d);
 					o.videoAttachmentList.push(d);
 				}
+				transferCallback(url, false);
 				counter++;
-			});
+			}));
 		}
+		
 		$timeout(function _fn_waiting_attachment() {
+			console.log(counter);
 			if (counter < total) $timeout(_fn_waiting_attachment, 200);
 			else (callback || angular.noop)(o);
 		});
@@ -1001,6 +1020,61 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			});
 		}
 	};
+}])
+.directive("myAutoTransfer", ["$interval", "$timeout", "transferCache", "model", function($interval, $timeout, transferCache, model) {
+	var  _transfers = {};
+	
+	function _transfer() {
+		var item = transferCache.get();
+		if (item) {
+			item._status = "o2";
+			item._statusText = "上传中";
+			model.uploadAttachments(item, function(i) {
+				var op;
+				switch(item._type) {
+					case "redian":
+						op = model.hotfocus.create;
+						break;
+					default:
+						op = angular.noop;
+				}
+				op(i, function(d) {
+					if (d) {
+						model.removeFiles(item.picAttachmentList.concat(item.videoAttachmentList));
+						transferCache.remove(item);
+					}
+				});
+			}, function(url, transfer) {
+				if (transfer) _transfers[url] = transfer;
+				else delete _transfers[url];
+			});
+		}
+	}
+	
+	function _check() {
+		if ( ((window.localStorage && localStorage["autoUpdateOnWiffi"]) || false) && ((navigator && navigator.network) ? navigator.network.connection.type == Connection.WIFI : false))
+			$timeout(_transfer);
+		else {
+			angular.forEach(_transfers, function(transfer) {
+				transfer.abort();
+			});
+			_transfers = {};
+		}
+	}
+	
+	return {
+		restrict: "E",
+		transclude: true,
+		replace: true,
+		link: function (scope, element, attrs) {
+			var id = $interval(_check, parseInt(attrs.interval), 0, false);
+			scope.$on("$destroy", function() {
+				$interval.cancel(id);
+			});
+		}
+	};
+}])
+.controller("myAutoTransfer", ["$scope", function($scope) {
 }])
 .controller("cLoading", ["$scope", "$document", "$rootScope","model", function($scope, $document, $rootScope, model) {
 	$rootScope.myHeaderPosition = "fixed";
@@ -1638,15 +1712,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	case '/shezhi':
 		//Get latest version
 		$scope.hasNewVersion = false;
-//		var device ={
-//				platform :"1"
-//		};
-		if (window.localStorage) {
-			$scope.autoUpdateOnWiffi = localStorage["autoUpdateOnWiffi"];
-			if(!$scope.autoUpdateOnWiffi){
-				$scope.autoUpdateOnWiffi = false;
-			}
-		}
+		if (window.localStorage) $scope.autoUpdateOnWiffi = localStorage["autoUpdateOnWiffi"] || false;
+		else $scope.autoUpdateOnWiffi = false;
 		
 		angular.extend($scope, {
 			setting:{
@@ -1657,15 +1724,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				lastVersion:""
 			},
 			onInstall:function(){
-				if($scope.hasNewVersion){
+				if($scope.hasNewVersion) {
 					//post to outside browser to open url
 					window.open($scope.setting.installer,"_system");
 				}
-				
 			},
-			setAutoUpload:function(){
+			setAutoUpload: function() {
 				$scope.autoUpdateOnWiffi = !$scope.autoUpdateOnWiffi;
-				localStorage["autoUpdateOnWiffi"] = $scope.autoUpdateOnWiffi;
+				if (window.localStorage) 
+					localStorage["autoUpdateOnWiffi"] = $scope.autoUpdateOnWiffi;
 			}
 		});
 
@@ -1679,7 +1746,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				platform = 2;
 				break;
 			}
-		
 			model.setting.getVersion(platform, function(d){
 				if(d){//
 					$scope.setting.currentVersion = d.version;
@@ -1695,12 +1761,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					}
 				}
 			});
-		}else{
-			$scope.setting.lastVersion = "0.0.1";
-		}
-		
-		
-		
+		} else $scope.setting.lastVersion = "0.0.1";
 		break;
 	case '/shezhi-guanyuwomen':
 		$scope.onepage.id = "about";
@@ -1803,7 +1864,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				$scope.current._statusText = "上传中";
 				model.uploadAttachments($scope.current, function(item) {
 					var op;
-					switch($scope.current._type) {
+					switch(item._type) {
 						case "redian":
 							op = model.hotfocus.create;
 							break;
@@ -1827,10 +1888,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				transferCache.remove($scope.current);
 			},
 			detail: function(task) {
-				$scope.current = task;
-				$scope.loadedClass = "loaded";
-				angular.element(document.body).addClass("noscroll");
-				$scope.detailVisibility = "block";
+				if (task._status == "o1") {
+					$scope.current = task;
+					$scope.loadedClass = "loaded";
+					angular.element(document.body).addClass("noscroll");
+					$scope.detailVisibility = "block";
+				}
 			},
 			closeDetail: function() {
 				$scope.loadedClass = "";
