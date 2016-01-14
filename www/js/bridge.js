@@ -14,6 +14,7 @@
 	$.getScript("lib/mobiscroll-master/js/mobiscroll.datetime.js");
 	$.getScript("lib/mobiscroll-master/js/mobiscroll.frame.ios.js");
 	$.getScript("lib/mobiscroll-master/js/i18n/mobiscroll.i18n.zh.js");
+	$.getScript("lib/touch-0.2.14.min.js");
 })($(document.head));
 
 /*列均分*/
@@ -134,6 +135,55 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		    return value + (tail || ' …');
 	  };
 }])
+.directive("myTouchZoom", function() {
+	touch.config.swipeFactor = 1;
+	return {
+		restrict: "A",
+		link: function (scope, element, attrs) {
+			var _times;
+
+			function _zoom(e) {
+				_times++;
+				if (_times > 24) {
+					var scale =  "scale(" + e.scale + "," + e.scale + ")";
+					element.css({
+						"transform": scale,
+						"-ms-transform": scale,
+						"-moz-transform": scale,
+						"-webkit-transform": scale,
+						"-o-transform": scale
+					});
+					_times = 0;
+				}
+			}
+			
+			function _move(e) {
+				var p = element.position(),
+				left = p.left + (e.distanceX > 0 ? 20 : -20),
+				top = p.top + (e.distanceY > 0 ? 20 : -20);
+				if (left > 0) left = 0;
+				if (top > 0) top = 0;
+				element.css({
+					"top": top,
+					"left": left
+				});
+			}
+			
+			touch.on(element, "pinchstart", function() {
+				_times = 0;
+			});
+			touch.on(element, "pinchin", _zoom);
+			touch.on(element, "pinchout", _zoom);
+			touch.on(element, "swiping", _move);
+			scope.$on("$destroy", function() {
+				touch.off(element, "swiping");
+				touch.off(element, "pinchout");
+				touch.off(element, "pinchin");
+				touch.off(element, "pinchstart");
+			});
+		}
+	};
+})
 .directive("myMediaSelector", ["$window", "$parse", "$timeout", function($window, $parse, $timeout) {
 	var _pane = angular.element("<div></div>").css({
 		"width": "100%",
