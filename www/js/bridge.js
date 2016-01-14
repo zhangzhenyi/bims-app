@@ -469,7 +469,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	$rootScope.origionVersion = "0.0.4.0109_beta";
 	$rootScope.hasChecked = false;
 	$rootScope.autoUpdateOnWiffi = false;
-	$rootScope.videoThumbnail = "http://101.201.141.1/bims-test/images/default_play.jpg";
+//	$rootScope.videoThumbnail = "http://101.201.141.1/bims-test/images/default_play.jpg";
 	$rootScope.Constants = {
 			ISSUETYPE_QUALITY:1,
 			ISSUETYPE_SECURITY:2,
@@ -500,6 +500,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	$rootScope.user = {};
 	$rootScope.notice = {};
 	$rootScope.hotfocus = {};
+	$rootScope.trace = {};
 	$rootScope.news = {};
 	$rootScope.sect = {};
 	$rootScope.issues = {};
@@ -507,7 +508,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	$rootScope.onepage = {id: "about"};
 
 	$rootScope.setting ={
-			installer : "http://101.201.141.1/test/install.html",
+			installer : "",
 			currentVersion:"",
 			versionTitle:"",
 			versionRemark:"",
@@ -775,6 +776,62 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				}, angular.isFunction(c) ? c : angular.noop);
 			}
 		},
+		trace: {
+			create: function(d, c) {
+				_req({
+					method: "post",
+					url: "trace/create.jo",
+					data: d
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			list: function(p,t, c) {
+				_req({
+					method: "get",
+					url: "trace/list.jo",
+					params: {
+						pageNum: p,
+						traceType:t
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			search: function(t,p, tt,c) {
+				_req({
+					method: "post",
+					url: "trace/searchTraceByTitle.jo",
+					data: {
+						title:t,
+						pageNum: p,
+						traceType: tt 
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			get: function(i,c) {
+				_req({
+					method: "get",
+					url: "trace/getById.jo",
+					params: {
+						id: i
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			update: function(d, c) {
+				_req({
+					method: "post",
+					url: "trace/update.jo",
+					data: d
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			//id is issue ID
+			remove: function(id, c) {
+				_req({
+					method: "delete",
+					url: "trace/delete.jo",
+					params: {
+						id:parseInt(id)
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			}
+		},
 		feedback: {
 			create: function(title, content, c) {
 				_req({
@@ -945,6 +1002,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}
 			
 		},
+		
 		sect : {
 			list: function(t, pn, c) {
 				_req({
@@ -1036,7 +1094,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		tipmessage("upload checkinging...", "tiploading");
 		var item = transferCache.get();
 		if (item) {
-			alert("uploading");
 			tipmessage("uploading...", "tiploading");
 			item._status = "o2";
 			item._statusText = "上传中";
@@ -1198,7 +1255,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			$scope.$location.path("/redian");
 		},
 		setting:{
-			installer : "http://101.201.141.1/test/install.html",
+			installer : "",
 			currentVersion:"",
 			versionTitle:"",
 			versionRemark:"",
@@ -1747,7 +1804,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		else $scope.autoUpdateOnWiffi = false;
 		angular.extend($scope, {
 			setting:{
-				installer : "http://101.201.141.1/test/install.html",
+				installer : "",
 				currentVersion:"",
 				versionTitle:"",
 				versionRemark:"",
@@ -2704,6 +2761,74 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			$scope.files.filename = $scope.files.filename.substring(0, 8) + " ...";
 	}
 }])
+.controller("cSpotCheck", ["$scope", "model", function($scope, model){
+	traceType = 1;
+	switch($scope.$location.path()) {
+	case "/spotcheck-list" ://TRACE_TYPE_SIGN = 1; //现场签认
+		_page = 0;
+		console.log("/spotcheck-list");
+		angular.extend($scope, {
+			page: 1,
+			filterChanged:false,
+			filterTitle:"",
+			items: [],
+			load: function() {
+			if($scope.filterChanged){
+				if (_page != $scope.page) {
+					_page = $scope.page;
+					model.trace.search($scope.filterTitle, $scope.page, traceType, function(d) {
+						if (d && d.length > 0) {
+							for (var i = 0; i < d.length; i++)
+								$scope.items.push(d[i]);
+							$scope.page++;
+						}
+					});
+				}
+			}else{
+				if (_page != $scope.page) {
+					_page = $scope.page;
+					model.trace.list($scope.page,traceType, function(d) {
+						if (d && d.length > 0) {
+							for (var i = 0; i < d.length; i++)
+								$scope.items.push(d[i]);
+							$scope.page++;
+						}
+					});
+				}
+			}
+			},
+			search:function(){
+				$scope.filterChanged = true;
+				$scope.page = 1;
+				_page = 0;
+				$scope.items.length = 0;
+				$scope.load();
+			},
+			itemClick: function(item) {
+				$scope.trace.current = item;
+				$scope.$location.path("/spotcheck-detail");
+			}
+		});
+
+		break;
+	case "/spotcheck-create":
+		break;
+	case "/spotcheck-edit":
+		break;
+	case "/spotcheck-detail":
+		angular.extend($scope, function(){
+			
+		});
+		model.trace.get($scope.trace.current.id, function(d) {
+			if(d) {
+				$scope.trace.current = d;
+			}
+		});
+		
+
+		break;
+	}
+}])
 .config(["myRouteProvider", function(myRouteProvider) {
 	myRouteProvider
 	.when("/login", {
@@ -2867,6 +2992,22 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	.when("/onefile", {
 		templateUrl: "partials/one-file.html",
 		controller: "cOneFile"
+	})
+	.when("/spotcheck-list", {
+		templateUrl: "partials/spotcheck-list.html",
+		controller: "cSpotCheck"
+	})
+	.when("/spotcheck-create", {
+		templateUrl: "partials/spotcheck-create.html",
+		controller: "cSpotCheck"
+	})
+	.when("/spotcheck-edit", {
+		templateUrl: "partials/spotcheck-edit.html",
+		controller: "cSpotCheck"
+	})
+	.when("/spotcheck-detail", {
+		templateUrl: "partials/spotcheck-details.html",
+		controller: "cSpotCheck"
 	})
 	.otherwise({
         redirectTo: "/"

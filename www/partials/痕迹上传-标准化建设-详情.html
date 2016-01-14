@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Cache-Control" content="no-transform " />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta name="format-detection" content="telephone=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<link rel="shortcut icon" href="favicon.ico">
+<title>桥梁ios</title>
+<link href="img/c.css" rel="stylesheet" type="text/css">
+</head>
+
+<body class="pt60">
+<header class="bg1">
+	<span class="return"><a href="javascript:history.go(-1);"><img src="img/11.png"></a></span>
+	<p class="title">标准化建设</p>
+	<span class="more"><img src="img/icon-more-1.png"></span>
+	<div class="pop-window1">
+	<img src="img/icon-jian5.png" class="j"><div class="cb"></div>
+	<ul>
+		<li><a href="#.html"><img src="img/icon-edit201512.png"> 编辑</a></li>
+		<li><a href="javascript:void(0)" id="del"><img src="img/icon-del201512.png"> 删除</a></li>
+		<li><a href="#.html"><img src="img/icon-m201512.png"> 处理</a></li>
+	</ul>
+	</div>
+</header>
+<section class="mlr10 mt15 pb20">
+	<p class="title-1">title 2008</p>
+</section>
+<section>
+	<ul class="list-3">
+		
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-2.jpg">地点</span><span class="r">啦啦啦啦</span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-8.jpg">人物</span><span class="r">重要人物</span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-12.jpg">标段</span><span class="r">土建S1标段</span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-14.jpg">创建人</span><span class="rr">Xgirl</span><span class="time">2015-11-12 11:34</span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-5.jpg">相片</span><span class="r"><a href="img/tem-img/img-100100-1.jpg" class="pic"><img src="img/tem-img/img-100100-1.jpg"></a></span>
+		</li>
+	</ul>
+</section>
+
+<script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="js/effect.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("header .more").click(function(){
+		if($(".pop-window1").height()== "0"){
+			$(".pop-window1").animate({height:100},300);
+		}else{
+			$(".pop-window1").animate({height:0},300);
+		}
+	})
+})
+</script>
+</body>
+</html>

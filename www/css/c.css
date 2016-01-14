@@ -375,3 +375,47 @@ nav a.on span.i5,nav a:hover span.i5{ background: url(../img/nav-i5on.png) no-re
    display: none;
 }
 .triangle-up {width: 0;height: 0;border-left: 10px solid;border-right: 10px solid;border-bottom: 20px solid red;}
+
+/*mr yang*/
+.list-3 li .rr{min-height:30px; font-size: 14px; line-height:18px;color: #525252;display:block; width:25%; float: left; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;padding-top:5px;}
+.list-3 li .time{font-size: 14px; text-align: right;line-height: 16px; color: rgb(99, 99, 99); position: relative; float:left; padding-top:5px;}
+.list-3 li .ll{ min-height: 30px; font-size: 14px;line-height: 30px; font-weight: bold;color: #525252; display: block; width: 2%; float: right; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; vertical-align: middle;margin-right: 50px;}
+.list-3 li .ll img{ width: 30px; vertical-align: top;}
+.list-3 li .ll a{ display:block;}
+.list-3 li .t{  min-height: 30px; font-size: 14px; line-height: 30px; font-weight: bold; color: #525252; display: block; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; vertical-align: middle;}
+.list-3 li .t img{width: 30px; vertical-align: top; margin-right: 3px;}
+.list-3 li .tp{ margin-left:33px; color:#858585; font-size:14px;}
+
+.list-2015-1-11 li{margin-bottom:10px;}
+.list-2015-1-11 a{display:block;padding:10px;position:relative;background:#fff;}
+
+.list-2015-1-11 .r{padding:0;padding-left:70px;display:block;min-height:62px;}
+.list-2015-1-11 span.i{width:60px;height:60px;margin-right:5px;display:block;position:absolute;left:10px;top:10px;}
+.list-2015-1-11 span.i img{width:100%;}
+.list-2015-1-11 span.title{display:block;font-size:16px;line-height:20px;font-weight:bold;color:#333;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; position:absolute; top:20px; right:10px;}
+.list-2015-1-11 span.txt{display:block;font-size: 14px; line-height:18px; color: #969696;margin-bottom:3px; margin-top:10px;}
+.list-2015-1-11 span.time{display:block;font-size: 12px; line-height: 16px;color: #c7c7c7;position:absolute; width:95%; left:0; bottom:5px; padding-left:10px;}
+.list-2015-1-11 span.time span.name{display: inline-block;font-size: 14px;line-height: 16px;position:absolute;right:0;top:0;}
+.list-2015-1-11 span.time span.c1{display: inline-block;color: #a2d9ff;font-size: 14px;line-height: 18px;position:absolute;right:0;top:-2px;padding-left:8px;padding-right:8px;border:1px solid #b7d4e6;border-radius:5px;}
+.list-2015-1-11 span.pic{display:block;float:none;display:inline-block;margin-top:5px;}
+.list-2015-1-11 span.pic span{width:50px;height:50px;overflow:hidden;margin-right:3px;display:inline-block;}
+.list-2015-1-11 span.pic span img{min-width:50px;min-height:50px;}
+
+.warp { border:1px solid #969696; border-radius:5px; margin-left:33px; margin-bottom:5px; margin-right:10px; padding:5px 10px;}
+.warp .tp{ color:#858585; font-size:14px;}
+.lll{min-height: 30px;font-size: 14px;line-height: 30px;font-weight: bold;color: rgb(82, 82, 82); display: block; width:100%; box-sizing: border-box; vertical-align: middle; margin-bottom:5px;}
+.lll img{width: 30px; vertical-align: top; margin-right: 3px;}
+
+.list2-2015-1-11{ overflow:hidden; padding-top:40px;}
+.list2-2015-1-11 li{ float:left; width:50%; margin-bottom:50px;}
+.list2-2015-1-11 li .pic{ width:190px; height:auto; display:block; margin:0 auto; padding:0 20px;}
+.list2-2015-1-11 li .pic img{ width:150px;}
+.list2-2015-1-11 li .title{ margin-bottom:10px;}
+.list2-2015-1-11 li .title a{ color:#6a6a6a; font-size:16px; display:block; text-align:center;}
+
+.list3-2015-1-11{ overflow:hidden; padding:10px;}
+.list3-2015-1-11 li{ width:50%;float:left; }
+.list3-2015-1-11 li .pic{ display:block;border:1px solid #d4d4d4;margin-right:5px; margin-bottom:5px;padding-bottom: 5px;}
+.list3-2015-1-11 li .mr{margin-right:0px;}
+.list3-2015-1-11 li .pic img{ display:block; width:130px; margin:5px auto; border-radius:5px;}
+.list3-2015-1-11 li .pic .title{ color:#2f3130; text-align:center; font-size:14px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; padding:0 5px;}

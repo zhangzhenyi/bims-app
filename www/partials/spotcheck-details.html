@@ -1,0 +1,60 @@
+
+<div class="pb75 pt60 ng-scope">
+<header class="bg1">
+	<span class="return"><a href="" ng-click="$location.back()"><img src="img/11.png"></a></span>
+	<p class="title">现场签认</p>
+	<span class="more"><img src="img/icon-more-1.png" style="width:24px;height:20px;"></span>
+	<div class="pop-window1">
+	<img src="img/icon-jian5.png" class="j"><div class="cb"></div>
+	<ul>
+		<li><a href=""><img src="img/icon-edit201512.png"> 编辑</a></li>
+		<li><a href="javascript:void(0)" id="del"><img src="img/icon-del201512.png"> 删除</a></li>
+		<li><a href=""><img src="img/icon-m201512.png"> 处理</a></li>
+	</ul>
+	</div>
+</header>
+<section class="mlr10 mt15 pb20">
+	<p class="title-1">{{trace.current.title}}</p>
+</section>
+<section>
+	<ul class="list-3">
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-1.jpg">构件编码</span><span class="r">{{trace.current.compId}} </span>
+		</li>
+		<li class="clearfix">
+			<span class="lll"><img src="img/i-xq-2.jpg">构件信息</span>
+			<div class="warp">
+				<p class="tp"><span>名称：</span>{{trace.current.component.name}}</p>
+				<p class="tp"><span>设计：</span>{{trace.current.component.designer}}</p>
+				<p class="tp"><span>施工：</span>{{trace.current.component.constructor}}</p>
+				<p class="tp"><span>监理：</span>{{trace.current.component.supervisor}}</p>        
+			</div>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-13.jpg">签认意见</span><span class="r">{{trace.current.content}}</span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-14.jpg">签认</span><span class="rr">{{trace.current.publisherName}}</span>
+			<span class="time">{{::formatDate(trace.current.createTime)}}</span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-5.jpg">相片</span><span class="r">
+			<a ng-repeat="pic in ::trace.current.picAttachmentList" ng-click="fileClicked('相片', pic.fileUrl)" href="" class="pic"><img ng-src="{{::pic.thumbnailUrl}}" style="width:100%;"/></a></span>
+		</li>
+	</ul>
+</section>
+
+<script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="js/effect.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("header .more").click(function(){
+		if($(".pop-window1").height()== "0"){
+			$(".pop-window1").animate({height:100},300);
+		}else{
+			$(".pop-window1").animate({height:0},300);
+		}
+	})
+})
+</script>
+</div>
