@@ -634,9 +634,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		tipmessage1(message="文件上传中",img="<img src='img/loading.gif';><br/>",id="tipimg");
 		transferCallback = transferCallback || angular.noop;
 		for (i = 0; i < item.picAttachmentList.length; i++) {
-			changeTipmessage(message="第"+counter+"个，<br/>共"+total+"个",id="tipimg");
+			//changeTipmessage(message="第"+counter+"个，<br/>共"+total+"个",id="tipimg");
 			transferCallback(item.picAttachmentList[i].fileUrl, _transfer(item.picAttachmentList[i].fileUrl, 2, item.topicType, function(d, url) {
-
 				if (d) {
 					o.attachments.push(d);
 					o.picAttachmentList.push(d);
@@ -646,7 +645,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}));
 		}
 		for (i = 0; i < item.videoAttachmentList.length; i++) {
-			changeTipmessage(message="第"+counter+"个，<br/>共"+total+"个",id="tipimg");
+			//changeTipmessage(message="第"+counter+"个，<br/>共"+total+"个",id="tipimg");
 			transferCallback(item.videoAttachmentList[i].fileUrl, _transfer(item.videoAttachmentList[i].fileUrl, 3, item.topicType, function(d, url) {
 				if (d) {
 					o.attachments.push(d);
@@ -2014,6 +2013,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 						default:
 							op = angular.noop;
 					}
+					delete item._index;
+					delete item._type;
+					delete item._status;
+					delete item._statusText;
+					delete item._time;
 					op(item, function(d) {
 						if (d) {
 							model.removeFiles($scope.current.picAttachmentList.concat($scope.current.videoAttachmentList));
@@ -2022,7 +2026,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 							$timeout(function() {
 								$scope.tipVisibility = "none";
 							}, 1000);
-						}
+						} else tipmessage("上传失败");
 					});
 				});
 			},
