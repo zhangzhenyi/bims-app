@@ -2871,9 +2871,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					name:"",
 					designer:"",
 					constructor:"",
-					supervisor:"",
-					picAttachmentList: [],
-				}
+					supervisor:""
+				},
+				picAttachmentList: []
 			},
 			
 			onscan:function(){
@@ -2908,7 +2908,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		        	return;
 		        }
 				model.uploadAttachments($scope.newItem, function(item) {
-					model.hotfocus.create(item, function(d) {
+					model.trace.create(item, function(d) {
 						if (d) {
 							model.removeFiles($scope.newItem.picAttachmentList);
 							tipmessage("创建成功");
