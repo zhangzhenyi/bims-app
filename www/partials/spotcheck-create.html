@@ -1,30 +1,39 @@
-<div class="href="" ng-click="$location.back()">
+<div  class="pb75 pt60 ng-scope">
 <!--header-->
 <header class="bg1">
 	<span class="return"><a href="" ng-click="$location.back()"><img src="img/11.png"></a></span>
 	<p class="title">现场签认</p>
-	<span class="txt1"><a href="">保存</a></span><span class="nochoose"><a href="">提交</a></span>
+	<span class="txt1" style=""><a ng-click="save()" href=""><span>保存</span></a></span><span class="nochoose"><a ng-click="submit()" href=""><span>提交</span></a></span>
 </header>
 <section class="mt10">
 	<ul class="list-3">
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-14.jpg">标题</span><span class="r"><textarea name="" cols="" rows="" class="fromarea" placeholder="您还可以输入150个字符"></textarea></span>
+			<span class="l"><img src="img/i-xq-14.jpg">标题</span><span class="r">
+			<span class="r">
+			<textarea name="" ng-model="newItem.title" cols="" rows="" class="fromarea" placeholder="最多支持150个字符" ng-maxlength="150" maxlength="150" required></textarea></span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-1.jpg">构件编码</span><span class="rr">comp_xxxx_120</span><span class="ll"><a href="#.html"><img src="img/scan.png"></a></span>
+			<span class="l"><img src="img/i-xq-1.jpg">构件编码</span><span class="rr">
+			{{::trace.current.compId}}</span>
+			<span class="ll"><a href="" ng-click="onscan()"><img src="img/scan.png"></a></span>
 		</li>
 		<li class="clearfix">
 			<span class="t"><img src="img/i-xq-2.jpg">构建信息</span>
-            <p class="tp"><span>名称：</span>comp_xxxx_120 name</p>
-            <p class="tp"><span>设计：</span>北京交科勘察设计研究院有限公司</p>
-            <p class="tp"><span>施工：</span>中交第二公路工程局有限公司</p>
-            <p class="tp"><span>监理：</span>中铁武汉大桥工程咨询监理有限公司</p>
+            <p class="tp"><span>名称：</span>{{::newItem.component.name}}</p>
+            <p class="tp"><span>设计：</span>{{::newItem.component.designer}}</p>
+            <p class="tp"><span>施工：</span>{{::newItem.component.constructor}}</p>
+            <p class="tp"><span>监理：</span>{{::newItem.component.supervisor}}</p>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-3.jpg">签认意见</span><span class="r"><textarea name="" cols="" rows="" class="fromarea" placeholder="您还可以输入150个字符"></textarea></span>
+			<span class="l"><img src="img/i-xq-3.jpg">签认意见</span><span class="r">
+			<label style="color:#aaa;">您还可输入{{remain}}个字符</label>
+			<textarea name="" ng-model="newItem.content" cols="" rows="" class="fromarea" placeholder="" ng-maxlength="150" maxlength="150" ng-change="changed()" required></textarea></span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-5.jpg">相片</span><span class="r pr"><img src="img/i-jia.jpg" class="pic"/><input type="file" class="file"/></span>
+			<span class="l"><img src="img/i-xq-5.jpg">相片</span>
+			<span ng-repeat="pic in newItem.picAttachmentList" class="pic" style="margin-right:5px;">
+			<img ng-src="{{pic.thumbnailUrl}}" style="width:100%; vertical-align:bottom;margin-bottom:0;"/></span>
+			<my-media-selector src="img/i-jia.jpg" class="pic" type="img" change="imageChanged($uri)"></my-media-selector></span>
 		</li>
 	</ul>
 </section>

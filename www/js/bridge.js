@@ -231,10 +231,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	function _error(error) {
 		if (angular.isString(error)) {
 			if (error != "no image selected")
-				alert("error: " + error);
+				tipmessage("发生错误："+error);
 		} else if(angular.isObject(error)) {
 			if (error.code != 3)
-				alert("error: " + JSON.stringify(error));
+				tipmessage("发生错误,Code:"+error.code);
 		}
 	}
 	
@@ -2862,6 +2862,39 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 
 		break;
 	case "/spotcheck-create":
+		angular.extend($scope, {
+			remain:150,
+			newItem:{
+				content:"",
+				title:"",
+				component:{
+					name:"",
+					designer:"",
+					constructor:"",
+					supervisor:"",
+					picAttachmentList: [],
+				}
+			},
+			
+			onscan:function(){
+				alert("scan");
+				cordova.plugins.barcodeScanner.scan(
+					      function (result) {
+					    	  if(result.cancelled == 0){
+					    		  alert(JSON.stringify(result));
+					    		  $scope.newItem.compId = result.text;
+					    		  tipmessage("数据提取成功");
+					    	  }
+					    
+					          
+					      }, 
+					      function (error) {
+					    	  tipmessage("扫描二维码失败");
+					      }
+				);
+			}
+		});
+		
 		break;
 	case "/spotcheck-edit":
 		break;
