@@ -434,7 +434,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	};
 }])
-.factory("transferCache", function() {
+.factory("transferCache", ["$rootScope", function($rootScope) {
 	var _key = "transferQ", _value = {list: [], count: 0}, _ls = window.localStorage || {};
 	 
 	(function() {
@@ -450,14 +450,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}
 		}
 	})();
-	
+
 	function _save() {
 		_ls[_key] = JSON.stringify(_value);
 	}
 	 
 	return {
 		list: function() {
-			return _value.list;
+			var r = new Array(), i;
+			for (i = 0; i < _value.list.length; i++)
+				if ((_value.list[i]._user || $rootScope.user.id) == $rootScope.user.id)
+					r.push(_value.list[i]);
+			return r;
 		},
 		get: function() {
 			for (var i = 0; i < _value.list.length; i++) {
@@ -472,6 +476,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				_type: type || 'redian',
 				_status: "o1",
 				_statusText: "未上传",
+				_user: $rootScope.user.id,
 				_time: new Date()
 			});
 			_value.list.push(e);
@@ -497,7 +502,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		},
 		save: _save
 	};
-})
+}])
 .factory("model", ["$rootScope", "$http", "$interval", "$timeout", "myRoute", function($rootScope, $http, $interval, $timeout, myRoute) {
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
 	function _fn() {
