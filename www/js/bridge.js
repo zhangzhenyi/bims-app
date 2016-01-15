@@ -231,10 +231,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	function _error(error) {
 		if (angular.isString(error)) {
 			if (error != "no image selected")
-				tipmessage("发生错误："+error);
+				tipmessage("发生错误："+error, "erroTip");
 		} else if(angular.isObject(error)) {
 			if (error.code != 3)
-				tipmessage("发生错误,Code:"+error.code);
+				tipmessage("发生错误,Code:"+error.code, "erroTip");
 		}
 	}
 	
@@ -2892,6 +2892,39 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					    	  tipmessage("扫描二维码失败");
 					      }
 				);
+			},
+			changed: function() {
+				$scope.remain = 150 - $scope.newItem.content.length;
+			},
+			imageChanged: function(uri) {
+				$scope.newItem.picAttachmentList.push({
+					fileUrl: uri,
+					thumbnailUrl: uri
+				});
+			},
+			submit: function() {
+				if(!$scope.form.$valid){
+		        	tipmessage("请检查输入内容是否正确");
+		        	return;
+		        }
+				model.uploadAttachments($scope.newItem, function(item) {
+					model.hotfocus.create(item, function(d) {
+						if (d) {
+							model.removeFiles($scope.newItem.picAttachmentList);
+							tipmessage("创建成功");
+							$timeout(function() {
+								$scope.$location.back();
+							}, 1000);
+						}
+					});
+				});
+			},
+			save: function() {
+				transferCache.push($scope.newItem, "spotcheck");
+				tipmessage("保存成功");//是否需要返回值？
+				$timeout(function() {
+					$scope.$location.back();
+				}, 1000);
 			}
 		});
 		
