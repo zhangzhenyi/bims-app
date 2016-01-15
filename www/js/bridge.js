@@ -136,50 +136,56 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	  };
 }])
 .directive("myTouchZoom", function() {
-	touch.config.swipeFactor = 1;
 	return {
 		restrict: "A",
 		link: function (scope, element, attrs) {
-			var _times;
+			var _scale = 1, _translateX = 0, _translateY = 0, scale = "", translate = "";
 
-			function _zoom(e) {
-				_times++;
-				if (_times > 24) {
-					var scale =  "scale(" + e.scale + "," + e.scale + ")";
-					element.css({
-						"transform": scale,
-						"-ms-transform": scale,
-						"-moz-transform": scale,
-						"-webkit-transform": scale,
-						"-o-transform": scale
-					});
-					_times = 0;
-				}
-			}
-			
-			function _move(e) {
-				var p = element.position(),
-				left = p.left + (e.distanceX > 0 ? 20 : -20),
-				top = p.top + (e.distanceY > 0 ? 20 : -20);
-				if (left > 0) left = 0;
-				if (top > 0) top = 0;
-				element.css({
-					"top": top,
-					"left": left
-				});
-			}
-			
-			touch.on(element, "pinchstart", function() {
-				_times = 0;
+			touch.on(element, "touchstart", function(e) {
+				e.preventDefault();
 			});
-			touch.on(element, "pinchin", _zoom);
-			touch.on(element, "pinchout", _zoom);
-			touch.on(element, "swiping", _move);
+			touch.on(element, "pinchstart", function(e) {
+				_translateX = 0;
+				_translateY = 0;
+				translate = "";
+			});
+			touch.on(element, "pinch", function(e) {
+				_scale += (e.scale - 1);
+				if (_scale < 1) _scale = 1;
+				else if (_scale > 20) _scale = 20;
+				scale =  " scale(" + _scale + ")";
+				var s = translate + scale;
+				element.css({
+					"transform": s,
+					"-ms-transform": s,
+					"-moz-transform": s,
+					"-webkit-transform": s,
+					"-o-transform": s
+				});
+			});
+			touch.on(element, "swiping", function(e) {
+				if (_scale > 1) {
+					translate = "translate(" + (e.distanceX + _translateX) + "px," + (e.distanceY + _translateY) + "px)";
+					var t = translate + scale;
+					element.css({
+						"transform": t,
+						"-ms-transform": t,
+						"-moz-transform": t,
+						"-webkit-transform": t,
+						"-o-transform": t
+					});
+				}
+			});
+			touch.on(element, "swipeend", function(e) {
+				_translateX += e.distanceX;
+				_translateY += e.distanceY;
+			});
 			scope.$on("$destroy", function() {
+				touch.off(element, "swipeend");
 				touch.off(element, "swiping");
-				touch.off(element, "pinchout");
-				touch.off(element, "pinchin");
+				touch.off(element, "pinch");
 				touch.off(element, "pinchstart");
+				touch.off(element, "touchstart");
 			});
 		}
 	};
@@ -652,7 +658,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 		
 		$timeout(function _fn_waiting_attachment() {
-			console.log(counter);
 			if (counter < total) $timeout(_fn_waiting_attachment, 200);
 			else {
 				(callback || angular.noop)(o);
@@ -1524,7 +1529,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		doLike:function(){
 			if(!$scope.isVote){
 				model.vote.doLike($scope.topicId, $scope.topicType, function(d){
-					console.log("Click vote true");
 					$scope.voteMembers.push($scope.user.name);
 					$scope.isVote = true;
 					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
@@ -1533,7 +1537,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}else{
 				if($scope.voteMembers.length <=0) return;
 				model.vote.disLike($scope.topicId, $scope.topicType, function(d){
-					console.log("unselect vote true");
 					for(var i=0; i < $scope.voteMembers.length; i++){
 						if($scope.voteMembers[i] == $scope.user.name){
 							$scope.voteMembers.splice(i,1);
@@ -1645,7 +1648,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			} else {
 				if($scope.voteMembers.length <=0) return;
 				model.vote.disLike($scope.topicId, $scope.topicType, function(d){
-					console.log("unselect vote true");
 					for(var i=0; i < $scope.voteMembers.length; i++){
 						if($scope.voteMembers[i] == $scope.user.name){
 							$scope.voteMembers.splice(i,1);
@@ -2211,7 +2213,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		doLike:function(){
 			if(!$scope.isVote){
 				model.vote.doLike($scope.topicId, $scope.topicType, function(d){
-					console.log("Click vote true");
 					$scope.voteMembers.push($scope.user.name);
 					$scope.isVote = true;
 					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
@@ -2220,7 +2221,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}else{
 				if($scope.voteMembers.length <=0) return;
 				model.vote.disLike($scope.topicId, $scope.topicType, function(d){
-					console.log("unselect vote true");
 					for(var i=0; i < $scope.voteMembers.length; i++){
 						if($scope.voteMembers[i] == $scope.user.name){
 							$scope.voteMembers.splice(i,1);
@@ -2412,7 +2412,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}
 			$timeout(function _fn_create() {
 				if (counter >= $scope.total) {
-					console.log(counter);
 					model.issues.update(_item, function(d) {
 						if (d) {
 							$scope.tipVisibility = "block";
@@ -2597,7 +2596,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		tipVisibility: "none",
 		tipContent:"",
 		selectAction:function(){
-			console.log($scope.issueItem.issueCategory);
 			if($scope.issueItem.issueCategory != 4){
 				$scope.issueItem.issueCategoryRemark = "";
 			}
@@ -2816,7 +2814,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	switch($scope.$location.path()) {
 	case "/spotcheck-list" ://TRACE_TYPE_SIGN = 1; //现场签认
 		_page = 0;
-		console.log("/spotcheck-list");
 		angular.extend($scope, {
 			page: 1,
 			filterChanged:false,
