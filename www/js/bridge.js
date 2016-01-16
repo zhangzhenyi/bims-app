@@ -835,6 +835,17 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				}, angular.isFunction(c) ? c : angular.noop);
 			}
 		},
+		component: {
+			get: function(i,c){
+				_req({
+					method: "get",
+					url: "component/get.jo",
+					params: {
+						compId: i
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			}
+		},
 		trace: {
 			create: function(d, c) {
 				_req({
@@ -873,6 +884,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
+			getByCompId:function(i,pn,t, c){
+				_req({
+					method: "get",
+					url: "trace/getByCompId.jo",
+					params:{
+						compId:i,
+						pageNum:pn,
+						traceType:t
+						
+					}
+				}, angular.isFunction(c)?c, angular.noop);
+			},
+			
 			update: function(d, c) {
 				_req({
 					method: "post",
@@ -2870,6 +2894,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	case "/spotcheck-create":
 		angular.extend($scope, {
 			remain:150,
+			saveTitle:"spotcheckCreate",
 			newItem:{
 				content:"",
 				title:"",
@@ -2883,16 +2908,33 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			},
 			
 			onscan:function(){
-				alert("scan");
 				cordova.plugins.barcodeScanner.scan(
 					      function (result) {
 					    	  if(result.cancelled == 0){
 					    		  alert(JSON.stringify(result));
 					    		  $scope.newItem.compId = result.text;
 					    		  tipmessage("数据提取成功");
+					    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+					    			  if(d){
+					    				  tipmessage("该构件签认已完成", "_FoundCompId");
+					    				  //Jump to sign details
+					    				  $scope.trace.current = d;
+					    				  $scope.$location.path("/spotcheck-detail");
+					    			  }else{
+					    				  
+					    				  //Get component info
+					    				  model.component.get($scope.newItem.compId, function(d){
+					    					  if(d){
+					    						  $scope.newItem.component = d;
+					    					  }else{
+					    						  tipmessage("该构件编码不存在", "_notFoundCompId");
+					    					  }
+					    				  });
+					    			  }
+					    		  });
 					    	  }
 					    
-					          
+					    	  
 					      }, 
 					      function (error) {
 					    	  tipmessage("扫描二维码失败");
@@ -2926,7 +2968,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				});
 			},
 			save: function() {
-				transferCache.push($scope.newItem, "spotcheck");
+				transferCache.push($scope.newItem, $scope.saveTitle);
 				tipmessage("保存成功");//是否需要返回值？
 				$timeout(function() {
 					$scope.$location.back();
@@ -2934,8 +2976,30 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}
 		});
 		
-		break;
 	case "/spotcheck-edit":
+		model.trace.get($scope.trace.current.id, function(d) {
+			if(d) {
+				$scope.newItem = d;
+			}
+		});
+		$scope.saveTitle = "spockcheckEdit";
+		$scope.submit = function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
+			model.uploadAttachments($scope.newItem, function(item) {
+				model.trace.update(item, function(d) {
+					if (d) {
+						model.removeFiles($scope.newItem.picAttachmentList);
+						tipmessage("创建成功");
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
+					}
+				});
+			});
+		};
 		break;
 	case "/spotcheck-detail":
 		angular.extend($scope, function(){
