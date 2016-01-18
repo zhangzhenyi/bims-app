@@ -135,6 +135,100 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		    return value + (tail || ' …');
 	  };
 }])
+.directive("myTouchRemove", ["$window", "$parse", function($window, $parse) {
+	var _selected,
+	_bk = angular.element("<div></div>").css({
+		"width": "100%",
+		"height": "100%",
+		"position":"absolute",
+		"top":"0",
+		"left":"0",
+		"background":"rgba(0,0,0,0.4)",
+		"z-index":"999",
+		"display":"none"
+	}).bind("click", function() {_select(0);}).appendTo("body"),
+	_pane = angular.element("<div></div>").css({
+		"background-color": "rgba(204,204,204,.5)",
+		"width": "100%",
+		"height": "80px",
+		"position": "absolute",
+		"top": angular.element($window).height() + 1
+	})
+	.append(angular.element("<p></p>").css("margin", 0).append(
+	angular.element("<button>删除</button>")
+		.css({
+			"margin-top": "5px",
+			"width": "100%",
+			"height":"30px"
+		})
+		.bind("click", function() {_select(1);}))
+	)
+	.append(angular.element("<p></p>").css("margin", 0).append(
+		angular.element("<button>取消</button>")
+		.css({
+			"width": "100%",
+			"margin-top": "5px",
+			"height":"30px"
+		})
+		.bind("click", function() {_select(0);}))
+	);
+	_pane.appendTo(_bk);
+	
+	function _select(n) {
+		_pane.css("top", angular.element($window).height() + 1);
+		_bk.css("display", "none");
+		_selected(n);
+	}
+	
+	function _show(c) {
+		_bk.css("display", "block");
+		_selected = c || angular.noop;
+		_pane.animate({top: angular.element($window).height() - 80}, {
+			speed: "slow",
+			queue: false
+		});
+	}
+	
+	return {
+		restrict: "A",
+		link: function (scope, element, attrs) {
+			var _able = false,
+			_ele = angular.element("<i></i>").css({
+				"position": "absolute",
+				"margin": "-4px auto auto 44px",
+				"background": "transparent url(img/remove.png) no-repeat 0 0",
+				"width": "10px",
+				"height": "10px",
+				"cursor": "pointer",
+				"display": "none"
+			}).insertBefore(element);
+			touch.on(element, "touchstart", function(e) {
+				e.preventDefault();
+			});
+			touch.on(element, "hold", function(e) {
+				if (!_able) {
+					_able = true;
+					_ele.css("display", "inline-block");
+					_show(function(n) {
+						if (n == 1) {
+							var item = attrs.myTouchRemove.substr(attrs.myTouchRemove.indexOf("(") + 1);
+							item = $.trim(item.substring(0, item.lastIndexOf(")"))), r = {};
+							r[item] = ($parse(item))(scope);
+							($parse(attrs.myTouchRemove))(scope, r);
+						} else {
+							_ele.css("display", "none");
+							_able = false;
+						}
+					});
+				}
+			});
+			scope.$on("$destroy", function() {
+				touch.off(element, "hold");
+				touch.off(element, "touchstart");
+			});
+		}
+	};
+}])
 .directive("myTouchZoom", function() {
 	return {
 		restrict: "A",
@@ -435,15 +529,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	};
 }])
 .factory("transferCache", ["$rootScope", function($rootScope) {
-	var _key = "transferQ", _value = {list: [], count: 0}, _ls = window.localStorage || {};
+	var _key = "transferQ", _value = {list: [], count: 0}, _ls = window.localStorage || {}, _view;
 	 
 	(function() {
 		var v = _ls[_key];
 		if (v) {
 			_value = JSON.parse(v);
 			if (angular.isArray(_value.list)) {
-				if (_value.list.length == 0)
-					_value.count = 0;
+				if (_value.list.length == 0) _value.count = 0;
 			} else {
 				_value.list = [];
 				_value.count = 0;
@@ -457,11 +550,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	 
 	return {
 		list: function() {
-			var r = new Array(), i;
-			for (i = 0; i < _value.list.length; i++)
+			if (_view || false) return _view;
+			_view = [];
+			for (var i = 0; i < _value.list.length; i++)
 				if ((_value.list[i]._user || $rootScope.user.id) == $rootScope.user.id)
-					r.push(_value.list[i]);
-			return r;
+					_view.push(_value.list[i]);
+			return _view;
 		},
 		get: function() {
 			for (var i = 0; i < _value.list.length; i++) {
@@ -470,17 +564,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			}
 			return false;
 		},
-		push: function(item, type) {
+		push: function(item, type, update) {
 			var e = angular.extend(item, {
 				_index: _value.count++,
 				_type: type || 'redian',
 				_status: "o1",
 				_statusText: "未上传",
 				_user: $rootScope.user.id,
-				_time: new Date()
+				_time: new Date(),
+				_update: update == "update"
 			});
 			_value.list.push(e);
 			_save();
+			_view.push(e);
 			return e;
 		},
 		remove: function(item) {
@@ -488,9 +584,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				if (_value.list[i]._index == item._index) {
 					_value.list.splice(i, 1);
 					_save();
+					for (i = 0; i < _view.length; i++) {
+						if (_view[i]._index == item._index) {
+							_view.splice(i, 1);
+							break;
+						}
+					}
 					if (window.resolveLocalFileSystemURL) {
 						var uris = item.picAttachmentList.concat(item.videoAttachmentList), j;
 						for (j = 0; j < uris.length; j++) {
+							if (uris[j].id || false) continue;
 							window.resolveLocalFileSystemURL(uris[j].fileUrl, function (file) {
 								file.remove(angular.noop, angular.noop);
 							});
@@ -606,7 +709,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			$rootScope.loading = false;
 			c(d);
 		})
-		.error(function() {
+		.error(function(d,s) {
 			$rootScope.loading = false;
 			c(false);
 		});
@@ -640,7 +743,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		transferCallback = transferCallback || angular.noop;
 		for (i = 0; i < item.picAttachmentList.length; i++) {
 			//changeTipmessage(message="第"+counter+"个，<br/>共"+total+"个",id="tipimg");
-			transferCallback(item.picAttachmentList[i].fileUrl, _transfer(item.picAttachmentList[i].fileUrl, 2, item.topicType, function(d, url) {
+			if (item.picAttachmentList[i].id || false) {
+				o.attachments.push(item.picAttachmentList[i]);
+				o.picAttachmentList.push(item.picAttachmentList[i]);
+				counter++;
+			} else transferCallback(item.picAttachmentList[i].fileUrl, _transfer(item.picAttachmentList[i].fileUrl, 2, item.topicType, function(d, url) {
 				if (d) {
 					o.attachments.push(d);
 					o.picAttachmentList.push(d);
@@ -651,7 +758,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 		for (i = 0; i < item.videoAttachmentList.length; i++) {
 			//changeTipmessage(message="第"+counter+"个，<br/>共"+total+"个",id="tipimg");
-			transferCallback(item.videoAttachmentList[i].fileUrl, _transfer(item.videoAttachmentList[i].fileUrl, 3, item.topicType, function(d, url) {
+			if (item.videoAttachmentList[i].id || false) {
+				o.attachments.push(item.videoAttachmentList[i]);
+				o.videoAttachmentList.push(item.videoAttachmentList[i]);
+				counter++;
+			} else transferCallback(item.videoAttachmentList[i].fileUrl, _transfer(item.videoAttachmentList[i].fileUrl, 3, item.topicType, function(d, url) {
 				if (d) {
 					o.attachments.push(d);
 					o.videoAttachmentList.push(d);
@@ -1182,13 +1293,20 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			item._statusText = "上传中";
 			model.uploadAttachments(item, function(i) {
 				var op;
-				switch(item._type) {
+				switch(i._type) {
 					case "redian":
-						op = model.hotfocus.create;
+						op = i._update ? model.hotfocus.update : model.hotfocus.create;
 						break;
 					default:
 						op = angular.noop;
 				}
+				delete i._index;
+				delete i._type;
+				delete i._status;
+				delete i._statusText;
+				delete i._user;
+				delete i._time;
+				delete i._update;
 				op(i, function(d) {
 					if (d) {
 						model.removeFiles(item.picAttachmentList.concat(item.videoAttachmentList));
@@ -1725,96 +1843,69 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	});
 }])
-.controller("cRedianEdit", ["$scope", "$timeout", "model","transferCache", function($scope, $timeout, model,transferCache) {
-	function _upload(file, blob, c) {
-		var formData = new FormData();
-		formData.append("file", file);
-		formData.append("attachment", blob);
-		model.uploadFile("attachment/upload.jo", formData, c);
-	}
-	$scope.newItem = {};
-	model.hotfocus.get($scope.hotfocus.current.id, function(d) {
-		if(d) {
-			$scope.hotfocus.current = d;
-			$scope.newItem = d;
-			
-			$scope.changed();
+.controller("cRedianEdit", ["$scope", "$timeout", "model","transferCache", function($scope, $timeout, model, transferCache) {
+	function _removeAttachment(id, arr) {
+		for (var i = 0; i < arr.length; i++) {
+			if (arr[i].id == id) {
+				arr.splice(i, 1);
+				for (i = 0; i < $scope.hotfocus.current.attachments.length; i++) {
+					if ($scope.hotfocus.current.attachments[i].id == id) {
+						$scope.hotfocus.current.attachments.splice(i, 1);
+						break;
+					}
+				}
+				$scope.$apply();
+				break;
+			}
 		}
-	});
+	}
+	
 	angular.extend($scope, {
 		tipVisibility: "none",
 		remain: 150,
+		removeImage: function(id) {
+			_removeAttachment(id, $scope.hotfocus.current.picAttachmentList);
+		},
+		removeVideo: function(id) {
+			_removeAttachment(id, $scope.hotfocus.current.videoAttachmentList);
+		},
 		changed: function() {
-			$scope.remain = 150 - $scope.newItem.content.length;
+			$scope.remain = 150 - ($scope.hotfocus.current.content && $scope.hotfocus.current.content.length);
 		},
-		imgChanged: function(e) {
-			var file = (angular.element(e))[0].files[0];
-			$scope.newItem.picAttachmentList.push({
-				file: file,
-				thumbnailUrl: URL.createObjectURL(file)
+		imageChanged: function(uri) {
+			$scope.hotfocus.current.picAttachmentList.push({
+				fileUrl: uri,
+				thumbnailUrl: uri
 			});
-			$scope.$apply();
-			e.outerHTML = e.outerHTML;
 		},
-		videoChanged: function(e) {
-			var file = angular.element(e)[0].files[0];
-			$scope.newItem.videoAttachmentList.push({
-				file: file,
-				thumbnailUrl: URL.createObjectURL(file)
+		videoChanged: function(uri) {
+			$scope.hotfocus.current.videoAttachmentList.push({
+				fileUrl: uri,
+				thumbnailUrl: uri
 			});
-			$scope.$apply();
-			e.outerHTML = e.outerHTML;
 		},
 		submit: function() {
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
-			var _item = {
-				id:$scope.newItem.id,
-				title: $scope.newItem.title,
-				content: $scope.newItem.content,
-				attachments: [],
-				picAttachmentList:[],
-				videoAttachmentList: []
-			},
-			total = $scope.newItem.picAttachmentList.length + $scope.newItem.videoAttachmentList.length,
-			counter = 0,
-			picBlob = new Blob(['{"fileType":2,"topicType":2}'], { type: "application/json"}),
-			vidBlob = new Blob(['{"fileType":3,"topicType":2}'], { type: "application/json"}), i;
-			for (i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
-				_upload($scope.newItem.picAttachmentList[i].file, picBlob, function(d) {
+			model.uploadAttachments($scope.hotfocus.current, function(item) {
+				model.hotfocus.update(item, function(d) {
 					if (d) {
-						_item.attachments.push(d);
-						_item.picAttachmentList.push(d);
+						tipmessage("修改成功");
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
 					}
-					counter++;
 				});
-			}
-			for (i = 0; i < $scope.newItem.videoAttachmentList.length; i++) {
-				_upload($scope.newItem.videoAttachmentList[i].file, vidBlob, function(d) {
-					if (d) {
-						_item.attachments.push(d);
-						_item.videoAttachmentList.push(d);
-					}
-					counter++;
-				});
-			}
-			$timeout(function _fn_create() {
-				if (counter >= total) {
-					model.hotfocus.update(_item, function(d) {
-						if (d) {
-							tipmessage("修改成功");
-							$timeout(function() {
-								$scope.$location.back();
-							}, 1000);
-						}
-					});
-				} else $timeout(_fn_create, 200);
 			});
 		},
 		save: function() {
-			
+			transferCache.push($scope.hotfocus.current, "redian", "update");
+			tipmessage("保存成功");//是否需要返回值？
+			$timeout(function() {
+				$scope.$location.back();
+			}, 1000);
 		}
 	});
 }])
@@ -2037,7 +2128,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					var op;
 					switch(item._type) {
 						case "redian":
-							op = model.hotfocus.create;
+							op = item._update ? model.hotfocus.update : model.hotfocus.create;
 							break;
 						default:
 							op = angular.noop;
@@ -2046,7 +2137,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					delete item._type;
 					delete item._status;
 					delete item._statusText;
+					delete item._user;
 					delete item._time;
+					delete item._update;
 					op(item, function(d) {
 						if (d) {
 							model.removeFiles($scope.current.picAttachmentList.concat($scope.current.videoAttachmentList));
