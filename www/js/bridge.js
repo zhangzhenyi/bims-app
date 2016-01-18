@@ -1918,6 +1918,26 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			videoAttachmentList: []
 		},
 		remain: 150,
+		removeImage: function(url) {
+			for (var i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
+				if ($scope.newItem.picAttachmentList[i].fileUrl == url) {
+					model.removeFiles([$scope.newItem.picAttachmentList[i]]);
+					$scope.newItem.picAttachmentList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
+		removeVideo: function(url) {
+			for (var i = 0; i < $scope.newItem.videoAttachmentList.length; i++) {
+				if ($scope.newItem.videoAttachmentList[i].fileUrl == url) {
+					model.removeFiles([$scope.newItem.videoAttachmentList[i]]);
+					$scope.newItem.videoAttachmentList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
 		changed: function() {
 			$scope.remain = 150 - $scope.newItem.content.length;
 		},
