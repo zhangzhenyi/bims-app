@@ -7,8 +7,8 @@
 	<div class="pop-window1">
 	<img src="img/icon-jian5.png" class="j"><div class="cb"></div>
 	<ul>
-		<li><a href=""><img src="img/icon-edit201512.png"> 编辑</a></li>
-		<li><a href="javascript:void(0)" id="del"><img src="img/icon-del201512.png"> 删除</a></li>
+		<li ng-show="issueItem.issueStatus == 1 && user.id == issueItem.publisherId"><a href=""><img src="img/icon-edit201512.png"> 编辑</a></li>
+		<li ng-show="user.id == issueItem.publisherId"><a href="javascript:void(0)" id="del"><img src="img/icon-del201512.png"> 删除</a></li>
 		<li><a href=""><img src="img/icon-m201512.png"> 处理</a></li>
 	</ul>
 	</div>
