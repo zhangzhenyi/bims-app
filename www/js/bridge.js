@@ -15,6 +15,7 @@
 	$.getScript("lib/mobiscroll-master/js/mobiscroll.frame.ios.js");
 	$.getScript("lib/mobiscroll-master/js/i18n/mobiscroll.i18n.zh.js");
 	$.getScript("lib/touch-0.2.14.min.js");
+	$.getScript("lib/Chart.min.js");
 })($(document.head));
 
 /*列均分*/
@@ -134,6 +135,41 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		    }
 		    return value + (tail || ' …');
 	  };
+}])
+.directive("myDonutChart", ["$window", "$parse", function($window, $parse) {
+	return {
+		restrict: "AE",
+		transclude: true,
+		replace: true,
+		template: "<div></div>",
+		compile: function(t, a) {
+			t.css({
+				"float": "left"
+			});
+			var _ctx = angular.element("<canvas/>")
+			.css({
+				"width": a.width || "200",
+				"height": a.height || "200"
+			})
+			.appendTo(t)
+			.getContext("2d");
+			
+			return {
+				pre: function(scope) {
+					if (!(scope.myDonutCharts || false))
+						scope.myDonutCharts = [];
+				},
+				post: function(scope, element, attrs) {					
+					scope.myDonutCharts.push(new Chart(_ctx).Doughnut(($parse(attrs.data))(scope), {responsive : true}));
+					scope.$on("$destroy", function() {
+						angular.forEach(scope.myDonutCharts, function(chart) {
+							chart.destroy();
+						});
+					});
+				}
+			};
+		}
+	};
 }])
 .directive("myTouchRemove", ["$window", "$parse", function($window, $parse) {
 	var _selected,
