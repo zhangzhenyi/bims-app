@@ -894,7 +894,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 						traceType:t
 						
 					}
-				}, angular.isFunction(c)?c, angular.noop);
+				}, angular.isFunction(c) ? c: angular.noop);
 			},
 			
 			update: function(d, c) {
