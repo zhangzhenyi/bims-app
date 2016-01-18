@@ -662,6 +662,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	};
 	
 	$rootScope.user = {};
+	$rootScope.component ={};
 	$rootScope.notice = {};
 	$rootScope.hotfocus = {};
 	$rootScope.trace = {};
@@ -3011,6 +3012,107 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			newItem:{
 				content:"",
 				title:"",
+				compId:"",
+				component:{
+					name:"",
+					designer:"",
+					constructor:"",
+					supervisor:""
+				},
+				picAttachmentList: []
+			},
+			
+			onscan:function(){
+				cordova.plugins.barcodeScanner.scan(
+					      function (result) {
+					    	  if(result.cancelled == 0){
+					    		  $scope.newItem.compId = result.text;
+					    		  tipmessage("二维码提取成功");
+					    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+					    			  if(d){
+					    				  tipmessage("该构件签认已完成", "_FoundCompId");
+					    				  //Jump to sign details
+					    				  $scope.trace.current = d;
+					    				  $scope.$location.path("/spotcheck-detail");
+					    			  }else{
+					    				  tipmessage("该构件允许签认", "_FoundCompId");
+					    				  //Get component info
+					    				  model.component.get($scope.newItem.compId, function(d){
+					    					  if(d){
+					    						  tipmessage("获得构件信息", "_FoundCompId");
+					    						  $scope.newItem.component = d;
+					    					  }else{
+					    						  tipmessage("该构件编码不存在", "_notFoundCompId");
+					    					  }
+					    				  });
+					    			  }
+					    		  });
+					    	  }
+					    
+					    	  
+					      }, 
+					      function (error) {
+					    	  tipmessage("扫描二维码失败");
+					      }
+				);
+			},
+			changed: function() {
+				$scope.remain = 150 - $scope.newItem.content.length;
+			},
+			imageChanged: function(uri) {
+				$scope.newItem.picAttachmentList.push({
+					fileUrl: uri,
+					thumbnailUrl: uri
+				});
+			},
+			submit: function() {
+				if(!$scope.form.$valid){
+		        	tipmessage("请检查输入内容是否正确");
+		        	return;
+		        }
+				else if(!$scope.newItem.component){
+					tipmessage("请检查构件是否存在");
+		        	return;
+				}
+				alert("s....");
+				model.uploadAttachments($scope.newItem, function(item) {
+					model.trace.create(item, function(d) {
+						if (d) {
+							model.removeFiles($scope.newItem.picAttachmentList);
+							tipmessage("创建成功");
+							$timeout(function() {
+								$scope.$location.back();
+							}, 1000);
+						}
+					});
+				});
+			},
+			save: function() {
+				
+				if(!$scope.form.$valid){
+		        	tipmessage("请检查输入内容是否正确");
+		        	return;
+		        }
+				else if(!$scope.newItem.component){
+					tipmessage("请检查构件是否存在");
+		        	return;
+				}
+				alert("save....");
+				transferCache.push($scope.newItem, $scope.saveTitle);
+				tipmessage("保存成功");//是否需要返回值？
+				$timeout(function() {
+					$scope.$location.back();
+				}, 1000);
+			}
+		});
+		break;
+	case "/spotcheck-edit":
+		angular.extend($scope, {
+			remain:150,
+			saveTitle:"spockcheckEdit",
+			newItem:{
+				content:"",
+				title:"",
 				component:{
 					name:"",
 					designer:"",
@@ -3069,10 +3171,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		        	return;
 		        }
 				model.uploadAttachments($scope.newItem, function(item) {
-					model.trace.create(item, function(d) {
+					model.trace.update(item, function(d) {
 						if (d) {
 							model.removeFiles($scope.newItem.picAttachmentList);
-							tipmessage("创建成功");
+							tipmessage("提交成功");
 							$timeout(function() {
 								$scope.$location.back();
 							}, 1000);
@@ -3081,6 +3183,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				});
 			},
 			save: function() {
+				if(!$scope.form.$valid){
+		        	tipmessage("请检查输入内容是否正确");
+		        	return;
+		        }
 				transferCache.push($scope.newItem, $scope.saveTitle);
 				tipmessage("保存成功");//是否需要返回值？
 				$timeout(function() {
@@ -3088,35 +3194,24 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				}, 1000);
 			}
 		});
-		
-	case "/spotcheck-edit":
 		model.trace.get($scope.trace.current.id, function(d) {
 			if(d) {
 				$scope.newItem = d;
 			}
 		});
-		$scope.saveTitle = "spockcheckEdit";
-		$scope.submit = function() {
-			if(!$scope.form.$valid){
-	        	tipmessage("请检查输入内容是否正确");
-	        	return;
-	        }
-			model.uploadAttachments($scope.newItem, function(item) {
-				model.trace.update(item, function(d) {
-					if (d) {
-						model.removeFiles($scope.newItem.picAttachmentList);
-						tipmessage("创建成功");
-						$timeout(function() {
-							$scope.$location.back();
-						}, 1000);
-					}
-				});
-			});
-		};
+		
 		break;
 	case "/spotcheck-detail":
-		angular.extend($scope, function(){
-			
+		angular.extend($scope, {
+			del : function(){
+				model.trace.remove($scope.trace.current.id, function(d){
+					if(d){
+						tipmessage("删除成功");
+					}else{
+						tipmessage("删除失败");
+					}
+				});
+			}
 		});
 		model.trace.get($scope.trace.current.id, function(d) {
 			if(d) {
