@@ -15,8 +15,6 @@
 	$.getScript("lib/mobiscroll-master/js/mobiscroll.frame.ios.js");
 	$.getScript("lib/mobiscroll-master/js/i18n/mobiscroll.i18n.zh.js");
 	$.getScript("lib/touch-0.2.14.min.js");
-	$.getScript("lib/radialIndicator.min.js");
-	$.getScript("lib/angular.radialIndicator.js");
 })($(document.head));
 
 /*列均分*/
@@ -1441,7 +1439,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		}
 	};
 }])
-.controller("cAutoTransfer", function() {})
+.controller("cAutoTransfer", ["$scope", function($scope) {}])
 .controller("cLoading", ["$scope", "$document", "$rootScope","model", function($scope, $document, $rootScope, model) {
 	$rootScope.myHeaderPosition = "fixed";
 	$scope.displayLoading = function() {
@@ -3138,7 +3136,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				picAttachmentList: [],
 				videoAttachmentList: []
 			},
-			
 			onscan:function(){
 				cordova.plugins.barcodeScanner.scan(
 					      function (result) {
@@ -3193,6 +3190,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				}
 				alert("s....");
 				model.uploadAttachments($scope.newItem, function(item) {
+					delete item.videoAttachmentList;
 					model.trace.create(item, function(d) {
 						if (d) {
 							model.removeFiles($scope.newItem.picAttachmentList);
