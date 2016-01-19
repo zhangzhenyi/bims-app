@@ -311,7 +311,49 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	};
 })
-.directive("myMediaSelector", ["$window", "$parse", "$timeout", function($window, $parse, $timeout) {
+.factory("fileSystem", ["$window", function($window) {
+	var _root, _dir, _dirName = ".bims.h5.cache";
+	
+	function _error(error) {
+		if (angular.isString(error)) {
+			if (error != "no image selected")
+				tipmessage("发生错误："+ error, "erroTip");
+		} else if(angular.isObject(error)) {
+			if (error.code != 3)
+				tipmessage("发生错误, Code:" + error.code, "erroTip");
+		}
+	}
+	
+	if ($window.requestFileSystem) {
+		$window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
+			_root = fileSystem.root;
+			_root.getDirectory(_dirName, {create: true, exclusive: false}, function(dirEntry) {
+				_dir = dirEntry;
+			}, _error);
+		}, _error);
+	}
+	
+	return {
+		clear: function() {
+			if (_dir) {
+				_dir.removeRecursively(function() {
+					_dir = null;
+					_root.getDirectory(_dirName, {create: true, exclusive: false}, function(dirEntry) {
+						_dir = dirEntry;
+					}, _error);
+				}, _error);
+			}
+		},
+		create: function(url, c) {
+			$window.resolveLocalFileSystemURL(url, function (file) {
+				file.copyTo(_dir, (new Date()).getTime() + file.name.substr(file.name.lastIndexOf('.')), function(f) {
+					(c || angular.noop)(f.toURL());
+				}, _error);
+			}, _error);
+		}
+	};
+}])
+.directive("myMediaSelector", ["$window", "$parse", "$timeout", "fileSystem", function($window, $parse, $timeout, fileSystem) {
 	var _pane = angular.element("<div></div>").css({
 		"width": "100%",
 		"height": "100%",
@@ -352,7 +394,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			"height":"30px"
 		})
 		.bind("click", function() {_select(0);}))
-	), 	_selected, _dir;
+	), 	_selected;
+	
 	_pane.append(btns);
 	
 	function _error(error) {
@@ -363,14 +406,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			if (error.code != 3)
 				tipmessage("发生错误,Code:"+error.code, "erroTip");
 		}
-	}
-	
-	if ($window.requestFileSystem) {
-		$window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
-			fileSystem.root.getDirectory(".bims.h5.cache", {create: true, exclusive: false}, function(dirEntry) {
-				_dir = dirEntry;
-			}, _error);
-		}, _error);
 	}
 	
 	function _select(n) {
@@ -391,21 +426,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	function _captureVideo(files, scope, change) {
 		tipmessage1(message="文件生成中",img="<img src='img/loading.gif';><br/>",id="tipimg");
 		for (var i = 0; i < files.length; i++) {
-			$window.resolveLocalFileSystemURL("file:///" + files[i].fullPath, function (file) {
-				file.copyTo(_dir, (new Date()).getTime() + file.name.substr(file.name.lastIndexOf('.')), function(f) {
-					scope.$apply(change(scope, {$uri: f.toURL()}));
-				}, _error);
-			}, _error);
+			fileSystem.create("file:///" + files[i].fullPath, function(url) {
+				scope.$apply(change(scope, {$uri: url}));
+			});
 		}
 		closetipmessage1("tipimg");
 	}
 	
 	function _selectMedia(uri, scope, change) {
-		$window.resolveLocalFileSystemURL(uri, function (file) {
-			file.copyTo(_dir, (new Date()).getTime() + file.name.substr(file.name.lastIndexOf('.')), function (f) {
-				scope.$apply(change(scope, {$uri: f.toURL()}));
-				if ($window.navigator && navigator.camera) navigator.camera.cleanup(angular.noop, angular.noop);
-			}, _error);
+		fileSystem.create(uri, function(url) {
+			scope.$apply(change(scope, {$uri: url}));
 		});
 	}
 	
@@ -2030,7 +2060,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	});
 }])
-.controller("cWode", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
+.controller("cWode", ["$scope", "$timeout", "model", "transferCache", "fileSystem", function($scope, $timeout, model, transferCache, fileSystem) {
 	switch($scope.$location.path()) {
 	case '/shezhi':
 		//Get latest version
@@ -2047,6 +2077,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		angular.extend($scope, {
 			clear: function() {
 				transferCache.clear();
+				fileSystem.clear();
 			},
 			setting:{
 				installer : "",
