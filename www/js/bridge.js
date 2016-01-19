@@ -15,7 +15,8 @@
 	$.getScript("lib/mobiscroll-master/js/mobiscroll.frame.ios.js");
 	$.getScript("lib/mobiscroll-master/js/i18n/mobiscroll.i18n.zh.js");
 	$.getScript("lib/touch-0.2.14.min.js");
-	$.getScript("lib/Chart.min.js");
+	$.getScript("lib/radialIndicator.min.js");
+	$.getScript("lib/angular.radialIndicator.js");
 })($(document.head));
 
 /*列均分*/
@@ -558,7 +559,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	var _key = "transferQ", _value = {list: [], count: 0}, _ls = window.localStorage || {}, _view;
 	 
 	(function() {
-		var v = _ls[_key];
+		var v = _ls[_key], i;
 		if (v) {
 			_value = JSON.parse(v);
 			if (angular.isArray(_value.list)) {
@@ -566,6 +567,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			} else {
 				_value.list = [];
 				_value.count = 0;
+			}
+			for (i = 0; i < _value.list.length; i++) {
+				_value.list[i]._status = "o1";
+				_value.list[i]._statusText = "未上传";
 			}
 		}
 	})();
