@@ -604,7 +604,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			_value.list.push(e);
 			_save();
 			tipmessage("成功结束");
-			_view.push(e);
+			if (_view || false) _view.push(e);
 			return e;
 		},
 		remove: function(item) {
@@ -612,10 +612,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				if (_value.list[i]._index == item._index) {
 					_value.list.splice(i, 1);
 					_save();
-					for (i = 0; i < _view.length; i++) {
-						if (_view[i]._index == item._index) {
-							_view.splice(i, 1);
-							break;
+					if (_view || false) {
+						for (i = 0; i < _view.length; i++) {
+							if (_view[i]._index == item._index) {
+								_view.splice(i, 1);
+								break;
+							}
 						}
 					}
 					if (window.resolveLocalFileSystemURL) {
