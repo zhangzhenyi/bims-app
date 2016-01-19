@@ -584,9 +584,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			return _view;
 		},
 		get: function() {
-			for (var i = 0; i < _value.list.length; i++) {
-				if (_value.list[i]._status == "o1")
-					return _value.list[i];
+			if (_value.list.length > 0) {
+				for (var i = 0; i < _value.list.length; i++) {
+					if (_value.list[i]._status == "o2") return false;
+				}
+				return _value.list[_value.list.length - 1];
 			}
 			return false;
 		},
