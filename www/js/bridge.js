@@ -2176,6 +2176,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					if (!($scope.current.topicType)) $scope.current.topicType = 2;
 					$scope.hotfocus.current = $scope.current;
 					$scope.$location.path("/redianxiangqing");
+				}else if($scope.current._type == "spotcheck" || $scope.current._type == "spotcheck"){
+					if (!($scope.current.topicType)) $scope.current.topicType = 8;
+					$scope.trace.current = $scope.current;
+					$scope.$location.path("/spotcheck-detail");
+				}else if($scope.current._type == "issue"){
+					if (!($scope.current.topicType)) $scope.current.topicType = 3;
+					$scope.issues.currentIssue = $scope.current;
+					$scope.$location.path("/issue-details");
 				}
 			},
 			transfer: function() {
@@ -2187,6 +2195,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					switch(item._type) {
 						case "redian":
 							op = item._update ? model.hotfocus.update : model.hotfocus.create;
+							break;
+						case "spotcheck":
+							op = item._update ? model.trace.update : model.trace.create;
+							break;
+						case "issue":
+							op = item_update ? model.issues.update : model.issues.create;
 							break;
 						default:
 							op = angular.noop;
@@ -3230,7 +3244,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
-				transferCache.push($scope.newItem, $scope.saveTitle);
+				transferCache.push($scope.newItem, $scope.saveTitle, "update");
 				tipmessage("保存成功");//是否需要返回值？
 				$timeout(function() {
 					$scope.$location.back();
