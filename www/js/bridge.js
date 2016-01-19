@@ -600,8 +600,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				_time: new Date(),
 				_update: update == "update"
 			});
+			tipmessage("开始保存");
 			_value.list.push(e);
 			_save();
+			tipmessage("成功结束");
 			_view.push(e);
 			return e;
 		},
@@ -2982,7 +2984,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			$scope.files.filename = $scope.files.filename.substring(0, 8) + " ...";
 	}
 }])
-.controller("cSpotCheck", ["$scope", "model", function($scope, model){
+.controller("cSpotCheck", ["$scope", "model", "transferCache", "$timeout",function($scope, model, transferCache, $timeout){
 	traceType = 1;
 	switch($scope.$location.path()) {
 	case "/spotcheck-list" ://TRACE_TYPE_SIGN = 1; //现场签认
@@ -3152,9 +3154,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				cordova.plugins.barcodeScanner.scan(
 					      function (result) {
 					    	  if(result.cancelled == 0){
-					    		  alert(JSON.stringify(result));
 					    		  $scope.newItem.compId = result.text;
-					    		  tipmessage("数据提取成功");
+					    		  tipmessage("二维码提取成功");
 					    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					    			  if(d){
 					    				  tipmessage("该构件签认已完成", "_FoundCompId");
@@ -3162,10 +3163,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					    				  $scope.trace.current = d;
 					    				  $scope.$location.path("/spotcheck-detail");
 					    			  }else{
-					    				  
+					    				  tipmessage("该构件允许签认", "_FoundCompId");
 					    				  //Get component info
 					    				  model.component.get($scope.newItem.compId, function(d){
 					    					  if(d){
+					    						  tipmessage("获得构件信息", "_FoundCompId");
 					    						  $scope.newItem.component = d;
 					    					  }else{
 					    						  tipmessage("该构件编码不存在", "_notFoundCompId");
@@ -3195,7 +3197,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
-		        }
+		        }else if(!$scope.newItem.component){
+					tipmessage("请检查构件是否存在");
+		        	return;
+				}
 				model.uploadAttachments($scope.newItem, function(item) {
 					model.trace.update(item, function(d) {
 						if (d) {
@@ -3212,7 +3217,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
-		        }
+		        }else if(!$scope.newItem.component){
+					tipmessage("请检查构件是否存在");
+		        	return;
+				}
 				transferCache.push($scope.newItem, $scope.saveTitle);
 				tipmessage("保存成功");//是否需要返回值？
 				$timeout(function() {
