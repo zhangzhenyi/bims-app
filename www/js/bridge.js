@@ -122,7 +122,7 @@ function isBlankString(s) {
 	return false;
 }
 
-angular.module("bridgeH5", ["myRoute", "ngSanitize"])
+angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 .filter('cutTail', [function () {
 	  return function (value, wordwise, max, tail) {
 		    if (!value) return '';
@@ -137,28 +137,44 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		    return value + (tail || ' …');
 	  };
 }])
-.directive("myDonutChart", ["$parse", function($parse) {
+.directive("myRadialIndicator", ["$parse", function($parse) {
 	return {
 		restrict: "AE",
 		transclude: true,
 		replace: true,
 		template: "<div></div>",
 		compile: function(t, a) {
-			var _ctx = (angular.element("<canvas></canvas>").appendTo(t))[0]	.getContext("2d");
-			return {
-				pre: function(scope) {
-					if (!(scope.myDonutCharts || false))
-						scope.myDonutCharts = [];
-				},
-				post: function(scope, element, attrs) {
-					scope.myDonutCharts.push(new Chart(_ctx).Doughnut(($parse(attrs.data))(scope), {responsive : true}));
-					scope.$on("$destroy", function() {
-						angular.forEach(scope.myDonutCharts, function(chart) {
-							chart.destroy();
-						});
-					});
-				}
-			};
+			angular.element("<div></div>")
+			.css({
+				"font-family": "宋体",
+				"font-size": "18px",
+				"font-weight": "bold",
+				"color": "#87CEEB"
+			})
+			.html("{{" + a.bigModel + "}}%")
+			.appendTo(t);
+			angular.element("<div></div>")
+			.css({
+				"display": "inline-block",
+				"margin-top": "-8px"
+			})
+			.attr({
+				"data-radial-indicator": "{radius: 60, barWidth: 15, percentage: true, displayNumber: false, barColor: '#87CEEB'}",
+				"data-radial-indicator-model": a.bigModel
+			})
+			.append(
+				angular.element("<div></div>")
+				.css({
+					"position": "absolute",
+					"margin-top": "20px",
+					"margin-left": "20px"
+				})
+				.attr({
+					"data-radial-indicator": "{radius: 40, barWidth: 15, percentage: true, barColor: '#87CEEB', fontSize: 20, fontFamily: '宋体'}",
+					"data-radial-indicator-model": a.smallModel
+				})
+			)
+			.appendTo(t);
 		}
 	};
 }])
