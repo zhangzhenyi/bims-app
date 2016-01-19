@@ -1418,6 +1418,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					}
 				}
 			}, attrs.interval ? parseInt(attrs.interval) : 2000, 0, false);
+			
 			scope.$on("$destroy", function() {
 				$interval.cancel(id);
 			});
@@ -2237,6 +2238,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				$scope.current._statusText = "上传中";
 				model.uploadAttachments($scope.current, function(item) {
 					var op;
+					alert(item._type);
 					switch(item._type) {
 						case "redian":
 							op = item._update ? model.hotfocus.update : model.hotfocus.create;
@@ -3208,7 +3210,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	case "/spotcheck-edit":
 		angular.extend($scope, {
 			remain:150,
-			saveTitle:"spockcheck",
+			saveTitle:"spotcheck",
 			newItem:{
 				content:"",
 				title:"",

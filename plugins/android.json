@@ -21,6 +21,9 @@
         },
         "phonegap-plugin-barcodescanner": {
             "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "cordova-plugin-network-information": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
         }
     },
     "dependent_plugins": {}
