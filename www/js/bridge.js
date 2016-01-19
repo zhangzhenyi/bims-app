@@ -1356,7 +1356,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	};
 }])
-.directive("myAutoTransfer", ["$rootScope","$interval", "$timeout", "transferCache", "model", function($rootScope, $interval, $timeout, transferCache, model) {
+.directive("myAutoTransfer", ["$rootScope","$interval", "$timeout", "$window", "transferCache", "model", function($rootScope, $interval, $timeout, $window, transferCache, model) {
 	var  _transfers = {};
 	
 	function _transfer() {
@@ -1401,33 +1401,30 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 	}
 	
-	function _check() {
-		if($rootScope.user && $rootScope.user.name) {
-			if (((window.localStorage && localStorage["autoUpdateOnWiffi"] == "true") || false) && ((window.navigator && navigator.network) ? navigator.network.connection.type == Connection.WIFI : false))
-				$timeout(_transfer);
-			else {
-				angular.forEach(_transfers, function(transfer) {
-					transfer.abort();
-				});
-				_transfers = {};
-			}
-		}
-	}
-	
 	return {
 		restrict: "E",
 		transclude: true,
 		replace: true,
 		link: function (scope, element, attrs) {
-			var id = $interval(_check, parseInt(attrs.interval), 0, false);
+			var id = $interval(function() {
+				if($rootScope.user && $rootScope.user.name) {
+					if ((($window.localStorage && localStorage["autoUpdateOnWiffi"] == "true") || false) && (($window.navigator && navigator.network) ? navigator.network.connection.type == Connection.WIFI : false))
+						$timeout(_transfer);
+					else {
+						angular.forEach(_transfers, function(transfer) {
+							transfer.abort();
+						});
+						_transfers = {};
+					}
+				}
+			}, attrs.interval ? parseInt(attrs.interval) : 2000, 0, false);
 			scope.$on("$destroy", function() {
 				$interval.cancel(id);
 			});
 		}
 	};
 }])
-.controller("myAutoTransfer", ["$scope", function($scope) {
-}])
+.controller("cAutoTransfer", function() {})
 .controller("cLoading", ["$scope", "$document", "$rootScope","model", function($scope, $document, $rootScope, model) {
 	$rootScope.myHeaderPosition = "fixed";
 	$scope.displayLoading = function() {
