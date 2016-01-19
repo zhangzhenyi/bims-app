@@ -640,6 +640,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				}
 			}
 		},
+		clear: function() {
+			 _value = {list: [], count: 0};
+			 _view = null;
+			 _save();
+		},
 		save: _save
 	};
 }])
@@ -2032,6 +2037,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		}
 		else $scope.autoUpdateOnWiffi = false;
 		angular.extend($scope, {
+			clear: function() {
+				transferCache.clear();
+			},
 			setting:{
 				installer : "",
 				currentVersion:"",
