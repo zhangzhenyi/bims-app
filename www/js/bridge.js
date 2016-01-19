@@ -1402,15 +1402,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	}
 	
 	function _check() {
-		if(!$rootScope.user.name) return;
-
-		if ( ((window.localStorage && localStorage["autoUpdateOnWiffi"] == "true") || false) && ((navigator && navigator.network) ? navigator.network.connection.type == Connection.WIFI : false))
-			$timeout(_transfer);
-		else {
-			angular.forEach(_transfers, function(transfer) {
-				transfer.abort();
-			});
-			_transfers = {};
+		if($rootScope.user && $rootScope.user.name) {
+			if (((window.localStorage && localStorage["autoUpdateOnWiffi"] == "true") || false) && ((window.navigator && navigator.network) ? navigator.network.connection.type == Connection.WIFI : false))
+				$timeout(_transfer);
+			else {
+				angular.forEach(_transfers, function(transfer) {
+					transfer.abort();
+				});
+				_transfers = {};
+			}
 		}
 	}
 	
