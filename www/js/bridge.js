@@ -136,30 +136,20 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		    return value + (tail || ' …');
 	  };
 }])
-.directive("myDonutChart", ["$window", "$parse", function($window, $parse) {
+.directive("myDonutChart", ["$parse", function($parse) {
 	return {
 		restrict: "AE",
 		transclude: true,
 		replace: true,
 		template: "<div></div>",
 		compile: function(t, a) {
-			t.css({
-				"float": "left"
-			});
-			var _ctx = angular.element("<canvas/>")
-			.css({
-				"width": a.width || "200",
-				"height": a.height || "200"
-			})
-			.appendTo(t)
-			.getContext("2d");
-			
+			var _ctx = (angular.element("<canvas></canvas>").appendTo(t))[0]	.getContext("2d");
 			return {
 				pre: function(scope) {
 					if (!(scope.myDonutCharts || false))
 						scope.myDonutCharts = [];
 				},
-				post: function(scope, element, attrs) {					
+				post: function(scope, element, attrs) {
 					scope.myDonutCharts.push(new Chart(_ctx).Doughnut(($parse(attrs.data))(scope), {responsive : true}));
 					scope.$on("$destroy", function() {
 						angular.forEach(scope.myDonutCharts, function(chart) {
