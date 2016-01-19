@@ -753,6 +753,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			c(d);
 		})
 		.error(function(d,s) {
+			alert(d);
+			alert(s);
 			$rootScope.loading = false;
 			c(false);
 		});
@@ -1339,6 +1341,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				switch(i._type) {
 					case "redian":
 						op = i._update ? model.hotfocus.update : model.hotfocus.create;
+						break;
+					case "spotcheck":
+						op = i._update ? model.trace.update : model.trace.create;
+						break;
+					case "issue":
+						op = i._update ? model.issues.update : model.issues.create;
 						break;
 					default:
 						op = angular.noop;
@@ -2208,7 +2216,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 							op = item._update ? model.trace.update : model.trace.create;
 							break;
 						case "issue":
-							op = item_update ? model.issues.update : model.issues.create;
+							op = item._update ? model.issues.update : model.issues.create;
 							break;
 						default:
 							op = angular.noop;
@@ -2235,6 +2243,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 			remove: function() {
 				$scope.closeDetail();
 				transferCache.remove($scope.current);
+				tipmessage("删除成功");
 			},
 			detail: function(task) {
 				if (task._status == "o1") {
@@ -3078,7 +3087,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					constructor:"",
 					supervisor:""
 				},
-				picAttachmentList: []
+				topicType: 8,
+				picAttachmentList: [],
+				videoAttachmentList: []
 			},
 			
 			onscan:function(){
@@ -3129,7 +3140,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
 		        }
-				else if(!$scope.newItem.component){
+				else if(isBlankString($scope.newItem.compId)){
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
@@ -3152,7 +3163,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
 		        }
-				else if(!$scope.newItem.component){
+				else if(isBlankString($scope.newItem.compId)){
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
@@ -3178,7 +3189,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 					constructor:"",
 					supervisor:""
 				},
-				picAttachmentList: []
+				topicType: 8,
+				picAttachmentList: [],
+				videoAttachmentList: []
 			},
 			
 			onscan:function(){
@@ -3228,7 +3241,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
-		        }else if(!$scope.newItem.component){
+		        }else if(isBlankString($scope.newItem.compId)){
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
@@ -3248,7 +3261,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
-		        }else if(!$scope.newItem.component){
+		        }else if(isBlankString($scope.newItem.compId)){
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
