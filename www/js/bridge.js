@@ -3104,7 +3104,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	case "/spotcheck-create":
 		angular.extend($scope, {
 			remain:150,
-			saveTitle:"spotcheckCreate",
+			saveTitle:"spotcheck",
 			newItem:{
 				content:"",
 				title:"",
@@ -3207,7 +3207,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 	case "/spotcheck-edit":
 		angular.extend($scope, {
 			remain:150,
-			saveTitle:"spockcheckEdit",
+			saveTitle:"spockcheck",
 			newItem:{
 				content:"",
 				title:"",
