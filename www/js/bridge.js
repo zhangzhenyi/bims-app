@@ -2219,11 +2219,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize"])
 				$scope.current.id = 0;
 				$scope.current.createTime = $scope.current._time;
 				$scope.current.publisherName = $scope.user.name;
+				alert("$scope.current._type: "+$scope.current._type);
 				if ($scope.current._type == "redian") {
 					if (!($scope.current.topicType)) $scope.current.topicType = 2;
 					$scope.hotfocus.current = $scope.current;
 					$scope.$location.path("/redianxiangqing");
-				}else if($scope.current._type == "spotcheck" || $scope.current._type == "spotcheck"){
+				}else if($scope.current._type == "spotcheck"){
 					if (!($scope.current.topicType)) $scope.current.topicType = 8;
 					$scope.trace.current = $scope.current;
 					$scope.$location.path("/spotcheck-detail");
