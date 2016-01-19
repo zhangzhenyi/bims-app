@@ -3128,6 +3128,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				content:"",
 				title:"",
 				compId:"",
+				traceType:traceType,
 				component:{
 					name:"",
 					designer:"",
@@ -3182,6 +3183,44 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					thumbnailUrl: uri
 				});
 			},
+			test:function(){
+				/****/
+				$scope.newItem.compId = "comp_xxxx_121";
+	    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+	    			  if(d){
+	    				  tipmessage("该构件签认已完成", "_FoundCompId");
+	    				  //Jump to sign details
+	    				  $scope.trace.current = d;
+	    				  $scope.$location.path("/spotcheck-detail");
+	    			  }else{
+	    				  tipmessage("该构件允许签认", "_FoundCompId");
+	    				  //Get component info
+	    				  model.component.get($scope.newItem.compId, function(d){
+	    					  if(d){
+	    						  tipmessage("获得构件信息", "_FoundCompId");
+	    						  $scope.newItem.component = d;
+	    					  }else{
+	    						  tipmessage("该构件编码不存在", "_notFoundCompId");
+	    					  }
+	    				  });
+	    			  }
+	    		  });
+				
+	    		  model.uploadAttachments($scope.newItem, function(item) {
+						model.trace.create(item, function(d) {
+							if (d) {
+								model.removeFiles($scope.newItem.picAttachmentList);
+								tipmessage("创建成功");
+								$timeout(function() {
+									$scope.$location.back();
+								}, 1000);
+							}
+						});
+					});
+				
+				/*****/
+			},
+			
 			submit: function() {
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
@@ -3230,6 +3269,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			newItem:{
 				content:"",
 				title:"",
+				traceType:traceType,
 				component:{
 					name:"",
 					designer:"",
