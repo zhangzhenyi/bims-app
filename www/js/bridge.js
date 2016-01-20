@@ -2664,10 +2664,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	}
 	
 	$scope.newIssue = {
-		issuePicAttachmentList: [],
-		issueVideoAttachmentList: [],
+		picAttachmentList: [],
+		videoAttachmentList: [],
 		issueRectification:"",
 		issueDesc:""
+			
 	};
 	
 	$scope.newIssue.important = $scope.Constants.ISSUE_IMPORTANT_3;
