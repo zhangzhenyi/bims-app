@@ -6,15 +6,6 @@
 	$("link:first", c).before($("<link>").attr({ rel: "stylesheet", type: "text/css", href: "lib/mobiscroll-master/css/mobiscroll.frame.css" }));
 	$("link:first", c).before($("<link>").attr({ rel: "stylesheet", type: "text/css", href: "lib/mobiscroll-master/css/mobiscroll.icons.css" }));
 	$("link:first", c).before($("<link>").attr({ rel: "stylesheet", type: "text/css", href: "lib/mobiscroll-master/css/mobiscroll.animation.css" }));
-	$.getScript("lib/mobiscroll-master/js/mobiscroll.core.js");
-	$.getScript("lib/mobiscroll-master/js/mobiscroll.frame.js");
-	$.getScript("lib/mobiscroll-master/js/mobiscroll.scroller.js");
-	$.getScript("lib/mobiscroll-master/js/mobiscroll.util.datetime.js");
-	$.getScript("lib/mobiscroll-master/js/mobiscroll.datetimebase.js");
-	$.getScript("lib/mobiscroll-master/js/mobiscroll.datetime.js");
-	$.getScript("lib/mobiscroll-master/js/mobiscroll.frame.ios.js");
-	$.getScript("lib/mobiscroll-master/js/i18n/mobiscroll.i18n.zh.js");
-	$.getScript("lib/touch-0.2.14.min.js");
 })($(document.head));
 
 /*列均分*/
