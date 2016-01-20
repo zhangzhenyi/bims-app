@@ -3,7 +3,7 @@
 <header class="bg1">
 	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
 	<p class="title">新建问题</p>
-	<span class="txt1" ><a ng-click="save()" href=""><span style="display:none">保存</span></a></span><span class="nochoose"><a ng-click="submit()" href="">提交</a></span>
+	<span class="txt1" ><a ng-click="save()" href=""><span>保存</span></a></span><span class="nochoose"><a ng-click="submit()" href="">提交</a></span>
 </header>
 
 <section class="mt10 mlr10 bg2 pb75">
@@ -33,10 +33,14 @@
 			<textarea ng-model="newIssue.issueRectification" id="issueRectification" cols="" rows="" class="fromarea" placeholder="点此输入" ng-change="changed()"  required ng-maxlength="150" maxlength="150"></textarea></span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r pr"><span ng-repeat="pic in newIssue.issuePicAttachmentList" class="pic" style="margin-right:5px;"><img ng-src="{{pic.thumbnailUrl}}" style="width:100%;"/></span><img src="img/i-jia.jpg" class="pic"/><input type="file" accept="image/*" class="file" onchange="angular.element(this).scope().imgChanged(this)"/></span>
+			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r pr"><span ng-repeat="pic in newIssue.issuePicAttachmentList" class="pic" style="margin-right:5px;">
+			<img ng-src="{{pic.thumbnailUrl}}" style="width:100%; vertical-align:bottom;margin-bottom:0;" my-touch-remove="removeImage(pic.fileUrl)"/></span>
+			<my-media-selector src="img/i-jia.jpg" class="pic" type="img" change="imageChanged($uri)"></my-media-selector></span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r pr"><span ng-repeat="vid in newIssue.issueVideoAttachmentList" class="vid" style="margin-right:5px;"><my-video src="vid.thumbnailUrl" height="50px"></my-video></span><img src="img/i-jia.jpg" class="pic"/><input type="file" accept="video/*" class="file" onchange="angular.element(this).scope().videoChanged(this)"/></span>
+			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r pr"><span ng-repeat="vid in newIssue.issueVideoAttachmentList" class="vid" style="margin-right:5px;">
+			<my-video src="vid.thumbnailUrl" width="50px" height="50px" margin-top="5px" my-touch-remove="removeVideo(vid.fileUrl)"></my-video></span>
+			<my-media-selector src="img/i-jia.jpg" class="pic" type="video" change="videoChanged($uri)"></my-media-selector></span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/icon-24.png"/>整改期限</span>

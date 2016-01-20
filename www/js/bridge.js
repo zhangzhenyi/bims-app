@@ -1379,7 +1379,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	var  _transfers = {};
 	
 	function _transfer() {
-		tipmessage("upload checkinging...", "tiploading");
+//		tipmessage("upload checkinging...", "tiploading");
 		var item = transferCache.get();
 		if (item) {
 			tipmessage("uploading...", "tiploading");
@@ -2598,96 +2598,64 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	$scope.total = 0;
 //	
 	$scope.imgChanged = function(e) {
-			var file = (angular.element(e))[0].files[0];
-			$scope.newIssue.issuePicAttachmentList.push({
-				file: file,
-				thumbnailUrl: URL.createObjectURL(file),
-				isNewFile:1
-			});
-			$scope.total++;
-			$scope.$apply();
-			e.outerHTML = e.outerHTML;
+		$scope.newIssue.picAttachmentList.push({
+			fileUrl: uri,
+			thumbnailUrl: uri
+		});
 	};
 	$scope.videoChanged = function(e) {
-			var file = angular.element(e)[0].files[0];
-			$scope.newIssue.issueVideoAttachmentList.push({
-				file: file,
-				thumbnailUrl: URL.createObjectURL(file),
-				isNewFile:1
-			});
-			$scope.total++;
-			$scope.$apply();
-			e.outerHTML = e.outerHTML;
+		$scope.newIssue.videoAttachmentList.push({
+			fileUrl: uri,
+			thumbnailUrl: uri
+		});
 	};
 		
+	$scope.removeImage = function(url) {
+			for (var i = 0; i < $scope.newIssue.picAttachmentList.length; i++) {
+				if ($scope.newIssue.picAttachmentList[i].fileUrl == url) {
+					model.removeFiles([$scope.newIssue.picAttachmentList[i]]);
+					$scope.newIssue.picAttachmentList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
+	$scope.removeVideo = function(url) {
+			for (var i = 0; i < $scope.newIssue.videoAttachmentList.length; i++) {
+				if ($scope.newIssue.videoAttachmentList[i].fileUrl == url) {
+					model.removeFiles([$scope.newIssue.videoAttachmentList[i]]);
+					$scope.newIssue.videoAttachmentList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
+		
 	$scope.save = function(i){
-		//TODO change by biz
+		$scope.newIssue.issueType = $scope.issues.currentIssueType;
+		$scope.newIssue.sectionId = $scope.issues.currentSectId;
+		transferCache.push($scope.newIssue, "issue");
+			tipmessage("保存成功");//是否需要返回值？
+			$timeout(function() {
+				$scope.$location.back();
+			}, 1000);
 	};
 	$scope.submit = function(i){
 		if(!$scope.form.$valid){
         	tipmessage("请检查输入内容是否正确");
         	return;
         }
-//		$scope.newIssue.issueType = $scope.issues.currentIssueType;
-//		$scope.newIssue.sectionId = $scope.issues.currentSectId;
-		var _item = {
-				id:$scope.newIssue.id,
-				issueTitle: $scope.newIssue.issueTitle,
-				issueType:$scope.issues.currentIssueType,
-				location:$scope.newIssue.location,
-				sectionId:$scope.issues.currentSectId,
-				issueDesc:$scope.newIssue.issueDesc,
-				issueRectification:$scope.newIssue.issueRectification,
-				important:$scope.newIssue.important,
-				deadlineTime:$scope.newIssue.deadlineTime,
-				issuePicAttachmentList:[],
-				issueVideoAttachmentList:[],
-				issueTotalAttachmentList:[]
-
-		},
-//			total = $scope.newIssue.issuePicAttachmentList.length + $scope.newIssue.issueVideoAttachmentList.length,
-			counter = 0,
-			picBlob = new Blob(['{"fileType":2,"topicType":2}'], { type: "application/json"}),
-			vidBlob = new Blob(['{"fileType":3,"topicType":2}'], { type: "application/json"}), i;
-			for (i = 0; i < $scope.newIssue.issuePicAttachmentList.length; i++) {
-				if($scope.newIssue.issuePicAttachmentList[i].isNewFile != 1) {
-					_item.issuePicAttachmentList.push($scope.newIssue.issuePicAttachmentList[i]);
-					_item.issueTotalAttachmentList.push($scope.newIssue.issuePicAttachmentList[i]);
-				}else
-				_upload($scope.newIssue.issuePicAttachmentList[i].file, picBlob, function(d) {
+		model.uploadAttachments($scope.newIssue, function(item) {
+				model.issues.create(item, function(d) {
 					if (d) {
-						_item.issueTotalAttachmentList.push(d);
-						_item.issuePicAttachmentList.push(d);
+			model.removeFiles($scope.newItem.picAttachmentList.concat($scope.newItem.videoAttachmentList));
+						tipmessage("修改成功");
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
 					}
-					counter++;
 				});
-			}
-			for (i = 0; i < $scope.newIssue.issueVideoAttachmentList.length; i++) {
-				if($scope.newIssue.issueVideoAttachmentList[i].isNewFile != 1) {
-					_item.issueTotalAttachmentList.push($scope.newIssue.issueVideoAttachmentList[i]);
-					_item.issueVideoAttachmentList.push($scope.newIssue.issueVideoAttachmentList[i]);
-				}else
-				_upload($scope.newIssue.issueVideoAttachmentList[i].file, vidBlob, function(d) {
-					if (d) {
-						_item.issueTotalAttachmentList.push(d);
-						_item.issueVideoAttachmentList.push(d);
-					}
-					counter++;
-				});
-			}
-			$timeout(function _fn_create() {
-				if (counter >= $scope.total) {
-					model.issues.update(_item, function(d) {
-						if (d) {
-							$scope.tipVisibility = "block";
-							$timeout(function() {
-								$scope.$location.back();
-							}, 1000);
-						}
-					});
-				} else $timeout(_fn_create, 200);
-			});
-		
+		});		
 	};
 }])
 .controller("cIssueCreate", ["$scope", "model", "$timeout", function($scope, model, $timeout){
@@ -2720,26 +2688,46 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			$scope.remain1 = 150 - $scope.newIssue.issueRectification.length;
 	};
 	$scope.imgChanged = function(e) {
-			var file = (angular.element(e))[0].files[0];
-			$scope.newIssue.issuePicAttachmentList.push({
-				file: file,
-				thumbnailUrl: URL.createObjectURL(file)
-			});
-			$scope.$apply();
-			e.outerHTML = e.outerHTML;
+		$scope.newIssue.picAttachmentList.push({
+			fileUrl: uri,
+			thumbnailUrl: uri
+		});
 	};
 	$scope.videoChanged = function(e) {
-			var file = angular.element(e)[0].files[0];
-			$scope.newIssue.issueVideoAttachmentList.push({
-				file: file,
-				thumbnailUrl: URL.createObjectURL(file)
-			});
-			$scope.$apply();
-			e.outerHTML = e.outerHTML;
+		$scope.newIssue.videoAttachmentList.push({
+			fileUrl: uri,
+			thumbnailUrl: uri
+		});
 	};
+	$scope.removeImage= function(url) {
+			for (var i = 0; i < $scope.newIssue.picAttachmentList.length; i++) {
+				if ($scope.newIssue.picAttachmentList[i].fileUrl == url) {
+					model.removeFiles([$scope.newIssue.picAttachmentList[i]]);
+					$scope.newIssue.picAttachmentList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
+	$scope.removeVideo=function(url) {
+			for (var i = 0; i < $scope.newItem.videoAttachmentList.length; i++) {
+				if ($scope.newIssue.videoAttachmentList[i].fileUrl == url) {
+					model.removeFiles([$scope.newIssue.videoAttachmentList[i]]);
+					$scope.newIssue.videoAttachmentList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
 		
 	$scope.save = function(i){
-		//TODO change by biz
+		$scope.newIssue.issueType = $scope.issues.currentIssueType;
+		$scope.newIssue.sectionId = $scope.issues.currentSectId;
+		transferCache.push($scope.newIssue, "issue");
+			tipmessage("保存成功");//是否需要返回值？
+			$timeout(function() {
+				$scope.$location.back();
+			}, 1000);
 	};
 	$scope.submit = function(i){
 		if(!$scope.form.$valid){
@@ -2748,55 +2736,17 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
         }
 		$scope.newIssue.issueType = $scope.issues.currentIssueType;
 		$scope.newIssue.sectionId = $scope.issues.currentSectId;
-		var _item = {
-				issueTitle: $scope.newIssue.issueTitle,
-				issueType:$scope.issues.currentIssueType,
-				location:$scope.newIssue.location,
-				sectionId:$scope.issues.currentSectId,
-				issueDesc:$scope.newIssue.issueDesc,
-				issueRectification:$scope.newIssue.issueRectification,
-				important:$scope.newIssue.important,
-				deadlineTime:$scope.newIssue.deadlineTime,
-				issuePicAttachmentList:[],
-				issueVideoAttachmentList:[],
-				issueTotalAttachmentList:[]
-
-		},
-			total = $scope.newIssue.issuePicAttachmentList.length + $scope.newIssue.issueVideoAttachmentList.length,
-			counter = 0,
-			picBlob = new Blob(['{"fileType":2,"topicType":2}'], { type: "application/json"}),
-			vidBlob = new Blob(['{"fileType":3,"topicType":2}'], { type: "application/json"}), i;
-			for (i = 0; i < $scope.newIssue.issuePicAttachmentList.length; i++) {
-				_upload($scope.newIssue.issuePicAttachmentList[i].file, picBlob, function(d) {
+		model.uploadAttachments($scope.newIssue, function(item) {
+				model.issues.create(item, function(d) {
 					if (d) {
-						_item.issueTotalAttachmentList.push(d);
-						_item.issuePicAttachmentList.push(d);
+			model.removeFiles($scope.newItem.picAttachmentList.concat($scope.newItem.videoAttachmentList));
+						tipmessage("创建成功");
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
 					}
-					counter++;
 				});
-			}
-			for (i = 0; i < $scope.newIssue.issueVideoAttachmentList.length; i++) {
-				_upload($scope.newIssue.issueVideoAttachmentList[i].file, vidBlob, function(d) {
-					if (d) {
-						_item.issueTotalAttachmentList.push(d);
-						_item.issueVideoAttachmentList.push(d);
-					}
-					counter++;
-				});
-			}
-			$timeout(function _fn_create() {
-				if (counter >= total) {
-					model.issues.create(_item, function(d) {
-						if (d) {
-							$scope.tipVisibility = "block";
-							$timeout(function() {
-								$scope.$location.back();
-							}, 1000);
-						}
-					});
-				} else $timeout(_fn_create, 200);
-			});
-		
+		});		
 	};
 }])
 .controller("cIssueCheck", ["$scope", "model", "$timeout",function($scope, model, $timeout){
