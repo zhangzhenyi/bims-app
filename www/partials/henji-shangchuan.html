@@ -1,0 +1,13 @@
+<div class="pt60">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">痕迹上传</p>
+</header>
+<section>
+	<ul class="list3-2015-1-11">
+    	<li ng-repeat="t in list">
+        	<a ng-click="itemClicked(t)" href="" class="pic"><img ng-src="{{::t.attachments[0].thumbnailUrl}}"><p class="title">{{::title(t.traceType)}}</p></a>
+        </li>
+    </ul>
+</section>
+</div>

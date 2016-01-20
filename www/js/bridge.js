@@ -30,12 +30,6 @@ function searchtool(){
 		$("header .jia").show();
 		$("header .nochoose").hide();
 	});
-	$(".searchblock input").blur(function(){
-		$(".searchblock").fadeOut();
-		$("header .search").show();
-		$("header .jia").show();
-		$("header .nochoose").hide();
-	});
 }
 
 /*块的显示隐藏*/
@@ -788,9 +782,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			$rootScope.loading = false;
 			c(d);
 		})
-		.error(function(d,s) {
-			alert(d);
-			alert(s);
+		.error(function() {
 			$rootScope.loading = false;
 			c(false);
 		});
@@ -1339,6 +1331,21 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					params: {
 						issueType: t,
 						pageNum: pn
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			all: function(c) {
+				_req({
+					method: "get",
+					url: "section/listAllSections.jo"
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			get: function(id, c) {
+				_req({
+					method: "get",
+					url: "section/getSectionById.jo",
+					params: {
+						sectionId: id
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
 			}
@@ -2296,7 +2303,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				$scope.current.id = 0;
 				$scope.current.createTime = $scope.current._time;
 				$scope.current.publisherName = $scope.user.name;
-				alert("$scope.current._type: "+$scope.current._type);
 				if ($scope.current._type == "redian") {
 					if (!($scope.current.topicType)) $scope.current.topicType = 2;
 					$scope.hotfocus.current = $scope.current;
@@ -2317,7 +2323,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				$scope.current._statusText = "上传中";
 				model.uploadAttachments($scope.current, function(item) {
 					var op;
-					alert(item._type);
 					switch(item._type) {
 						case "redian":
 							op = item._update ? model.hotfocus.update : model.hotfocus.create;
@@ -3245,7 +3250,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
-				alert("s....");
 				model.uploadAttachments($scope.newItem, function(item) {
 					delete item.videoAttachmentList;
 					model.trace.create(item, function(d) {
@@ -3260,7 +3264,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				});
 			},
 			save: function() {
-				
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
@@ -3269,7 +3272,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
-				alert("save....");
 				transferCache.push($scope.newItem, $scope.saveTitle);
 				tipmessage("保存成功");//是否需要返回值？
 				$timeout(function() {
@@ -3418,7 +3420,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			return "n/a";
 		},
 		itemClicked: function(t) {
-			$scope.trace.hengjishangchuan = {
+			$scope.trace.henjishangchuan = {
 				title: $scope.title(t.traceType),
 				type: t.traceType
 			};
@@ -3431,10 +3433,26 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		_page: 0,
 		page: 1,
 		list: [],
+		searching: {
+			query: "",
+			change: function() {
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.load();
+			},
+			cancel: function() {
+				$scope.searching.query = "";
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.load();
+			}
+		},
 		load: function() {
 			if ($scope._page != $scope.page) {
 				$scope._page = $scope.page;
-				model.trace.search(null, $scope.page, $scope.trace.hengjishangchuan.type, function(d) {
+				model.trace.search($scope.searching.query, $scope.page, $scope.trace.henjishangchuan.type, function(d) {
 					if (d && d.length > 0) {
 						for (var i = 0; i < d.length; i++)
 							$scope.list.push(d[i]);
@@ -3442,6 +3460,108 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					}
 				});
 			}
+		},
+		itemClicked: function(t) {
+			$scope.trace.henjishangchuan.current = t;
+			$scope.$location.path("/henji-shangchuan-xiangqing");
+		},
+		add: function() {
+			$scope.trace.henjishangchuan.current = null;
+			$scope.$location.path("/henji-shangchuan-edit");
+		}
+	});
+}])
+.controller("cHenjiShangchuanEdit", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
+	if ($scope.trace.henjishangchuan.type != 6) {
+		model.sect.all(function(d) {
+			if (d) $scope.sections = d;
+		});
+	}
+	angular.extend($scope, {
+		person: $scope.trace.henjishangchuan.type != 6,
+		background: $scope.trace.henjishangchuan.type > 9,
+		section: $scope.trace.henjishangchuan.type != 6,
+		locations: [
+		    {v: "东涌互通枢纽立交"}, {v: "骝东互通及主线桥"}, {v: "西引桥"}, {v: "大沙水道桥"}, {v: "中引桥"}, {v: "海鸥互通及主线桥"}, {v: "坭洲水道桥"}, {v: "东引桥"}, {v: "沙田互通枢纽立交"}
+		],
+		newItem: $scope.trace.henjishangchuan.current || {
+			topicType: 8,
+			traceType: $scope.trace.henjishangchuan.type,
+			picAttachmentList: [],
+			videoAttachmentList: []
+		},
+		removeImage: function(url) {
+			for (var i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
+				if ($scope.newItem.picAttachmentList[i].fileUrl == url) {
+					model.removeFiles([$scope.newItem.picAttachmentList[i]]);
+					$scope.newItem.picAttachmentList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
+		imageChanged: function(url) {
+			$scope.newItem.picAttachmentList.push({
+				fileUrl: url,
+				thumbnailUrl: url
+			});
+		},
+		submit: function() {
+			model.uploadAttachments($scope.newItem, function(item) {
+				delete item.videoAttachmentList;
+				(($scope.trace.henjishangchuan.current || false) ? model.trace.update : model.trace.create)(item, function(d) {
+					if (d) {
+						model.removeFiles($scope.newItem.picAttachmentList);
+						tipmessage("提交成功");
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
+					}
+				});
+			});
+		},
+		save: function() {
+			if ($scope.trace.henjishangchuan.current || false)
+				transferCache.push($scope.newItem, "spotcheck", "update");
+			else
+				transferCache.push($scope.newItem, "spotcheck");
+			tipmessage("保存成功");
+			$timeout(function() {
+				$scope.$location.back();
+			}, 1000);
+		}
+	});
+}])
+.controller("cHenjiShangchuanXiangqing", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
+	if ($scope.trace.henjishangchuan.current.sectionId || false) {
+		model.sect.get($scope.trace.henjishangchuan.current.sectionId, function(d) {
+			if (d) $scope.sectionName = d.sectionName;
+		});
+	}
+	angular.extend($scope, {
+		location: $scope.trace.henjishangchuan.current.location || false,
+		person: ($scope.trace.henjishangchuan.current.person || false) && ($scope.trace.henjishangchuan.type != 6),
+		background: ($scope.trace.henjishangchuan.current.background || false) && ($scope.trace.henjishangchuan.type > 9),
+		section: ($scope.trace.henjishangchuan.current.sectionId || false) && ($scope.trace.henjishangchuan.type != 6),
+		publisherName: $scope.trace.henjishangchuan.current.publisherName || false,
+		pic: $scope.trace.henjishangchuan.current.picAttachmentList && $scope.trace.henjishangchuan.current.picAttachmentList.length > 0,
+		sectionName: "",
+		edit: function() {
+			$scope.$location.path("/henji-shangchuan-edit");
+		},
+		remove: function() {
+			model.trace.remove($scope.trace.henjishangchuan.current.id, function(d) {
+				if (d) tipmessage("删除成功");
+				else tipmessage("删除失败");
+				$timeout(function() {
+					$scope.$location.back();
+				}, 1000);
+			});
+		},
+		fileClicked: function(name, path) {
+			$scope.files.filename = name;
+			$scope.files.filepath = path;
+			$scope.$location.path("/onefile");
 		}
 	});
 }])
@@ -3632,6 +3752,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	.when("/henji-shangchuan-list", {
 		templateUrl: "partials/henji-shangchuan-list.html",
 		controller: "cHenjiShangchuanList"
+	})
+	.when("/henji-shangchuan-edit", {
+		templateUrl: "partials/henji-shangchuan-edit.html",
+		controller: "cHenjiShangchuanEdit"
+	})
+	.when("/henji-shangchuan-xiangqing", {
+		templateUrl: "partials/henji-shangchuan-xiangqing.html",
+		controller: "cHenjiShangchuanXiangqing"
 	})
 	.otherwise({
         redirectTo: "/"

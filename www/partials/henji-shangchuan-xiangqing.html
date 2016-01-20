@@ -1,0 +1,61 @@
+<div class="pt60">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">{{::trace.henjishangchuan.title}}</p>
+	<span ng-show="user.id==trace.henjishangchuan.current.publisherId" class="more" ><img src="img/icon-more-1.png" style="width:24px;height:20px;"/></span>
+	<div class="pop-window1">
+	<img src="img/icon-jian5.png" class="j"/><div class="cb"></div>
+	<ul>
+		<li><a ng-click="edit()" href=""><img src="img/icon-edit201512.png"/> 编辑</a></li>
+		<li><a ng-click="remove()" href=""><img src="img/icon-del201512.png"/> 删除</a></li>
+	</ul>
+	</div>
+</header>
+<section class="mlr10 mt15 pb20">
+	<p class="title-1">{{::trace.henjishangchuan.current.title}}</p>
+</section>
+<section>
+	<ul class="list-3">
+		<li class="clearfix" ng-if="location">
+			<span class="l"><img src="img/i-xq-2.jpg"/>地点</span>
+			<span class="r">{{::trace.henjishangchuan.current.location}}</span>
+		</li>
+		<li class="clearfix" ng-if="person">
+			<span class="l"><img src="img/i-xq-8.jpg"/>人物</span>
+			<span class="r">{{::trace.henjishangchuan.current.person}}</span>
+		</li>
+		<li class="clearfix" ng-if="background">
+			<span class="l"><img src="img/i-xq-3.jpg">背景</span>
+			<span class="r">{{::trace.henjishangchuan.current.background}}</span>
+		</li>
+		<li class="clearfix" ng-if="section">
+			<span class="l"><img src="img/i-xq-12.jpg"/>标段</span>
+			<span class="r">{{sectionName}}</span>
+		</li>
+		<li class="clearfix" ng-if="publisherName">
+			<span class="l"><img src="img/i-xq-14.jpg"/>创建人</span>
+			<span class="rr">{{::trace.henjishangchuan.current.publisherName}}</span>
+			<span class="time">{{::formatDate(trace.henjishangchuan.current.createTime)}}</span>
+		</li>
+		<li class="clearfix" ng-if="pic">
+			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span>
+			<span class="r">
+				<a ng-repeat="pic in trace.henjishangchuan.current.picAttachmentList" ng-click="fileClicked('相片', pic.fileUrl)" class="pic">
+					<img ng-src="{{::pic.thumbnailUrl}}"/>
+				</a>
+			</span>
+		</li>
+	</ul>
+</section>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("header .more").click(function(){
+		if($(".pop-window1").height()== "0"){
+			$(".pop-window1").animate({height:100},300);
+		}else{
+			$(".pop-window1").animate({height:0},300);
+		}
+	})
+})
+</script>
+</div>
