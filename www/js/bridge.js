@@ -1064,7 +1064,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
-			search: function(t,p, tt,c) {
+			search: function(t, p, tt,c) {
 				_req({
 					method: "post",
 					url: "trace/searchTraceByTitle.jo",
@@ -1113,6 +1113,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 						id:parseInt(id)
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			picsList: function(c) {
+				_req({
+					method: "get",
+					url: "trace/getTracePicturesList.jo"
+				}, angular.isFunction(c) ? c : angular.noop);
 			}
 		},
 		feedback: {
@@ -1158,7 +1164,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
 			}
-			
 		},
 		news: {
 			list: function(p, c) {
@@ -3386,6 +3391,47 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		break;
 	}
 }])
+.controller("cHenjiShangchuan", ["$scope", "model", function($scope, model) {
+	var _titles = ["全景照片", "主要设备", "工艺与技术", "标准化建设", "专题会议", "任务风采", "其它"];
+	model.trace.picsList(function(d) {
+		if (d) $scope.list = d;
+	});
+	angular.extend($scope, {
+		_page: 0,
+		page: 1,
+		title: function(type) {
+			var i = type - 6;
+			if (i >= 0 && i < _titles.length) return _titles[i];
+			return "n/a";
+		},
+		itemClicked: function(t) {
+			$scope.trace.hengjishangchuan = {
+				title: $scope.title(t.traceType),
+				type: t.traceType
+			};
+			$scope.$location.path("/henji-shangchuan-list");
+		}
+	});
+}])
+.controller("cHenjiShangchuanList", ["$scope", "model", function($scope, model) {
+	angular.extend($scope, {
+		_page: 0,
+		page: 1,
+		list: [],
+		load: function() {
+			if ($scope._page != $scope.page) {
+				$scope._page = $scope.page;
+				model.trace.search(null, $scope.page, $scope.trace.hengjishangchuan.type, function(d) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.list.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
+		}
+	});
+}])
 .config(["myRouteProvider", function(myRouteProvider) {
 	myRouteProvider
 	.when("/login", {
@@ -3565,6 +3611,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	.when("/spotcheck-detail", {
 		templateUrl: "partials/spotcheck-details.html",
 		controller: "cSpotCheck"
+	})
+	.when("/henji-shangchuan", {
+		templateUrl: "partials/henji-shangchuan.html",
+		controller: "cHenjiShangchuan"
+	})
+	.when("/henji-shangchuan-list", {
+		templateUrl: "partials/henji-shangchuan-list.html",
+		controller: "cHenjiShangchuanList"
 	})
 	.otherwise({
         redirectTo: "/"
