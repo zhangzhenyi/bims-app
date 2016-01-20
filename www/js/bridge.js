@@ -2659,11 +2659,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	}
 	
 	$scope.newIssue = {
-		picAttachmentList: [],
+		picAttachmentList:[],
 		videoAttachmentList: [],
 		issueRectification:"",
-		issueDesc:""
-			
+		topicType: 3,
+		issueDesc:"",
+		issueType : $scope.issues.currentIssueType,
+		sectionId : $scope.issues.currentSectId
 	};
 	
 	$scope.newIssue.important = $scope.Constants.ISSUE_IMPORTANT_3;
@@ -2679,14 +2681,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			$scope.remain = 150 - $scope.newIssue.issueDesc.length;
 			$scope.remain1 = 150 - $scope.newIssue.issueRectification.length;
 	};
-	$scope.imgChanged = function(e) {
-		$scope.newIssue.picAttachmentList.push({
+	$scope.imageChanged = function(uri) {
+		$scope.newIssue.issuePicAttachmentList.push({
 			fileUrl: uri,
 			thumbnailUrl: uri
 		});
 	};
-	$scope.videoChanged = function(e) {
-		$scope.newIssue.videoAttachmentList.push({
+	$scope.videoChanged = function(uri) {
+		$scope.newIssue.issueVideoAttachmentList.push({
 			fileUrl: uri,
 			thumbnailUrl: uri
 		});
@@ -2726,8 +2728,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
         	tipmessage("请检查输入内容是否正确");
         	return;
         }
-		$scope.newIssue.issueType = $scope.issues.currentIssueType;
-		$scope.newIssue.sectionId = $scope.issues.currentSectId;
+		
 		model.uploadAttachments($scope.newIssue, function(item) {
 				model.issues.create(item, function(d) {
 					if (d) {
