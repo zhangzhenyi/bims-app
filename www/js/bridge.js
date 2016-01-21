@@ -415,9 +415,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	}
 	
 	function _show(c) {
-		_pane.css("display", "block");
+		btns.css("top", angular.element($window).height() + 1);
+		_pane.css("display", "inline-block");
 		_selected = c || angular.noop;
-		btns.animate({top: angular.element($window).height() -120}, {
+		btns.animate({top: angular.element($window).height() - 120}, {
 			speed: "slow",
 			queue: false
 		});
