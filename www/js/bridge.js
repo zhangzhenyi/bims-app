@@ -437,7 +437,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	}
 
 	function _captureVideo(files, scope, change) {
-		tipmessage1(message="文件生成中",img="<img src='img/loading.gif';><br/>",id="tipimg");
+		tipmessage1(message="文件生成中",id="tipimg");
 		for (var i = 0; i < files.length; i++) {
 			fileSystem.create("file:///" + files[i].fullPath, function(url) {
 				scope.$apply(change(scope, {$uri: url}));
@@ -1435,6 +1435,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 						op = i._update ? model.trace.update : model.trace.create;
 						break;
 					case "issue":
+						delete i.topicType;
 						op = i._update ? model.issues.update : model.issues.create;
 						break;
 					default:
@@ -1489,9 +1490,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	$rootScope.myHeaderPosition = "fixed";
 	$scope.displayLoading = function() {
 		if($scope.loading ){
-			tipmessage1(message="努力加载中",img="<img src='img/loading.gif';><br/>",id="tipimg");
+			tipmessage1(message="努力加载中",id="tipimgLoading");
 		}else{
-			closetipmessage1(id="tipimg");
+			closetipmessage1(id="tipimgLoading");
 		}
 		return $scope.loading ? "block" : "none";
 	};
@@ -2047,16 +2048,23 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
+	        tipmessage1(message="上传文件中",id="tipimg");
 			model.uploadAttachments($scope.hotfocus.current, function(item) {
+			changeTipmessage("开始创建","tipimg");
 				model.hotfocus.update(item, function(d) {
 					if (d) {
-						tipmessage("修改成功");
+					changeTipmessage("修改成功","tipimg");
+					
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
+					}else{
+						changeTipmessage("编辑失败","tipimg");
 					}
+					closetipmessage1("tipimg");
 				});
 			});
+			
 		},
 		save: function() {
 			transferCache.push($scope.hotfocus.current, "redian", "update");
@@ -2116,17 +2124,23 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
+	        tipmessage1(message="上传文件中",id="tipimg");
 			model.uploadAttachments($scope.newItem, function(item) {
+			changeTipmessage("开始创建","tipimg");
 				model.hotfocus.create(item, function(d) {
 					if (d) {
+						changeTipmessage("开始创建","tipimg");
 						model.removeFiles($scope.newItem.picAttachmentList.concat($scope.newItem.videoAttachmentList));
-						tipmessage("创建成功");
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
+					}else{
+						changeTipmessage("创建失败“,”tipimg");
 					}
+					closetipmessage1("tipimg");
 				});
 			});
+			
 		},
 		save: function() {
 			transferCache.push($scope.newItem, "redian");
@@ -2635,11 +2649,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	model.issues.getIssue(id, function(d) {
 		if(d) {
 			$scope.newIssue = d;
+			$scope.newIssue.topicType = 3;
 			$scope.changed();
 		}
 	});
 	
-//	$scope.newIssue.issueTotalAttachmentList = [];
 //	$scope.newIssue = $scope.issues.currentIssue;
 //	$scope.newIssue.deadlineTime = new Date($scope.newIssue.deadlineTime);
 //	$scope.issues.currentIssue.issuePicAttachmentList = $scope.issues.currentIssue.issuePicAttachmentList;
@@ -2687,7 +2701,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
-		transferCache.push($scope.newIssue, "issue");
+		transferCache.push($scope.newIssue, "issue","update");
 			tipmessage("保存成功");//是否需要返回值？
 			$timeout(function() {
 				$scope.$location.back();
@@ -2698,18 +2712,25 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
         	tipmessage("请检查输入内容是否正确");
         	return;
         }
-		
+		tipmessage1(message="上传文件中",id="tipimg");
+	
 		model.uploadAttachments($scope.newIssue, function(item) {
+		changeTipmessage("开始创建","tipimg");
+		delete item.topicType;
 				model.issues.update(item, function(d) {
 					if (d) {
-			model.removeFiles($scope.newIssue.issuePicAttachmentList.concat($scope.newIssue.issueVideoAttachmentList));
-						tipmessage("创建成功");
+			changeTipmessage("编辑成功”,”tipimg");
+	model.removeFiles($scope.newIssue.issuePicAttachmentList.concat($scope.newIssue.issueVideoAttachmentList));
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
+					}else{
+						changeTipmessage("编辑失败”,”tipimg");
 					}
+					closetipmessage1("tipimg");
 				});
 		});		
+		
 	};
 }])
 .controller("cIssueCreate", ["$scope", "model", "$timeout", function($scope, model, $timeout){
@@ -2795,18 +2816,25 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
         	tipmessage("请检查输入内容是否正确");
         	return;
         }
-		
+		tipmessage1(message="上传文件中",id="tipimg");
 		model.uploadAttachments($scope.newIssue, function(item) {
+			changeTipmessage("开始创建","tipimg");
+				delete item.topicType;
 				model.issues.create(item, function(d) {
 					if (d) {
+						changeTipmessage("创建成功",id="tipimg");
 			model.removeFiles($scope.newIssue.issuePicAttachmentList.concat($scope.newIssue.issueVideoAttachmentList));
-						tipmessage("创建成功");
+
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
+					}else{
+						changeTipmessage("创建失败","tipimg");
 					}
+					closetipmessage1("tipimg");
 				});
-		});		
+		});
+				
 	};
 }])
 .controller("cIssueCheck", ["$scope", "model", "$timeout",function($scope, model, $timeout){
@@ -3242,18 +3270,25 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
+				tipmessage1(message="上传文件中",id="tipimg");
+	
 				model.uploadAttachments($scope.newItem, function(item) {
+				changeTipmessage("开始创建","tipimg");
 					delete item.videoAttachmentList;
 					model.trace.create(item, function(d) {
 						if (d) {
+							changeTipmessage("创建成功”,”tipimg");
 							model.removeFiles($scope.newItem.picAttachmentList);
-							tipmessage("创建成功");
 							$timeout(function() {
 								$scope.$location.back();
 							}, 1000);
+						}else{
+							changeTipmessage("创建失败”,”tipimg");
 						}
+						closetipmessage1("tipimg");
 					});
 				});
+				
 			},
 			save: function() {
 				if(!$scope.form.$valid){
@@ -3342,17 +3377,24 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
+				tipmessage1(message="上传文件中",id="tipimg");
+	
 				model.uploadAttachments($scope.newItem, function(item) {
+				changeTipmessage("开始编辑”,”tipimg");
 					model.trace.update(item, function(d) {
 						if (d) {
+						changeTipmessage("编辑成功","tipimg");
 							model.removeFiles($scope.newItem.picAttachmentList);
-							tipmessage("提交成功");
 							$timeout(function() {
 								$scope.$location.back();
 							}, 1000);
+						}else{
+							changeTipmessage("编辑失败","tipimg");
 						}
+						closetipmessage1("tipimg");
 					});
 				});
+				
 			},
 			save: function() {
 				if(!$scope.form.$valid){
