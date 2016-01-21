@@ -806,99 +806,79 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	}
 	
 	function _uploadAttachments(item, callback, transferCallback) {
-		var pics = [], videos = [], isIssue = false;
-		if(item.topicType == 3){
+		var pics, videos, o = angular.extend({}, item), 	total, counter = 0, i, loops;
+		if(item.topicType == 3) {
 			pics = item.issuePicAttachmentList;
 			videos = item.issueVideoAttachmentList;
-			isIssue = true;
-		}else{
-			pics = item.picAttachmentList;
-			videos = item.videoAttachmentList;
-		}
-/* 		alert("isIssue: "+isIssue+" pics: "+pics.length+ " videos: "+videos.length ); */
-		var o = angular.extend({}, item),
-		total = pics.length + videos.length,
-		counter = 0, i;
-		if(isIssue){
 			o.issueTotalAttachmentList = [];
 			o.issuePicAttachmentList = [];
 			o.issueVideoAttachmentList = [];
-		}else{
+		} else {
+			pics = item.picAttachmentList;
+			videos = item.videoAttachmentList;
 			o.attachments = [];
 			o.picAttachmentList = [];
 			o.videoAttachmentList = [];
 		}
-		
-		tipmessage1(message="文件上传中",img="<img src='img/loading.gif';><br/>",id="tipimg");
-		transferCallback = transferCallback || angular.noop;
-		
-		
-		
-		for (i = 0; i < pics.length; i++) {
-			//changeTipmessage(message="第"+counter+"个，<br/>共"+total+"个",id="tipimg");
+		loops = (pics || false) ? pics.length : 0;
+		total = loops;
+		for (i = 0; i < loops; i++) {
 			if (pics[i].id || false) {
-				if(isIssue){
+				if(item.topicType == 3) {
 					o.issueTotalAttachmentList.push(pics[i]);
 					o.issuePicAttachmentList.push(pics[i]);
-				}else{
+				} else {
 					o.attachments.push(pics[i]);
 					o.picAttachmentList.push(pics[i]);
 				}
-				
 				counter++;
-			} else transferCallback(pics[i].fileUrl, _transfer(pics[i].fileUrl, 2, item.topicType, function(d, url) {
-/* 			alert("Image "+JSON.stringify(d)); */
-				if (d) {
-				
-					if(isIssue){
-					alert("Image uploaded: ");
-						o.issueTotalAttachmentList.push(d);
-						o.issuePicAttachmentList.push(d);
-					}else{
-						o.attachments.push(d);
-						o.picAttachmentList.push(d);
+			} else {
+				(transferCallback || angular.noop)(pics[i].fileUrl, _transfer(pics[i].fileUrl, 2, item.topicType, function(d, url) {
+					if (d) {
+						if (item.topicType == 3) {
+							o.issueTotalAttachmentList.push(d);
+							o.issuePicAttachmentList.push(d);
+						} else {
+							o.attachments.push(d);
+							o.picAttachmentList.push(d);
+						}
 					}
-					
-				}
-				transferCallback(url, false);
-				counter++;
-			}));
+					(transferCallback || angular.noop)(url, false);
+					counter++;
+				}));
+			}
 		}
-		for (i = 0; i < videos.length; i++) {
-			//changeTipmessage(message="第"+counter+"个，<br/>共"+total+"个",id="tipimg");
+		loops = ((videos || false) ? videos.length : 0);
+		total += loops;
+		for (i = 0; i < loops; i++) {
 			if (videos[i].id || false) {
-			if(isIssue){
-				o.issueTotalAttachmentList.push(videos[i]);
-				o.issueVideoAttachmentList.push(videos[i]);
-			}else{
-				o.attachments.push(videos[i]);
-				o.videoAttachmentList.push(videos[i]);
-			}
-				
-				counter++;
-			} else transferCallback(item.videos[i].fileUrl, _transfer(videos[i].fileUrl, 3, item.topicType, function(d, url) {
-/* 			alert("video "+JSON.stringify(d)); */
-				if (d) {
-					if(isIssue){
-					alert("video uploaded: ");
-						o.issueTotalAttachmentList.push(d);
-				o.issueVideoAttachmentList.push(d);
-			}else{
-				o.attachments.push(d);
-				o.videoAttachmentList.push(d);
-			}
+				if (item.topicType == 3) {
+					o.issueTotalAttachmentList.push(videos[i]);
+					o.issueVideoAttachmentList.push(videos[i]);
+				} else {
+					o.attachments.push(videos[i]);
+					o.videoAttachmentList.push(videos[i]);
 				}
-				transferCallback(url, false);
 				counter++;
-			}));
+			} else {
+				(transferCallback || angular.noop)(videos[i].fileUrl, _transfer(videos[i].fileUrl, 3, item.topicType, function(d, url) {
+					if (d) {
+						if(item.topicType == 3) {
+							o.issueTotalAttachmentList.push(d);
+							o.issueVideoAttachmentList.push(d);
+						} else {
+							o.attachments.push(d);
+							o.videoAttachmentList.push(d);
+						}
+					}
+					(transferCallback || angular.noop)(url, false);
+					counter++;
+				}));
+			}
 		}
-		
 		$timeout(function _fn_waiting_attachment() {
 			if (counter < total) $timeout(_fn_waiting_attachment, 200);
-			else {
-				(callback || angular.noop)(o);
-				closetipmessage1(id="tipimg");
-			}
+			else (callback || angular.noop)(o);
 		});
 	}
 
@@ -2727,7 +2707,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		formData.append("attachment", blob);
 		model.uploadFile("attachment/upload.jo", formData, c);
 	}
-	var issueId;
 	$scope.newIssue = {
 		issuePicAttachmentList:[],
 		issueVideoAttachmentList:[],
