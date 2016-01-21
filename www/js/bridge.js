@@ -1427,6 +1427,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			item._statusText = "上传中";
 			model.uploadAttachments(item, function(i) {
 				var op;
+				var isIssue = false;
 				switch(i._type) {
 					case "redian":
 						op = i._update ? model.hotfocus.update : model.hotfocus.create;
@@ -1436,6 +1437,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 						break;
 					case "issue":
 						delete i.topicType;
+						isIssue = true;
 						op = i._update ? model.issues.update : model.issues.create;
 						break;
 					default:
@@ -1450,9 +1452,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				delete i._update;
 				op(i, function(d) {
 					if (d) {
+					if(isIssue){
+						model.removeFiles(item.issuePicAttachmentList.concat(item.issueVideoAttachmentList));
+					}else{
 						model.removeFiles(item.picAttachmentList.concat(item.videoAttachmentList));
-						transferCache.remove(item);
 					}
+						tipmessage("上传成功");
+						transferCache.remove(item);
+					}else tipmessage("上传失败");
 				});
 			}, function(url, transfer) {
 				if (transfer) _transfers[url] = transfer;
@@ -2357,7 +2364,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					delete item._update;
 					op(item, function(d) {
 						if (d) {
-							model.removeFiles($scope.current.picAttachmentList.concat($scope.current.videoAttachmentList));
+							if(isIssue){
+								model.removeFiles($scope.current.issuePicAttachmentList.concat($scope.current.issueVideoAttachmentList));
+							}else{
+								model.removeFiles($scope.current.picAttachmentList.concat($scope.current.videoAttachmentList));
+							}
+							
 							tipmessage("上传成功");
 							transferCache.remove($scope.current);
 							$timeout(function() {
