@@ -253,11 +253,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				}
 				e.preventDefault();
 			});
-			touch.on(element, "touchend", function(e) {
+			touch.on(element, "tap", function(e) {
 				e.preventDefault();
 			});
 			scope.$on("$destroy", function() {
-				touch.off(element, "touchend");
+				touch.off(element, "tap");
 				touch.off(element, "hold");
 				touch.off(element, "touchstart");
 			});
@@ -2047,7 +2047,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		videoChanged: function(uri) {
 			$scope.hotfocus.current.videoAttachmentList.push({
 				fileUrl: uri,
-				thumbnailUrl: uri
+				thumbnailUrl: "img/icon-15.png"
 			});
 		},
 		submit: function() {
@@ -2123,7 +2123,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		videoChanged: function(uri) {
 			$scope.newItem.videoAttachmentList.push({
 				fileUrl: uri,
-				thumbnailUrl: uri
+				thumbnailUrl: "img/icon-15.png"
 			});
 		},
 		submit: function() {
@@ -2688,7 +2688,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	$scope.videoChanged = function(uri) {
 		$scope.newIssue.issueVideoAttachmentList.push({
 			fileUrl: uri,
-			thumbnailUrl: uri
+			thumbnailUrl: "img/icon-15.png"
 		});
 	};;
 		
@@ -2793,7 +2793,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	$scope.videoChanged = function(uri) {
 		$scope.newIssue.issueVideoAttachmentList.push({
 			fileUrl: uri,
-			thumbnailUrl: uri
+			thumbnailUrl: "img/icon-15.png"
 		});
 	};
 	$scope.removeImage= function(url) {
@@ -3618,6 +3618,21 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		}
 	});
 }])
+.controller("cHenjiGongchengjindu", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
+	model.sect.all(function(d) {
+		if (d) {
+			console.log(d);
+			for (var i = 0; i < d.length; i++) {
+				d[i].percentTime = parseFloat(d[i].percentTime.substring(0, d[i].percentTime.length - 1)) / 100;
+				d[i].percentProject = parseFloat(d[i].percentProject.substring(0, d[i].percentProject.length - 1)) / 100;
+			}
+			$scope.sections = d;
+		}
+	});
+	$scope.list = function(id) {
+		
+	};
+}])
 .config(["myRouteProvider", function(myRouteProvider) {
 	myRouteProvider
 	.when("/login", {
@@ -3797,6 +3812,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	.when("/spotcheck-detail", {
 		templateUrl: "partials/spotcheck-details.html",
 		controller: "cSpotCheck"
+	})
+	.when("/henji-gongchengjindu", {
+		templateUrl: "partials/henji-gongchengjindu.html",
+		controller: "cHenjiGongchengjindu"
 	})
 	.when("/henji-shangchuan", {
 		templateUrl: "partials/henji-shangchuan.html",
