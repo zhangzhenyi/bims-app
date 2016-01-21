@@ -161,7 +161,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		}
 	};
 }])
-.directive("myTouchRemove", ["$window", "$parse", function($window, $parse) {
+.directive("myTouchRemove", ["$window", "$document", "$parse", function($window, $document, $parse) {
 	var _selected,
 	_bk = angular.element("<div></div>").css({
 		"width": "100%",
@@ -170,14 +170,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		"top":"0",
 		"left":"0",
 		"background":"rgba(0,0,0,0.4)",
-		"z-index":"999",
+		"z-index":"9999",
 		"display":"none"
 	}).bind("click", function() {_select(0);}).appendTo("body"),
 	_pane = angular.element("<div></div>").css({
 		"background-color": "rgba(204,204,204,.5)",
 		"width": "100%",
 		"height": "80px",
-		"position": "absolute",
+		"position": "fixed",
 		"top": angular.element($window).height() + 1
 	})
 	.append(angular.element("<p></p>").css("margin", 0).append(
@@ -207,7 +207,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	}
 	
 	function _show(c) {
-		_bk.css("display", "block");
+		_pane.css("top", angular.element($window).height() + 1);
+		_bk.css({
+			"height": angular.element($document).height(),
+			"display": "inline-block"
+		});
 		_selected = c || angular.noop;
 		_pane.animate({top: angular.element($window).height() - 80}, {
 			speed: "slow",
@@ -247,8 +251,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 						}
 					});
 				}
+				e.preventDefault();
+			});
+			touch.on(element, "touchend", function(e) {
+				e.preventDefault();
 			});
 			scope.$on("$destroy", function() {
+				touch.off(element, "touchend");
 				touch.off(element, "hold");
 				touch.off(element, "touchstart");
 			});
@@ -353,7 +362,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		}
 	};
 }])
-.directive("myMediaSelector", ["$window", "$parse", "$timeout", "fileSystem", function($window, $parse, $timeout, fileSystem) {
+.directive("myMediaSelector", ["$window", "$document", "$parse", "$timeout", "fileSystem", function($window, $document, $parse, $timeout, fileSystem) {
 	var _pane = angular.element("<div></div>").css({
 		"width": "100%",
 		"height": "100%",
@@ -369,7 +378,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		"background-color": "rgba(204,204,204,.5)",
 		"width": "100%",
 		"height": "120px",
-		"position": "absolute",
+		"position": "fixed",
 		"top": angular.element($window).height() + 1
 	})
 	.append(angular.element("<p></p>").css("margin", 0).append(
@@ -415,8 +424,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	}
 	
 	function _show(c) {
+		_pane.css({
+			"height":  angular.element($document).height(),
+			"display": "inline-block"
+		});
 		btns.css("top", angular.element($window).height() + 1);
-		_pane.css("display", "inline-block");
 		_selected = c || angular.noop;
 		btns.animate({top: angular.element($window).height() - 120}, {
 			speed: "slow",
