@@ -6,7 +6,10 @@
 <section>
 	<ul class="list3-2015-1-11">
     	<li ng-repeat="t in list">
-        	<a ng-click="itemClicked(t)" href="" class="pic"><img ng-src="{{::t.attachments[0].thumbnailUrl}}"><p class="title">{{::title(t.traceType)}}</p></a>
+        	<a ng-click="itemClicked(t)" href="" class="pic">
+        		<img ng-src="{{::t.attachments[0].thumbnailUrl}}" style="width:180px;height:180px;">
+        		<p class="title">{{::title(t.traceType)}}</p>
+        	</a>
         </li>
     </ul>
 </section>
