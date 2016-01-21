@@ -1422,7 +1422,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 //		tipmessage("upload checkinging...", "tiploading");
 		var item = transferCache.get();
 		if (item) {
-			tipmessage("uploading...", "tiploading");
+			tipmessage("自动开始上传...", "tiploading");
 			item._status = "o2";
 			item._statusText = "上传中";
 			model.uploadAttachments(item, function(i) {
@@ -2143,6 +2143,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			
 		},
 		save: function() {
+		if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			transferCache.push($scope.newItem, "redian");
 			tipmessage("保存成功");//是否需要返回值？
 			$timeout(function() {
@@ -2338,6 +2342,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 							op = item._update ? model.trace.update : model.trace.create;
 							break;
 						case "issue":
+							delete item.topicType;
 							op = item._update ? model.issues.update : model.issues.create;
 							break;
 						default:
@@ -2627,7 +2632,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		});
 	};
 }])
-.controller("cIssueEdit", ["$scope", "model", "$timeout", function($scope, model, $timeout){
+.controller("cIssueEdit", ["$scope", "model", "$timeout","transferCache", function($scope, model, $timeout, transferCache){
 	$scope.newIssue = {
 	};
 	$scope.tipVisibility = "none";
@@ -2733,7 +2738,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		
 	};
 }])
-.controller("cIssueCreate", ["$scope", "model", "$timeout", function($scope, model, $timeout){
+.controller("cIssueCreate", ["$scope", "model", "$timeout","transferCache", function($scope, model, $timeout,transferCache){
 	
 	function _upload(file, blob, c) {
 		var formData = new FormData();
@@ -2805,8 +2810,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
+			tipmessage1(message="保存中",id="tipimg");
 		transferCache.push($scope.newIssue, "issue");
-			tipmessage("保存成功");//是否需要返回值？
+			changeTipmessage("保存成功",id="tipimg");
+			closetipmessage1("tipimg");
 			$timeout(function() {
 				$scope.$location.back();
 			}, 1000);
