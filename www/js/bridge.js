@@ -253,11 +253,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				}
 				e.preventDefault();
 			});
-			touch.on(element, "touchend", function(e) {
+			touch.on(element, "tap", function(e) {
 				e.preventDefault();
 			});
 			scope.$on("$destroy", function() {
-				touch.off(element, "touchend");
+				touch.off(element, "tap");
 				touch.off(element, "hold");
 				touch.off(element, "touchstart");
 			});
@@ -2039,7 +2039,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		videoChanged: function(uri) {
 			$scope.hotfocus.current.videoAttachmentList.push({
 				fileUrl: uri,
-				thumbnailUrl: uri
+				thumbnailUrl: "img/icon-15.png"
 			});
 		},
 		submit: function() {
@@ -2108,7 +2108,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		videoChanged: function(uri) {
 			$scope.newItem.videoAttachmentList.push({
 				fileUrl: uri,
-				thumbnailUrl: uri
+				thumbnailUrl: "img/icon-15.png"
 			});
 		},
 		submit: function() {
@@ -2657,7 +2657,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	$scope.videoChanged = function(uri) {
 		$scope.newIssue.issueVideoAttachmentList.push({
 			fileUrl: uri,
-			thumbnailUrl: uri
+			thumbnailUrl: "img/icon-15.png"
 		});
 	};;
 		
@@ -2755,7 +2755,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	$scope.videoChanged = function(uri) {
 		$scope.newIssue.issueVideoAttachmentList.push({
 			fileUrl: uri,
-			thumbnailUrl: uri
+			thumbnailUrl: "img/icon-15.png"
 		});
 	};
 	$scope.removeImage= function(url) {
