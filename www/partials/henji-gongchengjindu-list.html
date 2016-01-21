@@ -1,11 +1,11 @@
 <div class="pt60">
-<!--header-->
 <header class="bg1">
 	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
-	<p class="title">{{::trace.henjishangchuan.title}}</p>
-	<span class="search"><img src="img/icon-search.png"/></span><span class="jia" ng-click="add()"><img src="img/icon-jia.png"/></span><span ng-click="searching.cancel()" class="nochoose" style="display:none;">取消</span>
+	<p class="title">{{::trace.gongchengjindu.sectionName}} 进度月报</p>
+	<span class="jia" ng-click="add()"><img src="img/icon-jia.png"/></span>
 </header>
-<section class="searchblock"><input type="text" ng-model="searching.query" ng-change="searching.change()"/></section>
+<section class="searchblock"><input name="" type="text"></section>
+
 <section class="mlr10 mt15" my-scroll="load()">
 	<ul class="list-2015-1-11">
 		<li class="clearfix" ng-repeat="t in list track by t.id">
@@ -19,9 +19,4 @@
         </li>
     </ul>
 </section>
-<script type="text/javascript">
-$(document).ready(function(){
-	searchtool();
-});
-</script>
 </div>

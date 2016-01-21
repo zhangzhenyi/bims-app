@@ -132,7 +132,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				"font-family": "宋体",
 				"font-size": "18px",
 				"font-weight": "bold",
-				"color": "#87CEEB"
+				"color": "#9797EF",
+				"text-align": "center"
 			})
 			.html("{{" + a.bigModel + "}}%")
 			.appendTo(t);
@@ -142,18 +143,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				"margin-top": "-8px"
 			})
 			.attr({
-				"data-radial-indicator": "{radius: 60, barWidth: 15, percentage: true, displayNumber: false, barColor: '#87CEEB'}",
+				"data-radial-indicator": "{radius: 60, barWidth: 15, percentage: true, displayNumber: false, barColor: '#9797EF'}",
 				"data-radial-indicator-model": a.bigModel
 			})
 			.append(
 				angular.element("<div></div>")
 				.css({
 					"position": "absolute",
-					"margin-top": "20px",
-					"margin-left": "20px"
+					"margin-top": "18px",
+					"margin-left": "18px"
 				})
 				.attr({
-					"data-radial-indicator": "{radius: 40, barWidth: 15, percentage: true, barColor: '#87CEEB', fontSize: 20, fontFamily: '宋体'}",
+					"data-radial-indicator": "{radius: 42, barWidth: 15, percentage: true, barColor: '#87CEEB', fontSize: 20, fontFamily: '宋体'}",
 					"data-radial-indicator-model": a.smallModel
 				})
 			)
@@ -801,8 +802,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		});
 	}
 	
-	function _transfer(fileURI, fileType, topicType, callback) {
-		var url = encodeURI(_base + "attachment/uploadForH5.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType + "&showName=&thumbnailUri=&title=&content="),
+	function _transfer(fileURI, fileType, topicType, callback, content) {
+		var url = encodeURI(_base + "attachment/uploadForH5.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType + "&showName=&thumbnailUri=&title=&content=" + (content || "")),
 		ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop, abort: angular.noop},
 		opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
 		opt.fileKey = "file";
@@ -858,7 +859,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					}
 					(transferCallback || angular.noop)(url, false);
 					counter++;
-				}));
+				}, pics[i].content));
 			}
 		}
 		loops = ((videos || false) ? videos.length : 0);
@@ -886,7 +887,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					}
 					(transferCallback || angular.noop)(url, false);
 					counter++;
-				}));
+				}, videos[i].content));
 			}
 		}
 		$timeout(function _fn_waiting_attachment() {
@@ -1100,6 +1101,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
+			reportList: function(id, pn, c) {
+				_req({
+					method: "get",
+					url: "trace/getProgressReportList.jo",
+					params: {
+						sectionId: id,
+						pageNum: pn
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
 			get: function(i,c) {
 				_req({
 					method: "get",
@@ -1121,7 +1132,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					}
 				}, angular.isFunction(c) ? c: angular.noop);
 			},
-			
 			update: function(d, c) {
 				_req({
 					method: "post",
@@ -3599,20 +3609,120 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		}
 	});
 }])
-.controller("cHenjiGongchengjindu", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
+.controller("cHenjiGongchengjindu", ["$scope", "model", function($scope, model) {
 	model.sect.all(function(d) {
 		if (d) {
-			console.log(d);
-			for (var i = 0; i < d.length; i++) {
-				d[i].percentTime = parseFloat(d[i].percentTime.substring(0, d[i].percentTime.length - 1)) / 100;
-				d[i].percentProject = parseFloat(d[i].percentProject.substring(0, d[i].percentProject.length - 1)) / 100;
+			var v, i;
+			for (i = 0; i < d.length; i++) {
+				v = parseFloat(d[i].percentTime.substring(0, d[i].percentTime.length - 1));
+				d[i].percentTime = v > 100 ? 100 : v;
+				v = parseFloat(d[i].percentProject.substring(0, d[i].percentProject.length - 1));
+				d[i].percentProject = v > 100 ? 100 : v;
 			}
 			$scope.sections = d;
 		}
 	});
-	$scope.list = function(id) {
-		
+	$scope.list = function(s) {
+		$scope.trace.gongchengjindu = {
+				sectionId: s.id,
+				sectionName: s.sectionName
+		};
+		$scope.$location.path("/henji-gongchengjindu-list");
 	};
+}])
+.controller("cHenjiGongchengjinduList", ["$scope", "model", function($scope, model) {
+	angular.extend($scope, {
+		_page: 0,
+		page: 1,
+		list: [],
+		load: function() {
+			if ($scope._page != $scope.page) {
+				$scope._page = $scope.page;
+				model.trace.reportList($scope.trace.gongchengjindu.sectionId, $scope.page, function(d) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.list.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
+		},
+		itemClicked: function(t) {
+			$scope.trace.gongchengjindu.current = t;
+			$scope.$location.path("/henji-gongchengjindu-xiangqing");
+		},
+		add: function() {
+			$scope.trace.gongchengjindu.current = null;
+			$scope.$location.path("/henji-gongchengjindu-edit");
+		}
+	});
+}])
+.controller("cHenjiGongchengjinduXiangqing", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
+	angular.extend($scope, {
+		edit: function() {
+			$scope.$location.path("/henji-gongchengjindu-edit");
+		},
+		remove: function() {
+			model.trace.remove($scope.trace.gongchengjindu.current.id, function(d) {
+				if (d) tipmessage("删除成功");
+				else tipmessage("删除失败");
+				$timeout(function() {
+					$scope.$location.back();
+				}, 1000);
+			});
+		}
+	});
+}])
+.controller("cHenjiGongchengjinduEdit", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
+	angular.extend($scope, {
+		newItem: $scope.trace.gongchengjindu.current || {
+			topicType: 8,
+			traceType: 4,
+			sectionId: $scope.trace.gongchengjindu.sectionId,
+			picAttachmentList: [],
+			videoAttachmentList: []
+		},
+		removeImage: function(url) {
+			for (var i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
+				if ($scope.newItem.picAttachmentList[i].fileUrl == url) {
+					model.removeFiles([$scope.newItem.picAttachmentList[i]]);
+					$scope.newItem.picAttachmentList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
+		imageChanged: function(url) {
+			$scope.newItem.picAttachmentList.push({
+				fileUrl: url,
+				thumbnailUrl: url
+			});
+		},
+		submit: function() {
+			model.uploadAttachments($scope.newItem, function(item) {
+				delete item.videoAttachmentList;
+				(($scope.trace.gongchengjindu.current || false) ? model.trace.update : model.trace.create)(item, function(d) {
+					if (d) {
+						model.removeFiles($scope.newItem.picAttachmentList);
+						tipmessage("提交成功");
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
+					}
+				});
+			});
+		},
+		save: function() {
+			if ($scope.trace.gongchengjindu.current || false)
+				transferCache.push($scope.newItem, "spotcheck", "update");
+			else
+				transferCache.push($scope.newItem, "spotcheck");
+			tipmessage("保存成功");
+			$timeout(function() {
+				$scope.$location.back();
+			}, 1000);
+		}
+	});
 }])
 .config(["myRouteProvider", function(myRouteProvider) {
 	myRouteProvider
@@ -3797,6 +3907,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	.when("/henji-gongchengjindu", {
 		templateUrl: "partials/henji-gongchengjindu.html",
 		controller: "cHenjiGongchengjindu"
+	})
+	.when("/henji-gongchengjindu-list", {
+		templateUrl: "partials/henji-gongchengjindu-list.html",
+		controller: "cHenjiGongchengjinduList"
+	})
+	.when("/henji-gongchengjindu-xiangqing", {
+		templateUrl: "partials/henji-gongchengjindu-xiangqing.html",
+		controller: "cHenjiGongchengjinduXiangqing"
+	})
+	.when("/henji-gongchengjindu-edit", {
+		templateUrl: "partials/henji-gongchengjindu-edit.html",
+		controller: "cHenjiGongchengjinduEdit"
 	})
 	.when("/henji-shangchuan", {
 		templateUrl: "partials/henji-shangchuan.html",
