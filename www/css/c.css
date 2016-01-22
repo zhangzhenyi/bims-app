@@ -220,6 +220,7 @@ nav a.on span.i5,nav a:hover span.i5{ background: url(../img/nav-i5on.png) no-re
 .list-9 li span.title{display:block;font-size:16px;line-height:20px;font-weight:bold;color:#040404;margin-bottom:3px;position:relative;padding-right:60px;}
 .list-9 li span.title i.o1{ font-size:14px; line-height:20px; display:inline-block; position:absolute; top:0; right:0; background:#ff7a00; color:#fff; padding-left:5px; padding-right:5px; border-radius:5px; font-style: normal; }
 .list-9 li span.title i.o2{ font-size:14px; line-height:20px; display:inline-block; position:absolute; top:0; right:0; background:#1fb6ff; color:#fff; padding-left:5px; padding-right:5px; border-radius:5px; font-style: normal; }
+.list-9 li span.title i.o3{ font-size:14px; line-height:20px; display:inline-block; position:absolute; top:0; right:0; background:#ff0000; color:#fff; padding-left:5px; padding-right:5px; border-radius:5px; font-style: normal; }
 .list-9 li span.txt{display:block;font-size: 14px; line-height:18px; color: #636363;margin-bottom:3px;}
 .list-9 li span.time{display:block;font-size: 14px; text-align:right;line-height: 16px;color: #636363;margin-top:5px;position:relative;}
 
