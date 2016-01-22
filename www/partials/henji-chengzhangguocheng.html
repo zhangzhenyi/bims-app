@@ -1,0 +1,26 @@
+<div class="pt60">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">成长过程</p>
+	<span class="search"><img src="img/icon-search.png"/></span><span class="jia" ng-click="add()"><img src="img/icon-jia.png"/></span><span class="nochoose" style="display:none;">取消</span>
+</header>
+<section class="searchblock"><input name="" type="text"></section>
+<section class="mlr10 mt15" my-scroll="load()">
+	<ul class="list-2015-1-11">
+		<li class="clearfix" ng-repeat="t in list track by t.id">
+           <a ng-click="itemClicked(t)" href="">
+                <span class="i"><img ng-src="{{::t.publisherAvatarUrl}}"/></span>
+                <span class="r">
+                   <span class="txt">{{::t.title}}</span><span class="title">{{::t.compId}}</span>
+                </span>
+                <span class="time">{{::formatDate(t.createTime)}} <span class="name">{{::t.publisherName}}</span></span>
+            </a>
+        </li>
+    </ul>
+</section>
+<script type="text/javascript">
+$(document).ready(function(){
+	searchtool();	
+});
+</script>
+</div>
