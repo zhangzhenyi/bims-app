@@ -105,7 +105,99 @@ function isBlankString(s) {
 	return false;
 }
 
-angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
+(function() {
+    'use strict';
+     angular.module('base64', []).constant('$base64', (function() {
+        var buffer = (typeof module !== 'undefined' && module.exports) ? require('buffer').Buffer : null,
+        b64chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
+        b64tab = (function(bin) {
+            var t = {};
+            for (var i = 0,
+            l = bin.length; i < l; i++) t[bin.charAt(i)] = i;
+            return t;
+        })(b64chars),
+        fromCharCode = String.fromCharCode,
+        cb_utob = function(c) {
+        	var cc;
+            if (c.length < 2) {
+                cc = c.charCodeAt(0);
+                return cc < 0x80 ? c: cc < 0x800 ? (fromCharCode(0xc0 | (cc >>> 6)) + fromCharCode(0x80 | (cc & 0x3f))) : (fromCharCode(0xe0 | ((cc >>> 12) & 0x0f)) + fromCharCode(0x80 | ((cc >>> 6) & 0x3f)) + fromCharCode(0x80 | (cc & 0x3f)));
+            }
+            cc = 0x10000 + (c.charCodeAt(0) - 0xD800) * 0x400 + (c.charCodeAt(1) - 0xDC00);
+            return (fromCharCode(0xf0 | ((cc >>> 18) & 0x07)) + fromCharCode(0x80 | ((cc >>> 12) & 0x3f)) + fromCharCode(0x80 | ((cc >>> 6) & 0x3f)) + fromCharCode(0x80 | (cc & 0x3f)));
+        },
+        re_utob = /[\uD800-\uDBFF][\uDC00-\uDFFFF]|[^\x00-\x7F]/g,
+        utob = function(u) {
+            return u.replace(re_utob, cb_utob);
+        },
+        cb_encode = function(ccc) {
+            var padlen = [0, 2, 1][ccc.length % 3],
+            ord = ccc.charCodeAt(0) << 16 | ((ccc.length > 1 ? ccc.charCodeAt(1) : 0) << 8) | ((ccc.length > 2 ? ccc.charCodeAt(2) : 0)),
+            chars = [b64chars.charAt(ord >>> 18), b64chars.charAt((ord >>> 12) & 63), padlen >= 2 ? '=': b64chars.charAt((ord >>> 6) & 63), padlen >= 1 ? '=': b64chars.charAt(ord & 63)];
+            return chars.join('');
+        },
+        btoa = function(b) {
+            return b.replace(/[\s\S]{1,3}/g, cb_encode);
+        },
+        _encode = buffer ?
+        function(u) {
+            return (u.constructor === buffer.constructor ? u: new buffer(u)).toString('base64');
+        }: function(u) {
+            return btoa(utob(u));
+        },
+        encode = function(u, urisafe) {
+            return ! urisafe ? _encode(String(u)) : _encode(String(u)).replace(/[+\/]/g,
+            function(m0) {
+                return m0 == '+' ? '-': '_';
+            }).replace(/=/g, '');
+        },
+        re_btou = new RegExp(['[\xC0-\xDF][\x80-\xBF]', '[\xE0-\xEF][\x80-\xBF]{2}', '[\xF0-\xF7][\x80-\xBF]{3}'].join('|'), 'g'),
+        cb_btou = function(cccc) {
+            switch (cccc.length) {
+            case 4:
+                var cp = ((0x07 & cccc.charCodeAt(0)) << 18) | ((0x3f & cccc.charCodeAt(1)) << 12) | ((0x3f & cccc.charCodeAt(2)) << 6) | (0x3f & cccc.charCodeAt(3)),
+                offset = cp - 0x10000;
+                return (fromCharCode((offset >>> 10) + 0xD800) + fromCharCode((offset & 0x3FF) + 0xDC00));
+            case 3:
+                return fromCharCode(((0x0f & cccc.charCodeAt(0)) << 12) | ((0x3f & cccc.charCodeAt(1)) << 6) | (0x3f & cccc.charCodeAt(2)));
+            default:
+                return fromCharCode(((0x1f & cccc.charCodeAt(0)) << 6) | (0x3f & cccc.charCodeAt(1)));
+            }
+        },
+        btou = function(b) {
+            return b.replace(re_btou, cb_btou);
+        },
+        cb_decode = function(cccc) {
+            var len = cccc.length,
+            padlen = len % 4,
+            n = (len > 0 ? b64tab[cccc.charAt(0)] << 18 : 0) | (len > 1 ? b64tab[cccc.charAt(1)] << 12 : 0) | (len > 2 ? b64tab[cccc.charAt(2)] << 6 : 0) | (len > 3 ? b64tab[cccc.charAt(3)] : 0),
+            chars = [fromCharCode(n >>> 16), fromCharCode((n >>> 8) & 0xff), fromCharCode(n & 0xff)];
+            chars.length -= [0, 0, 2, 1][padlen];
+            return chars.join('');
+        },
+        atob = function(a) {
+            return a.replace(/[\s\S]{1,4}/g, cb_decode);
+        },
+        _decode = buffer ?
+        function(a) {
+            return (a.constructor === buffer.constructor ? a: new buffer(a, 'base64')).toString();
+        }: function(a) {
+            return btou(atob(a));
+        },
+        decode = function(a) {
+            return _decode(String(a).replace(/[-_]/g,
+            function(m0) {
+                return m0 == '-' ? '+': '/';
+            }).replace(/[^A-Za-z0-9\+\/]/g, ''));
+        };
+         return {            
+            encode: encode,            
+            decode: decode,
+        };
+    })());
+})();
+
+angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"])
 .filter('cutTail', [function () {
 	  return function (value, wordwise, max, tail) {
 		    if (!value) return '';
@@ -514,6 +606,39 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		}
 	};
 }])
+.directive("myTitlePicker", ["$parse", function($parse) {
+	return {
+		restrict: "E",
+		transclude: true,
+		link: function(scope, element, attrs) {
+			element.removeAttr("ng-model");
+			angular.element("<input/>")
+			.attr({
+				type: "text",
+				placeholder: "请点击选择主题"
+			})
+			.css({
+				"width": "100%",
+				"border": "0"
+			})
+			.val($parse(attrs.ngModel)(scope))
+			.appendTo(element)
+			.mobiscroll().date({
+				theme: "ios",
+				mode: "mixed",
+				display: "bottom",
+				lang: "zh",
+				dateFormat: "yy年mm月进度月报",
+				onBeforeShow: function (inst) {
+					inst.settings.wheels[0].length > 2 ? inst.settings.wheels[0].pop() : null;
+				},
+				onSelect: function(t) {
+					($parse(attrs.ngModel).assign)(scope, t);
+				}
+			});
+		}
+	};
+}])
 .directive("myDatetimePicker", ["$parse", function($parse) {
 	return {
 		restrict: "E",
@@ -692,7 +817,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		save: _save
 	};
 }])
-.factory("model", ["$rootScope", "$http", "$interval", "$timeout", "myRoute", function($rootScope, $http, $interval, $timeout, myRoute) {
+.factory("model", ["$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", function($rootScope, $http, $interval, $timeout, $base64, myRoute) {
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
 	function _fn() {
 		$.get( _base + 'login/createToken.jo' + (_sessionId ? ";jsessionid=" + _sessionId : ""), function(data) {
@@ -714,6 +839,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	};
 	$rootScope.formatDate = function(time) {
 		return (new Date(time)).format("yyyy-MM-dd hh:mm");
+	};
+	$rootScope.formatDate2Day = function(time) {
+		return (new Date(time)).format("yyyy-MM-dd");
 	};
 	
 	$rootScope.origionVersion = "0.0.4.0109_beta";
@@ -803,7 +931,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	}
 	
 	function _transfer(fileURI, fileType, topicType, callback, content) {
-		var url = encodeURI(_base + "attachment/uploadForH5.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType + "&showName=&thumbnailUri=&title=&content=" + (content || "")),
+		var url = encodeURI(_base + "attachment/uploadForH5.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType + "&showName=&thumbnailUri=&title=&content=" + $base64.encode(content || "")),
 		ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop, abort: angular.noop},
 		opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
 		opt.fileKey = "file";
@@ -1139,13 +1267,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					data: d
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
-			//id is issue ID
 			remove: function(id, c) {
 				_req({
 					method: "delete",
 					url: "trace/delete.jo",
 					params: {
-						id:parseInt(id)
+						id: parseInt(id)
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
@@ -1325,7 +1452,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			}
 			
 		},
-		
 		sect : {
 			list: function(t, pn, c) {
 				_req({
@@ -3552,7 +3678,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		},
 		submit: function() {
 			model.uploadAttachments($scope.newItem, function(item) {
-				delete item.videoAttachmentList;
 				(($scope.trace.henjishangchuan.current || false) ? model.trace.update : model.trace.create)(item, function(d) {
 					if (d) {
 						model.removeFiles($scope.newItem.picAttachmentList);
@@ -3625,12 +3750,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	$scope.list = function(s) {
 		$scope.trace.gongchengjindu = {
 				sectionId: s.id,
-				sectionName: s.sectionName
+				sectionName: s.sectionName,
+				startDate: s.startDate,
+				endDate: s.endDate,
+				contractAmount: s.contractAmount,
+				paymentTotal: s.paymentTotal,
+				percentTime: s.percentTime,
+				percentProject: s.percentProject
 		};
 		$scope.$location.path("/henji-gongchengjindu-list");
 	};
 }])
-.controller("cHenjiGongchengjinduList", ["$scope", "model", function($scope, model) {
+.controller("cHenjiGongchengjinduList", ["$scope", "$base64", "model", function($scope, $base64, model) {
 	angular.extend($scope, {
 		_page: 0,
 		page: 1,
@@ -3648,8 +3779,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			}
 		},
 		itemClicked: function(t) {
-			$scope.trace.gongchengjindu.current = t;
-			$scope.$location.path("/henji-gongchengjindu-xiangqing");
+			model.trace.get(t.id, function(d) {
+				if (d) {
+					if (d.picAttachmentList) {
+						for (var i = 0; i < d.picAttachmentList.length; i++) {
+							if (d.picAttachmentList[i].content || false)
+								d.picAttachmentList[i].content = $base64.decode(d.picAttachmentList[i].content);
+						}
+					}
+					$scope.trace.gongchengjindu.current = d;
+					$scope.$location.path("/henji-gongchengjindu-xiangqing");
+				}
+			});
 		},
 		add: function() {
 			$scope.trace.gongchengjindu.current = null;
@@ -3670,17 +3811,32 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					$scope.$location.back();
 				}, 1000);
 			});
+		},
+		fileClicked: function(name, path) {
+			$scope.files.filename = name;
+			$scope.files.filepath = path;
+			$scope.$location.path("/onefile");
 		}
 	});
 }])
 .controller("cHenjiGongchengjinduEdit", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
+	var _last_payment = 0;
 	angular.extend($scope, {
-		newItem: $scope.trace.gongchengjindu.current || {
-			topicType: 8,
-			traceType: 4,
-			sectionId: $scope.trace.gongchengjindu.sectionId,
-			picAttachmentList: [],
-			videoAttachmentList: []
+		newItem: (function() {
+			var r = $scope.trace.gongchengjindu.current || {
+				topicType: 8,
+				traceType: 4,
+				sectionId: $scope.trace.gongchengjindu.sectionId
+			};
+			r.picAttachmentList = r.picAttachmentList || [];
+			r.videoAttachmentList = r.videoAttachmentList || [];
+			$scope.payment = r.payment ? parseFloat(r.payment) : 0;
+			return r;
+		})(),
+		change: function() {
+			var s = $scope.payment + '';
+			if (s.match(/^\d+(\.\d{0,2})?$/g)) _last_payment = $scope.payment;
+			else 	$scope.payment = _last_payment;
 		},
 		removeImage: function(url) {
 			for (var i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
@@ -3699,8 +3855,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			});
 		},
 		submit: function() {
+			$scope.newItem.payment = $scope.payment + '';
 			model.uploadAttachments($scope.newItem, function(item) {
-				delete item.videoAttachmentList;
 				(($scope.trace.gongchengjindu.current || false) ? model.trace.update : model.trace.create)(item, function(d) {
 					if (d) {
 						model.removeFiles($scope.newItem.picAttachmentList);
@@ -3708,11 +3864,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
-					}
+					} else tipmessage("提交失败");
 				});
 			});
 		},
 		save: function() {
+			$scope.newItem.payment = $scope.payment + '';
 			if ($scope.trace.gongchengjindu.current || false)
 				transferCache.push($scope.newItem, "spotcheck", "update");
 			else
