@@ -3842,20 +3842,45 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	};
 }])
 .controller("cHenjiGongchengjinduList", ["$scope", "$base64", "model", function($scope, $base64, model) {
+	function _fn(d) {
+		if (d && d.length > 0) {
+			for (var i = 0; i < d.length; i++) {
+				if (d[i].sectionId == $scope.trace.gongchengjindu.sectionId)
+					$scope.list.push(d[i]);
+			}
+			$scope.page++;
+			if ($scope.list.length < 10) $scope.load();
+		}
+	}
+	
 	angular.extend($scope, {
 		_page: 0,
 		page: 1,
 		list: [],
+		isSearching: false,
+		searching: {
+			query: "",
+			change: function() {
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.isSearching = true;
+				$scope.load();
+			},
+			cancel: function() {
+				$scope.searching.query = "";
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.isSearching = false;
+				$scope.load();
+			}
+		},
 		load: function() {
 			if ($scope._page != $scope.page) {
 				$scope._page = $scope.page;
-				model.trace.reportList($scope.trace.gongchengjindu.sectionId, $scope.page, function(d) {
-					if (d && d.length > 0) {
-						for (var i = 0; i < d.length; i++)
-							$scope.list.push(d[i]);
-						$scope.page++;
-					}
-				});
+				if ($scope.isSearching) model.trace.search($scope.searching.query, $scope.page, 4, _fn);
+				else model.trace.reportList($scope.trace.gongchengjindu.sectionId, $scope.page, _fn);
 			}
 		},
 		itemClicked: function(t) {
@@ -3992,10 +4017,26 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		_page: 0,
 		page: 1,
 		list: [],
+		searching: {
+			query: "",
+			change: function() {
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.load();
+			},
+			cancel: function() {
+				$scope.searching.query = "";
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.load();
+			}
+		},
 		load: function() {
 			if ($scope._page != $scope.page) {
 				$scope._page = $scope.page;
-				model.trace.list($scope.page, 3, function(d) {
+				model.trace.search($scope.searching.query, $scope.page, 3, function(d) {
 					if (d && d.length > 0) {
 						for (var i = 0; i < d.length; i++)
 							$scope.list.push(d[i]);
@@ -4154,10 +4195,26 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		_page: 0,
 		page: 1,
 		list: [],
+		searching: {
+			query: "",
+			change: function() {
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.load();
+			},
+			cancel: function() {
+				$scope.searching.query = "";
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.load();
+			}
+		},
 		load: function() {
 			if ($scope._page != $scope.page) {
 				$scope._page = $scope.page;
-				model.trace.list($scope.page, 2, function(d) {
+				model.trace.search($scope.searching.query, $scope.page, 2, function(d) {
 					if (d && d.length > 0) {
 						for (var i = 0; i < d.length; i++)
 							$scope.list.push(d[i]);
