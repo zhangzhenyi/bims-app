@@ -4058,7 +4058,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	});
 }])
-.controller("cHenjiZhiliangEdit", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
+.controller("cHenjiZhiliangEdit", ["$window", "$scope", "$timeout", "model", "transferCache", function($window, $scope, $timeout, model, transferCache) {
 	angular.extend($scope, {
 		docTypes:  [
     	    {id: 1, v: "出厂证书"},
@@ -4073,15 +4073,23 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			picAttachmentList: [],
 			videoAttachmentList: []
 		},
+		canScan: $window.cordova && $window.cordova.plugins && cordova.plugins.barcodeScanner,
 		scan: function() {
-			$scope.newItem.compId = "comp_xxxx_120";
-			$scope.newItem.component = {
-				compId: "comp_xxxx_120",
-				name: "comp_xxxx_120 name",
-				designer: "北京交科勘察设计研究院有限公司",
-				constructor: "中交第二公路工程局有限公司",
-				supervisor: "中铁武汉大桥工程咨询监理有限公司"
-			};
+			cordova.plugins.barcodeScanner.scan(function(r) {
+				$scope.newItem.compId = r.text;
+				model.component.get(r.text, function(d) {
+					if (d) $scope.newItem.component = d;
+					else tipmessage("该构件编码不存在");
+				});
+			}, function(e) {
+				tipmessage("扫描二维码失败");
+			});
+		},
+		onCompIdChange: function() {
+			model.component.get($scope.newItem.compId, function(d) {
+				if (d) $scope.newItem.component = d;
+				else tipmessage("该构件编码不存在");
+			});
 		},
 		removeImage: function(url) {
 			for (var i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
@@ -4205,7 +4213,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	});
 }])
-.controller("cHenjiChengzhangguochengEdit", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
+.controller("cHenjiChengzhangguochengEdit", ["$window", "$scope", "$timeout", "model", "transferCache", function($window, $scope, $timeout, model, transferCache) {
 	angular.extend($scope, {
 		newItem: $scope.trace.chengzhangguocheng.current || {
 			topicType: 8,
@@ -4213,15 +4221,23 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			picAttachmentList: [],
 			videoAttachmentList: []
 		},
+		canScan: $window.cordova && $window.cordova.plugins && cordova.plugins.barcodeScanner,
 		scan: function() {
-			$scope.newItem.compId = "comp_xxxx_122";
-			$scope.newItem.component = {
-				compId: "comp_xxxx_122",
-				name: "comp_xxxx_122 name",
-				designer: "北京交科勘察设计研究院有限公司",
-				constructor: "中交第二公路工程局有限公司",
-				supervisor: "中铁武汉大桥工程咨询监理有限公司"
-			};
+			cordova.plugins.barcodeScanner.scan(function(r) {
+				$scope.newItem.compId = r.text;
+				model.component.get(r.text, function(d) {
+					if (d) $scope.newItem.component = d;
+					else tipmessage("该构件编码不存在");
+				});
+			}, function(e) {
+				tipmessage("扫描二维码失败");
+			});
+		},
+		onCompIdChange: function() {
+			model.component.get($scope.newItem.compId, function(d) {
+				if (d) $scope.newItem.component = d;
+				else tipmessage("该构件编码不存在");
+			});
 		},
 		removeImage: function(url) {
 			for (var i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
