@@ -554,7 +554,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			var data = {};
 			angular.element("<img/>")
 			.attr({
-				"src": a["src"],
+				"ng-src": a["src"],
 				"class": a["class"]
 			})
 			.css("cursor", "pointer")
@@ -825,7 +825,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		save: _save
 	};
 }])
-.factory("model", ["$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", function($rootScope, $http, $interval, $timeout, $base64, myRoute) {
+.factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute) {
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
 	function _fn() {
 		$.get( _base + 'login/createToken.jo' + (_sessionId ? ";jsessionid=" + _sessionId : ""), function(data) {
@@ -1036,6 +1036,20 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			return _host + _path;
 		},
 		user: {
+			uploadAvatar: function(fileURI, callback) {
+				var url = encodeURI(_base + "user/uploadAvatar.jo;jsessionid=" + _sessionId),
+				ft = ($window.FileTransfer) ? new FileTransfer() : {upload: angular.noop, abort: angular.noop},
+				opt = ($window.FileUploadOptions) ? new FileUploadOptions() : {};
+				opt.fileKey = "avatarImg";
+				opt.fileName = fileURI.substr(fileURI.lastIndexOf('/') + 1);
+				opt.mimeType = "multipart/form-data";
+				opt.chunkedMode = false;
+				ft.upload(fileURI, url, function(r) {
+					callback(JSON.parse(r.response));
+				}, function() {
+					callback(false);
+				}, opt);
+			},
 			login: function(u,p,c) {
 				_req({
 					method: "post",
@@ -2309,12 +2323,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	});
 }])
-.controller("cWode", ["$scope", "$timeout", "model", "transferCache", "fileSystem", function($scope, $timeout, model, transferCache, fileSystem) {
+.controller("cWode", ["$window", "$scope", "$timeout", "model", "transferCache", "fileSystem", function($window, $scope, $timeout, model, transferCache, fileSystem) {
 	switch($scope.$location.path()) {
 	case '/shezhi':
 		//Get latest version
 		$scope.hasNewVersion = false;
-		if (window.localStorage) {
+		if ($window.localStorage) {
 			var wiffi = localStorage["autoUpdateOnWiffi"] || false;
 			if(wiffi == "true"){
 				$scope.autoUpdateOnWiffi = true;
@@ -2338,7 +2352,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			onInstall:function(){
 				if($scope.hasNewVersion) {
 					//post to outside browser to open url
-					window.open($scope.setting.installer,"_system");
+					$window.open($scope.setting.installer,"_system");
 				}
 			},
 			setAutoUpload: function() {
@@ -2347,14 +2361,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				}else{
 					$scope.autoUpdateOnWiffi = true;
 				}
-				if (window.localStorage) 
+				if ($window.localStorage) 
 					localStorage["autoUpdateOnWiffi"] = $scope.autoUpdateOnWiffi;
 			}
 		});
 
-		if(window.device) {
+		if($window.device) {
 			var platform = 1;
-			switch(window.device.platform){
+			switch($window.device.platform){
 			case 'iPhone':
 				platform = 1;
 				break;
@@ -2384,19 +2398,29 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		$scope.$location.path('/onepage');
 		break;
 	case '/wode-gerenxinxi':
-		$scope.imgChanged = function(e) {
-			var formData = new FormData();
-			formData.append("avatarImg", (angular.element(e))[0].files[0]);
-			model.uploadFile("user/uploadAvatar.jo", formData, function(d) {
-				if (d) {
-					$scope.user.photo = d.avatarUrl;
-					$scope.user.original.avatarUrl = d.avatarUrl;
-					$scope.$apply();
-				}
-			}, function(progress) {
-				console.log(progress);
-			});
-		};
+		angular.extend($scope, {
+			imgChanged: function(e) {
+				var formData = new FormData();
+				formData.append("avatarImg", (angular.element(e))[0].files[0]);
+				model.uploadFile("user/uploadAvatar.jo", formData, function(d) {
+					if (d) {
+						$scope.user.photo = d.avatarUrl;
+						$scope.user.original.avatarUrl = d.avatarUrl;
+						$scope.$apply();
+					}
+				});
+			},
+			usingCamera: $window.FileTransfer || false,
+			imageChanged: function(url) {
+				model.user.uploadAvatar(url, function(d) {
+					if (d) {
+						$scope.user.photo = d.avatarUrl;
+						$scope.user.original.avatarUrl = d.avatarUrl;
+						$scope.$apply();
+					}
+				});
+			}
+		});
 		break;
 	case '/wode-gerenxinxi-xingming':
 		angular.extend($scope, {
