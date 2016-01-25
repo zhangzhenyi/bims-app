@@ -567,13 +567,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 							if (n != 0) {
 								if ( (attrs.type || "img").toLowerCase() == "video") {
 									if (n == 1) {
-										data.op = (navigator && navigator.device) ? navigator.device.capture.captureVideo : angular.noop;
+										data.op = ($window.navigator && navigator.device) ? navigator.device.capture.captureVideo : angular.noop;
 										data.opt = {limit: 1};
 										data.success = function(files) {
 											_captureVideo(files, scope, $parse(attrs.change));
 										};
 									} else {
-										data.op = (navigator && navigator.camera) ? navigator.camera.getPicture : angular.noop;
+										data.op = ($window.navigator && navigator.camera) ? navigator.camera.getPicture : angular.noop;
 										data.opt = {
 											destinationType: 1,	//Camera.DestinationType.FILE_URI
 											sourceType: 2,	//SAVEDPHOTOALBUM
@@ -584,7 +584,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 										};
 									}
 								} else {
-									data.op = (navigator && navigator.camera) ? navigator.camera.getPicture : angular.noop;
+									data.op = ($window.navigator && navigator.camera) ? navigator.camera.getPicture : angular.noop;
 									data.opt = {
 										quality: 50,
 										destinationType: 1,
@@ -1953,7 +1953,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				});
 			}
 		},
-		
 		newComment: "",
 		save: function() {
 			if ($scope.newComment != "") {
@@ -2042,32 +2041,38 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	});
 }])
 .controller("cRedianxiangqing", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
-	$scope.voteMembers = (isBlankString($scope.hotfocus.current.voteUsersX))? [] : $scope.hotfocus.current.voteUsersX.split(",");
-	if($scope.voteMembers.length > 0) {
-		$scope.voteMemberStr = $scope.voteMembers.join("，"); 
-		if($scope.voteMembers.length > 0) {
-			$scope.voteMemberStr = $scope.voteMembers.join("，"); 
-			for (var x in $scope.voteMembers) {
-				if($scope.voteMembers[x] == $scope.user.name) {
-					$scope.isVote = true;
-					break;
+	model.hotfocus.get($scope.hotfocus.current.id, function(d) {
+		if (d) {
+			$scope.hotfocus.current = d;
+			$scope.voteMembers = (isBlankString(d.voteUsersX)) ? [] : d.voteUsersX.split(",");
+			if($scope.voteMembers.length > 0) {
+				$scope.voteMemberStr = $scope.voteMembers.join("，"); 
+				if($scope.voteMembers.length > 0) {
+					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
+					for (var x in $scope.voteMembers) {
+						if($scope.voteMembers[x] == $scope.user.name) {
+							$scope.isVote = true;
+							break;
+						}
+					}
+				}
+				if($scope.isVote) {
+					model.vote.isVoted(d.id, d.topicType, function(d) {
+						if(d) $scope.isVote = true;
+						else $scope.isVote = false;
+					});
 				}
 			}
 		}
-		if($scope.isVote) {
-			model.vote.isVoted($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, function(d) {
-				if(d) $scope.isVote = true;
-				else $scope.isVote = false;
-			});
-		}
-	}
+	});
+	
 	angular.extend($scope, {
 		_page: 0,
 		page: 1,
 		comments: [],
-		isVote:false,
-		voteMembers:[],
-		voteMemberStr:"",
+		isVote: false,
+		voteMembers: [],
+		voteMemberStr: "",
 		showComments: !($scope.hotfocus.current._status || false),
 		load: function() {
 			if (!($scope.hotfocus.current._status || false)) {
@@ -2084,25 +2089,23 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			}
 		},
 		more: $scope.user.id == $scope.hotfocus.current.publisherId || $scope.hotfocus.current._status,
-		topicId: $scope.hotfocus.current.id,
-		topicType: $scope.hotfocus.current.topicType,
-		doLike:function(){
-			if(!$scope.isVote){
-				model.vote.doLike($scope.topicId, $scope.topicType, function(d){
-					$scope.voteMembers.push($scope.user.name);
-					$scope.isVote = true;
-					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
-				});
-			} else {
+		doLike: function() {
+			if($scope.isVote) {
 				if($scope.voteMembers.length <=0) return;
-				model.vote.disLike($scope.topicId, $scope.topicType, function(d){
-					for(var i=0; i < $scope.voteMembers.length; i++){
-						if($scope.voteMembers[i] == $scope.user.name){
-							$scope.voteMembers.splice(i,1);
+				model.vote.disLike($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, function(d) {
+					for(var i = 0; i < $scope.voteMembers.length; i++) {
+						if($scope.voteMembers[i] == $scope.user.name) {
+							$scope.voteMembers.splice(i, 1);
 							break;
 						}
 					}
 					$scope.isVote = false;
+					$scope.voteMemberStr = $scope.voteMembers.join("，");
+				});
+			} else {
+				model.vote.doLike($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, function(d) {
+					$scope.voteMembers.push($scope.user.name);
+					$scope.isVote = true;
 					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
 				});
 			}
