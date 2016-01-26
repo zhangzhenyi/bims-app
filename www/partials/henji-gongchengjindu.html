@@ -1,0 +1,16 @@
+<div class="pt60">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">工程进度</p>
+</header>
+<section class="bg2">
+	<ul class="list2-2015-1-11 clearfix">
+		<li ng-repeat="section in sections">
+			<p class="title"><a ng-click="list(section)" href=""><b>{{::section.sectionName}}</b></a></p>
+			<a ng-click="list(section)" href="" class="pic">
+				<my-radial-indicator small-model="section.percentTime" big-model="section.percentProject"></my-radial-indicator>
+			</a>
+		</li>
+	</ul>
+</section>
+</div>

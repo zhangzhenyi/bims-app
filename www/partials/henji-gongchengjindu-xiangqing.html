@@ -1,0 +1,68 @@
+<div class="pt60">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">{{::trace.gongchengjindu.sectionName}} 进度月报</p>
+	<span ng-show="more" class="more" ><img src="img/icon-more-1.png" style="width:24px;height:20px;"/></span>
+	<div class="pop-window1">
+	<img src="img/icon-jian5.png" class="j"/><div class="cb"></div>
+	<ul>
+		<li><a ng-click="edit()" href=""><img src="img/icon-edit201512.png"/> 编辑</a></li>
+		<li><a ng-click="remove()" href=""><img src="img/icon-del201512.png"/> 删除</a></li>
+	</ul>
+	</div>
+</header>
+<section class="mt10">
+	<ul class="list-3">
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-14.jpg">标题</span><span class="r">{{::trace.gongchengjindu.current.title}}</span>
+		</li>
+		<li class="clearfix">
+			<span class="t"><img src="img/i-xq-2.jpg"/>总体概况</span>
+			<div style="border:1px solid #ccc;border-radius:5px;padding:10px;margin:5px;">
+            <p class="tp1 clearfix">
+            	<span class="l">合同额</span>
+            	<span class="r" style="text-align:right;">{{::trace.gongchengjindu.contractAmount}}</span>
+            </p>
+            <p class="tp1 clearfix">
+            	<span class="l">计划完成时间</span>
+            	<span class="r" style="text-align:right;">{{::formatDate2Day(trace.gongchengjindu.endDate)}}</span>
+            </p>
+            <p class="tp1 clearfix">
+            	<span class="l">时间燃烧</span>
+            	<span class="r" style="text-align:right;">{{::trace.gongchengjindu.percentTime}}%</span>
+            </p>
+            <p class="tp1 clearfix">
+            	<span class="l">本月计量</span>
+            	<span class="r" style="text-align:right;">{{::trace.gongchengjindu.current.payment}}</span>
+            </p>
+			<p class="tp1 clearfix">
+				<span class="l">累计计量</span>
+				<span class="r" style="text-align:right;">{{::trace.gongchengjindu.paymentTotal}}</span>
+			</p>
+			<p class="tp1 clearfix">
+				<span class="l">工程完成率</span>
+				<span class="r" style="text-align:right;">{{::trace.gongchengjindu.percentProject}}%</span>
+			</p>
+			</div>
+		</li>
+		<li class="clearfix" ng-show="{{::(trace.gongchengjindu.current.picAttachmentList && trace.gongchengjindu.current.picAttachmentList.length > 0)}}">
+			<span class="l"><img src="img/i-xq-5.jpg"/>现场进度实景</span><div class="cb"></div>
+			<div class="clearfix" ng-repeat="pic in trace.gongchengjindu.current.picAttachmentList" style="margin:10px;">
+				<span class="l"><img ng-src="{{::pic.thumbnailUrl}}" style="width:50px;height:50px;overflow:hidden;vertical-align:bottom;margin-bottom:0;" ng-click="fileClicked('相片', pic.fileUrl)"/></span>
+				<span class="r" style="margin-top:9px;text-align:right;">{{::pic.content}}</span>
+			</div>
+		</li>
+	</ul>
+</section>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("header .more").click(function(){
+		if($(".pop-window1").height()== "0"){
+			$(".pop-window1").animate({height:100},300);
+		}else{
+			$(".pop-window1").animate({height:0},300);
+		}
+	})
+})
+</script>
+</div>

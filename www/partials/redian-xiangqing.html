@@ -2,12 +2,12 @@
 <header class="bg1">
 	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
 	<p class="title">热点议题详情</p>
-	<span class="more" ng-show="user.id == hotfocus.current.publisherId"><img src="img/icon-more-1.png" style="width:24px;height:20px;"></span>
+	<span class="more" ng-show="more"><img src="img/icon-more-1.png" style="width:24px;height:20px;"></span>
 	<div class="pop-window1" >
-	<img src="img/icon-jian5.png" class="j"><div class="cb"></div>
+	<img src="img/icon-jian5.png" class="j"/><div class="cb"></div>
 	<ul>
 		<li ><a href="" ng-click="$location.path('/redian-edit')" ><img src="img/icon-edit201512.png"/> 编辑</a></li>
-		<li ><a href="javascript:void(0))" id="del" ><img src="img/icon-del201512.png"/> 删除</a></li>
+		<li ><a href="javascript:void(0)" id="del" ><img src="img/icon-del201512.png"/> 删除</a></li>
 	</ul>
 	</div>
 </header>
@@ -38,15 +38,15 @@
 		</li>
 	</ul>
 </section>
-<section class="mt10 mlr10">
-	<div class="clearfix snsblock"><a href="#.html" class="c"><img src="img/i-commend.png"/>{{hotfocus.current.totalCommentNum}} 评论</a>
+<section ng-show="showComments" class="mt10 mlr10">
+	<div class="clearfix snsblock"><a href="" class="c"><img src="img/i-commend.png"/>{{hotfocus.current.totalCommentNum}} 评论</a>
 	<a href="" class="z" ng-click="doLike()">
 	<img src="img/i-zan.png" ng-if="!isVote"/>
 	<img src="img/i-zanon.png" ng-if="isVote"/><i>点赞</i></a></div>
 </section>
-<section class="mt20 mlr20 commendblock" my-scroll="load()">
-	<span class="j" ng-if="voteMembers.length > 0 || comments.length > 0"><img src="img/i-jian-1.png"/></span>
-	<div ng-if="voteMembers.length > 0"><img src="img/i-zan.png"/><i>{{voteMemberStr}}</i></div>
+<section ng-show="showComments" class="mt20 mlr20 commendblock" my-scroll="load()">
+	<span class="j" ng-show="voteMembers.length > 0 || comments.length > 0"><img src="img/i-jian-1.png"/></span>
+	<div ng-show="voteMembers.length > 0"><img src="img/i-zan.png"/><i>{{voteMemberStr}}</i></div>
 	<ul class="list-5">
 		<li class="clearfix" ng-repeat="c in comments track by c.id">
 			<span class="i"><img ng-src="{{::(c.creatorAvatarUrl || 'img/tem-img/img-person.jpg')}}"/></span>
@@ -58,9 +58,12 @@
 		</li>
 	</ul>
 </section>
-<section class="comformblock">
+<section ng-show="showComments" class="comformblock">
 <div class="comformblock1">
-	<div class="comform"><input ng-model="newComment" type="text" class="i" placeholder="随便说说什么"><input ng-click="save()" type="button" class="b"></div>
+	<div class="comform">
+		<input type="text" ng-model="newComment" class="i" placeholder="随便说说什么"/>
+		<input type="button" ng-click="save()"  class="b"/>
+	</div>
 </div>
 </section>
 <!--pop window-->
@@ -82,7 +85,7 @@ $(document).ready(function(){
 		}else{
 			$(".pop-window1").animate({height:0},300);
 		}
-	})
+	});
 	$(".snsblock a.z").click(function(){
 		if($(this).find("img").attr("src") == "img/i-zan.png"){
 			$(this).find("img").attr("src","img/i-zanon.png");
@@ -91,18 +94,17 @@ $(document).ready(function(){
 			$(this).find("img").attr("src","img/i-zan.png");
 			$(this).find("i").html("点赞");
 		}
-	})
-	
+	});
 	//弹窗弹出状态
 	$(".pop-window1 #del").click(function(){
-	$("#zoomscroll").addClass("loaded").animate({opacity:1},200);
-	$(document.body).addClass("noscroll");
-	$(".txt-25 a").click(function(){
-		$(".pop-window1").animate({height:0},50);
-		$("#zoomscroll").animate({opacity:0},200);
-		setTimeout(function(){$('#zoomscroll').removeClass('loaded');$(document.body).removeClass("noscroll");$("#zoom").html("");},400);
-	})
-	})
-})
+		$("#zoomscroll").addClass("loaded").animate({opacity:1},200);
+		$(document.body).addClass("noscroll");
+		$(".txt-25 a").click(function(){
+			$(".pop-window1").animate({height:0},50);
+			$("#zoomscroll").animate({opacity:0},200);
+			setTimeout(function(){$('#zoomscroll').removeClass('loaded');$(document.body).removeClass("noscroll");$("#zoom").html("");},400);
+		});
+	});
+});
 </script>
 </div>

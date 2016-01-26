@@ -1,0 +1,61 @@
+<div class="pt60">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">质量记录</p>
+	<span class="more" ng-show="more"><img src="img/icon-more-1.png" style="width:20px;height:20px;"/></span>
+	<div class="pop-window1">
+	<img src="img/icon-jian5.png" class="j"/><div class="cb"></div>
+	<ul>
+		<li><a ng-click="edit()" href=""><img src="img/icon-edit201512.png"/> 编辑</a></li>
+		<li><a ng-click="remove()" href=""><img src="img/icon-del201512.png"/> 删除</a></li>
+	</ul>
+	</div>
+</header>
+<section class="mlr10 mt15 pb20">
+	<p class="title-1">{{::trace.zhiliang.current.title}}</p>
+</section>
+<section>
+	<ul class="list-3">
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-3.jpg"/>报表类型</span>
+			<span class="r">{{::docType(trace.zhiliang.current.docType)}}</span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-1.jpg"/>构件编码</span>
+			<span class="r">{{::trace.zhiliang.current.compId}}</span>
+		</li>
+		<li class="clearfix">
+			<span class="lll"><img src="img/i-xq-2.jpg"/>构件信息</span>
+			<div class="warp">
+				<p class="tp"><span>名称：</span>{{::trace.zhiliang.current.component.name}}</p>
+				<p class="tp"><span>设计：</span>{{::trace.zhiliang.current.component.designer}}</p>
+				<p class="tp"><span>施工：</span>{{::trace.zhiliang.current.component.constructor}}</p>
+				<p class="tp"><span>监理：</span>{{::trace.zhiliang.current.component.supervisor}}</p>
+			</div>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-14.jpg"/>创建人</span>
+			<span class="rr">{{::trace.zhiliang.current.publisherName}}</span><span class="time">{{::formatDate(trace.zhiliang.current.createTime)}}</span>
+		</li>
+		<li class="clearfix" ng-if="image">
+			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span>
+			<span class="r">
+				<a ng-repeat="pic in trace.zhiliang.current.picAttachmentList" ng-click="fileClicked('相片', pic.fileUrl)" class="pic">
+					<img ng-src="{{::pic.thumbnailUrl}}"/>
+				</a>
+			</span>
+		</li>
+	</ul>
+</section>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("header .more").click(function(){
+		if($(".pop-window1").height()== "0"){
+			$(".pop-window1").animate({height:100},300);
+		}else{
+			$(".pop-window1").animate({height:0},300);
+		}
+	});
+});
+</script>
+</div>

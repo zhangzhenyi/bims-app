@@ -105,7 +105,99 @@ function isBlankString(s) {
 	return false;
 }
 
-angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
+(function() {
+    'use strict';
+     angular.module('base64', []).constant('$base64', (function() {
+        var buffer = (typeof module !== 'undefined' && module.exports) ? require('buffer').Buffer : null,
+        b64chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
+        b64tab = (function(bin) {
+            var t = {};
+            for (var i = 0,
+            l = bin.length; i < l; i++) t[bin.charAt(i)] = i;
+            return t;
+        })(b64chars),
+        fromCharCode = String.fromCharCode,
+        cb_utob = function(c) {
+        	var cc;
+            if (c.length < 2) {
+                cc = c.charCodeAt(0);
+                return cc < 0x80 ? c: cc < 0x800 ? (fromCharCode(0xc0 | (cc >>> 6)) + fromCharCode(0x80 | (cc & 0x3f))) : (fromCharCode(0xe0 | ((cc >>> 12) & 0x0f)) + fromCharCode(0x80 | ((cc >>> 6) & 0x3f)) + fromCharCode(0x80 | (cc & 0x3f)));
+            }
+            cc = 0x10000 + (c.charCodeAt(0) - 0xD800) * 0x400 + (c.charCodeAt(1) - 0xDC00);
+            return (fromCharCode(0xf0 | ((cc >>> 18) & 0x07)) + fromCharCode(0x80 | ((cc >>> 12) & 0x3f)) + fromCharCode(0x80 | ((cc >>> 6) & 0x3f)) + fromCharCode(0x80 | (cc & 0x3f)));
+        },
+        re_utob = /[\uD800-\uDBFF][\uDC00-\uDFFFF]|[^\x00-\x7F]/g,
+        utob = function(u) {
+            return u.replace(re_utob, cb_utob);
+        },
+        cb_encode = function(ccc) {
+            var padlen = [0, 2, 1][ccc.length % 3],
+            ord = ccc.charCodeAt(0) << 16 | ((ccc.length > 1 ? ccc.charCodeAt(1) : 0) << 8) | ((ccc.length > 2 ? ccc.charCodeAt(2) : 0)),
+            chars = [b64chars.charAt(ord >>> 18), b64chars.charAt((ord >>> 12) & 63), padlen >= 2 ? '=': b64chars.charAt((ord >>> 6) & 63), padlen >= 1 ? '=': b64chars.charAt(ord & 63)];
+            return chars.join('');
+        },
+        btoa = function(b) {
+            return b.replace(/[\s\S]{1,3}/g, cb_encode);
+        },
+        _encode = buffer ?
+        function(u) {
+            return (u.constructor === buffer.constructor ? u: new buffer(u)).toString('base64');
+        }: function(u) {
+            return btoa(utob(u));
+        },
+        encode = function(u, urisafe) {
+            return ! urisafe ? _encode(String(u)) : _encode(String(u)).replace(/[+\/]/g,
+            function(m0) {
+                return m0 == '+' ? '-': '_';
+            }).replace(/=/g, '');
+        },
+        re_btou = new RegExp(['[\xC0-\xDF][\x80-\xBF]', '[\xE0-\xEF][\x80-\xBF]{2}', '[\xF0-\xF7][\x80-\xBF]{3}'].join('|'), 'g'),
+        cb_btou = function(cccc) {
+            switch (cccc.length) {
+            case 4:
+                var cp = ((0x07 & cccc.charCodeAt(0)) << 18) | ((0x3f & cccc.charCodeAt(1)) << 12) | ((0x3f & cccc.charCodeAt(2)) << 6) | (0x3f & cccc.charCodeAt(3)),
+                offset = cp - 0x10000;
+                return (fromCharCode((offset >>> 10) + 0xD800) + fromCharCode((offset & 0x3FF) + 0xDC00));
+            case 3:
+                return fromCharCode(((0x0f & cccc.charCodeAt(0)) << 12) | ((0x3f & cccc.charCodeAt(1)) << 6) | (0x3f & cccc.charCodeAt(2)));
+            default:
+                return fromCharCode(((0x1f & cccc.charCodeAt(0)) << 6) | (0x3f & cccc.charCodeAt(1)));
+            }
+        },
+        btou = function(b) {
+            return b.replace(re_btou, cb_btou);
+        },
+        cb_decode = function(cccc) {
+            var len = cccc.length,
+            padlen = len % 4,
+            n = (len > 0 ? b64tab[cccc.charAt(0)] << 18 : 0) | (len > 1 ? b64tab[cccc.charAt(1)] << 12 : 0) | (len > 2 ? b64tab[cccc.charAt(2)] << 6 : 0) | (len > 3 ? b64tab[cccc.charAt(3)] : 0),
+            chars = [fromCharCode(n >>> 16), fromCharCode((n >>> 8) & 0xff), fromCharCode(n & 0xff)];
+            chars.length -= [0, 0, 2, 1][padlen];
+            return chars.join('');
+        },
+        atob = function(a) {
+            return a.replace(/[\s\S]{1,4}/g, cb_decode);
+        },
+        _decode = buffer ?
+        function(a) {
+            return (a.constructor === buffer.constructor ? a: new buffer(a, 'base64')).toString();
+        }: function(a) {
+            return btou(atob(a));
+        },
+        decode = function(a) {
+            return _decode(String(a).replace(/[-_]/g,
+            function(m0) {
+                return m0 == '-' ? '+': '/';
+            }).replace(/[^A-Za-z0-9\+\/]/g, ''));
+        };
+         return {            
+            encode: encode,            
+            decode: decode,
+        };
+    })());
+})();
+
+angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"])
 .filter('cutTail', [function () {
 	  return function (value, wordwise, max, tail) {
 		    if (!value) return '';
@@ -132,7 +224,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				"font-family": "宋体",
 				"font-size": "18px",
 				"font-weight": "bold",
-				"color": "#87CEEB"
+				"color": "#9797EF",
+				"text-align": "center"
 			})
 			.html("{{" + a.bigModel + "}}%")
 			.appendTo(t);
@@ -142,18 +235,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				"margin-top": "-8px"
 			})
 			.attr({
-				"data-radial-indicator": "{radius: 60, barWidth: 15, percentage: true, displayNumber: false, barColor: '#87CEEB'}",
+				"data-radial-indicator": "{radius: 60, barWidth: 15, percentage: true, displayNumber: false, barColor: '#9797EF'}",
 				"data-radial-indicator-model": a.bigModel
 			})
 			.append(
 				angular.element("<div></div>")
 				.css({
 					"position": "absolute",
-					"margin-top": "20px",
-					"margin-left": "20px"
+					"margin-top": "18px",
+					"margin-left": "18px"
 				})
 				.attr({
-					"data-radial-indicator": "{radius: 40, barWidth: 15, percentage: true, barColor: '#87CEEB', fontSize: 20, fontFamily: '宋体'}",
+					"data-radial-indicator": "{radius: 42, barWidth: 15, percentage: true, barColor: '#87CEEB', fontSize: 20, fontFamily: '宋体'}",
 					"data-radial-indicator-model": a.smallModel
 				})
 			)
@@ -461,7 +554,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			var data = {};
 			angular.element("<img/>")
 			.attr({
-				"src": a["src"],
+				"ng-src": a["src"],
 				"class": a["class"]
 			})
 			.css("cursor", "pointer")
@@ -474,13 +567,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 							if (n != 0) {
 								if ( (attrs.type || "img").toLowerCase() == "video") {
 									if (n == 1) {
-										data.op = (navigator && navigator.device) ? navigator.device.capture.captureVideo : angular.noop;
+										data.op = ($window.navigator && navigator.device) ? navigator.device.capture.captureVideo : angular.noop;
 										data.opt = {limit: 1};
 										data.success = function(files) {
 											_captureVideo(files, scope, $parse(attrs.change));
 										};
 									} else {
-										data.op = (navigator && navigator.camera) ? navigator.camera.getPicture : angular.noop;
+										data.op = ($window.navigator && navigator.camera) ? navigator.camera.getPicture : angular.noop;
 										data.opt = {
 											destinationType: 1,	//Camera.DestinationType.FILE_URI
 											sourceType: 2,	//SAVEDPHOTOALBUM
@@ -491,7 +584,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 										};
 									}
 								} else {
-									data.op = (navigator && navigator.camera) ? navigator.camera.getPicture : angular.noop;
+									data.op = ($window.navigator && navigator.camera) ? navigator.camera.getPicture : angular.noop;
 									data.opt = {
 										quality: 50,
 										destinationType: 1,
@@ -510,6 +603,39 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					});
 				}
 			};
+		}
+	};
+}])
+.directive("myTitlePicker", ["$parse", function($parse) {
+	return {
+		restrict: "E",
+		transclude: true,
+		link: function(scope, element, attrs) {
+			element.removeAttr("ng-model");
+			angular.element("<input/>")
+			.attr({
+				type: "text",
+				placeholder: "请点击选择主题"
+			})
+			.css({
+				"width": "100%",
+				"border": "0"
+			})
+			.val($parse(attrs.ngModel)(scope))
+			.appendTo(element)
+			.mobiscroll().date({
+				theme: "ios",
+				mode: "mixed",
+				display: "bottom",
+				lang: "zh",
+				dateFormat: "yy年mm月进度月报",
+				onBeforeShow: function (inst) {
+					inst.settings.wheels[0].length > 2 ? inst.settings.wheels[0].pop() : null;
+				},
+				onSelect: function(t) {
+					($parse(attrs.ngModel).assign)(scope, t);
+				}
+			});
 		}
 	};
 }])
@@ -621,7 +747,34 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	function _save() {
 		_ls[_key] = JSON.stringify(_value);
 	}
-	 
+	
+	function _remove(item) {
+		for (var i = 0; i < _value.list.length; i++) {
+			if (_value.list[i]._index == item._index) {
+				_value.list.splice(i, 1);
+				_save();
+				if (_view || false) {
+					for (i = 0; i < _view.length; i++) {
+						if (_view[i]._index == item._index) {
+							_view.splice(i, 1);
+							break;
+						}
+					}
+				}
+				if (window.resolveLocalFileSystemURL) {
+					var uris = item.picAttachmentList.concat(item.videoAttachmentList), j;
+					for (j = 0; j < uris.length; j++) {
+						if (uris[j].id || false) continue;
+						window.resolveLocalFileSystemURL(uris[j].fileUrl, function (file) {
+							file.remove(angular.noop, angular.noop);
+						});
+					}
+				}
+				break;
+			}
+		}
+	}
+	
 	return {
 		list: function() {
 			if (_view || false) return _view;
@@ -641,48 +794,29 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			return false;
 		},
 		push: function(item, type, update) {
-			var e = angular.extend(item, {
-				_index: _value.count++,
-				_type: type || 'redian',
-				_status: "o1",
-				_statusText: "未上传",
-				_user: $rootScope.user.id,
-				_time: new Date(),
-				_update: update == "update"
-			});
+			var e;
 			tipmessage("开始保存");
+			if (item._status || false) {
+				_remove(item);
+				e = item;
+			} else {
+				e = angular.extend(item, {
+					_index: _value.count++,
+					_type: type,
+					_status: "o1",
+					_statusText: "未上传",
+					_user: $rootScope.user.id,
+					_time: new Date(),
+					_update: update == "update"
+				});
+			}
 			_value.list.push(e);
 			_save();
 			tipmessage("成功结束");
 			if (_view || false) _view.push(e);
 			return e;
 		},
-		remove: function(item) {
-			for (var i = 0; i < _value.list.length; i++) {
-				if (_value.list[i]._index == item._index) {
-					_value.list.splice(i, 1);
-					_save();
-					if (_view || false) {
-						for (i = 0; i < _view.length; i++) {
-							if (_view[i]._index == item._index) {
-								_view.splice(i, 1);
-								break;
-							}
-						}
-					}
-					if (window.resolveLocalFileSystemURL) {
-						var uris = item.picAttachmentList.concat(item.videoAttachmentList), j;
-						for (j = 0; j < uris.length; j++) {
-							if (uris[j].id || false) continue;
-							window.resolveLocalFileSystemURL(uris[j].fileUrl, function (file) {
-								file.remove(angular.noop, angular.noop);
-							});
-						}
-					}
-					break;
-				}
-			}
-		},
+		remove: _remove,
 		clear: function() {
 			 _value = {list: [], count: 0};
 			 _view = null;
@@ -691,7 +825,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		save: _save
 	};
 }])
-.factory("model", ["$rootScope", "$http", "$interval", "$timeout", "myRoute", function($rootScope, $http, $interval, $timeout, myRoute) {
+.factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute) {
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
 	function _fn() {
 		$.get( _base + 'login/createToken.jo' + (_sessionId ? ";jsessionid=" + _sessionId : ""), function(data) {
@@ -714,11 +848,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	$rootScope.formatDate = function(time) {
 		return (new Date(time)).format("yyyy-MM-dd hh:mm");
 	};
+	$rootScope.formatDate2Day = function(time) {
+		return (new Date(time)).format("yyyy-MM-dd");
+	};
 	
 	$rootScope.origionVersion = "0.0.4.0109_beta";
 	$rootScope.hasChecked = false;
 	$rootScope.autoUpdateOnWiffi = false;
-//	$rootScope.videoThumbnail = "http://101.201.141.1/bims-test/images/default_play.jpg";
 	$rootScope.Constants = {
 			ISSUETYPE_QUALITY:1,
 			ISSUETYPE_SECURITY:2,
@@ -801,8 +937,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		});
 	}
 	
-	function _transfer(fileURI, fileType, topicType, callback) {
-		var url = encodeURI(_base + "attachment/uploadForH5.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType + "&showName=&thumbnailUri=&title=&content="),
+	function _transfer(fileURI, fileType, topicType, callback, content) {
+		var url = encodeURI(_base + "attachment/uploadForH5.jo;jsessionid=" + _sessionId + "?fileType=" + fileType + "&topicType=" + topicType + "&showName=&thumbnailUri=&title=&content=" + $base64.encode(content || "")),
 		ft = (window.FileTransfer) ? new FileTransfer() : {upload: angular.noop, abort: angular.noop},
 		opt = (window.FileUploadOptions) ? new FileUploadOptions() : {};
 		opt.fileKey = "file";
@@ -858,7 +994,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					}
 					(transferCallback || angular.noop)(url, false);
 					counter++;
-				}));
+				}, pics[i].content));
 			}
 		}
 		loops = ((videos || false) ? videos.length : 0);
@@ -886,7 +1022,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					}
 					(transferCallback || angular.noop)(url, false);
 					counter++;
-				}));
+				}, videos[i].content));
 			}
 		}
 		$timeout(function _fn_waiting_attachment() {
@@ -900,6 +1036,20 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			return _host + _path;
 		},
 		user: {
+			uploadAvatar: function(fileURI, callback) {
+				var url = encodeURI(_base + "user/uploadAvatar.jo;jsessionid=" + _sessionId),
+				ft = ($window.FileTransfer) ? new FileTransfer() : {upload: angular.noop, abort: angular.noop},
+				opt = ($window.FileUploadOptions) ? new FileUploadOptions() : {};
+				opt.fileKey = "avatarImg";
+				opt.fileName = fileURI.substr(fileURI.lastIndexOf('/') + 1);
+				opt.mimeType = "multipart/form-data";
+				opt.chunkedMode = false;
+				ft.upload(fileURI, url, function(r) {
+					callback(JSON.parse(r.response));
+				}, function() {
+					callback(false);
+				}, opt);
+			},
 			login: function(u,p,c) {
 				_req({
 					method: "post",
@@ -1100,6 +1250,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
+			reportList: function(id, pn, c) {
+				_req({
+					method: "get",
+					url: "trace/getProgressReportList.jo",
+					params: {
+						sectionId: id,
+						pageNum: pn
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
 			get: function(i,c) {
 				_req({
 					method: "get",
@@ -1121,7 +1281,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					}
 				}, angular.isFunction(c) ? c: angular.noop);
 			},
-			
 			update: function(d, c) {
 				_req({
 					method: "post",
@@ -1129,13 +1288,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					data: d
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
-			//id is issue ID
 			remove: function(id, c) {
 				_req({
 					method: "delete",
 					url: "trace/delete.jo",
 					params: {
-						id:parseInt(id)
+						id: parseInt(id)
 					}
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
@@ -1315,7 +1473,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			}
 			
 		},
-		
 		sect : {
 			list: function(t, pn, c) {
 				_req({
@@ -1419,10 +1576,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	var  _transfers = {};
 	
 	function _transfer() {
-//		tipmessage("upload checkinging...", "tiploading");
 		var item = transferCache.get();
 		if (item) {
-			tipmessage("自动开始上传...", "tiploading");
 			item._status = "o2";
 			item._statusText = "上传中";
 			model.uploadAttachments(item, function(i) {
@@ -1433,6 +1588,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 						op = i._update ? model.hotfocus.update : model.hotfocus.create;
 						break;
 					case "spotcheck":
+					case "henji-shangchuan":
+					case "henji-gongchengjindu":
+					case "henji-zhiliang":
+					case "henji-chengzhangguocheng":
 						op = i._update ? model.trace.update : model.trace.create;
 						break;
 					case "issue":
@@ -1450,6 +1609,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				delete i._user;
 				delete i._time;
 				delete i._update;
+				delete i._option;
 				op(i, function(d) {
 					if (d) {
 					if(isIssue){
@@ -1800,7 +1960,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				});
 			}
 		},
-		
 		newComment: "",
 		save: function() {
 			if ($scope.newComment != "") {
@@ -1888,65 +2047,72 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		}
 	});
 }])
-.controller("cRedianxiangqing", ["$scope", "model", function($scope, model) {
-	$scope.voteMembers = (isBlankString($scope.hotfocus.current.voteUsersX))? [] : $scope.hotfocus.current.voteUsersX.split(",");
-	if($scope.voteMembers.length > 0) {
-		$scope.voteMemberStr = $scope.voteMembers.join("，"); 
-		if($scope.voteMembers.length > 0) {
-			$scope.voteMemberStr = $scope.voteMembers.join("，"); 
-			for (var x in $scope.voteMembers) {
-				if($scope.voteMembers[x] == $scope.user.name) {
-					$scope.isVote = true;
-					break;
+.controller("cRedianxiangqing", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
+	model.hotfocus.get($scope.hotfocus.current.id, function(d) {
+		if (d) {
+			$scope.hotfocus.current = d;
+			$scope.voteMembers = (isBlankString(d.voteUsersX)) ? [] : d.voteUsersX.split(",");
+			if($scope.voteMembers.length > 0) {
+				$scope.voteMemberStr = $scope.voteMembers.join("，"); 
+				if($scope.voteMembers.length > 0) {
+					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
+					for (var x in $scope.voteMembers) {
+						if($scope.voteMembers[x] == $scope.user.name) {
+							$scope.isVote = true;
+							break;
+						}
+					}
+				}
+				if($scope.isVote) {
+					model.vote.isVoted(d.id, d.topicType, function(d) {
+						if(d) $scope.isVote = true;
+						else $scope.isVote = false;
+					});
 				}
 			}
 		}
-		if($scope.isVote) {
-			//Judge whether is voted or not
-			model.vote.isVoted($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, function(d) {
-				if(d) $scope.isVote = true;
-				else $scope.isVote = false;
-			});
-		}
-	}
+	});
+	
 	angular.extend($scope, {
 		_page: 0,
 		page: 1,
 		comments: [],
-		isVote:false,
-		voteMembers:[],
-		voteMemberStr:"",
+		isVote: false,
+		voteMembers: [],
+		voteMemberStr: "",
+		showComments: !($scope.hotfocus.current._status || false),
 		load: function() {
-			if ($scope._page != $scope.page) {
-				$scope._page = $scope.page;
-				model.comment.list($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, $scope.page, function(d) {
-					if (d && d.length > 0) {
-						for (var i = 0; i < d.length; i++)
-							$scope.comments.push(d[i]);
-						$scope.page++;
-					}
-				});
+			if (!($scope.hotfocus.current._status || false)) {
+				if ($scope._page != $scope.page) {
+					$scope._page = $scope.page;
+					model.comment.list($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, $scope.page, function(d) {
+						if (d && d.length > 0) {
+							for (var i = 0; i < d.length; i++)
+								$scope.comments.push(d[i]);
+							$scope.page++;
+						}
+					});
+				}
 			}
-		},	
-		topicId: $scope.hotfocus.current.id,
-		topicType: $scope.hotfocus.current.topicType,
-		doLike:function(){
-			if(!$scope.isVote){
-				model.vote.doLike($scope.topicId, $scope.topicType, function(d){
-					$scope.voteMembers.push($scope.user.name);
-					$scope.isVote = true;
-					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
-				});
-			} else {
+		},
+		more: $scope.user.id == $scope.hotfocus.current.publisherId || $scope.hotfocus.current._status,
+		doLike: function() {
+			if($scope.isVote) {
 				if($scope.voteMembers.length <=0) return;
-				model.vote.disLike($scope.topicId, $scope.topicType, function(d){
-					for(var i=0; i < $scope.voteMembers.length; i++){
-						if($scope.voteMembers[i] == $scope.user.name){
-							$scope.voteMembers.splice(i,1);
+				model.vote.disLike($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, function(d) {
+					for(var i = 0; i < $scope.voteMembers.length; i++) {
+						if($scope.voteMembers[i] == $scope.user.name) {
+							$scope.voteMembers.splice(i, 1);
 							break;
 						}
 					}
 					$scope.isVote = false;
+					$scope.voteMemberStr = $scope.voteMembers.join("，");
+				});
+			} else {
+				model.vote.doLike($scope.hotfocus.current.id, $scope.hotfocus.current.topicType, function(d) {
+					$scope.voteMembers.push($scope.user.name);
+					$scope.isVote = true;
 					$scope.voteMemberStr = $scope.voteMembers.join("，"); 
 				});
 			}
@@ -1965,22 +2131,30 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				$scope.newComment = "";
 			}
 		},
-		del : function(){
-			model.hotfocus.remove($scope.hotfocus.current.id, function(d){
-				if(d){
-					$scope.tipContent = "删除成功";
-					$scope.tipVisibility = "block";
-					$timeout(function(){
-						$scope.$location.path("/redian");
-					} ,1000);
-				}else{
-					$scope.tipContent = "删除失败";
-					$scope.tipVisibility = "block";
-					$timeout(function(){
-						$scope.tipVisibility = "none";
-					} ,1000);
-				}
-			});
+		del : function() {
+			if ($scope.hotfocus.current._status || false) {
+				transferCache.remove($scope.hotfocus.current);
+				tipmessage("删除成功");
+				$timeout(function() {
+					$scope.$location.back();
+				}, 1000);
+			} else {
+				model.hotfocus.remove($scope.hotfocus.current.id, function(d) {
+					if(d){
+						$scope.tipContent = "删除成功";
+						$scope.tipVisibility = "block";
+						$timeout(function(){
+							$scope.$location.back();
+						} ,1000);
+					} else {
+						$scope.tipContent = "删除失败";
+						$scope.tipVisibility = "block";
+						$timeout(function() {
+							$scope.tipVisibility = "none";
+						} ,1000);
+					}
+				});
+			}
 		},
 		fileClicked: function(name, path) {
 			$scope.files.filename = name;
@@ -2055,27 +2229,33 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
-	        tipmessage1(message="上传文件中",id="tipimg");
 			model.uploadAttachments($scope.hotfocus.current, function(item) {
-			changeTipmessage("开始创建","tipimg");
-				model.hotfocus.update(item, function(d) {
+				delete item._index;
+				delete item._type;
+				delete item._status;
+				delete item._statusText;
+				delete item._user;
+				delete item._time;
+				delete item._update;
+				delete item._option;
+				(($scope.hotfocus.current._status || false) ? ($scope.hotfocus.current._update ? model.hotfocus.update : model.hotfocus.create) : model.hotfocus.update)(item, function(d) {
 					if (d) {
-					changeTipmessage("修改成功","tipimg");
-					
+						if($scope.hotfocus.current._status || false) transferCache.remove($scope.hotfocus.current);
+						tipmessage("提交成功");
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
-					}else{
-						changeTipmessage("编辑失败","tipimg");
-					}
-					closetipmessage1("tipimg");
+					} else tipmessage("提交失败");
 				});
 			});
 			
 		},
 		save: function() {
-			transferCache.push($scope.hotfocus.current, "redian", "update");
-			tipmessage("保存成功");//是否需要返回值？
+			if ($scope.hotfocus.current._status || false) {
+				if ($scope.hotfocus.current._update) transferCache.push($scope.hotfocus.current, "redian", "update");
+				else transferCache.push($scope.hotfocus.current, "redian");
+			} else transferCache.push($scope.hotfocus.current, "redian", "update");
+			tipmessage("保存成功");
 			$timeout(function() {
 				$scope.$location.back();
 			}, 1000);
@@ -2131,20 +2311,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
-	        tipmessage1(message="上传文件中",id="tipimg");
 			model.uploadAttachments($scope.newItem, function(item) {
-			changeTipmessage("开始创建","tipimg");
 				model.hotfocus.create(item, function(d) {
 					if (d) {
-						changeTipmessage("开始创建","tipimg");
+						tipmessage("提交成功");
 						model.removeFiles($scope.newItem.picAttachmentList.concat($scope.newItem.videoAttachmentList));
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
-					}else{
-						changeTipmessage("创建失败“,”tipimg");
-					}
-					closetipmessage1("tipimg");
+					}else tipmessage("提交失败");
 				});
 			});
 			
@@ -2155,19 +2330,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	        	return;
 	        }
 			transferCache.push($scope.newItem, "redian");
-			tipmessage("保存成功");//是否需要返回值？
+			tipmessage("保存成功");
 			$timeout(function() {
 				$scope.$location.back();
 			}, 1000);
 		}
 	});
 }])
-.controller("cWode", ["$scope", "$timeout", "model", "transferCache", "fileSystem", function($scope, $timeout, model, transferCache, fileSystem) {
+.controller("cWode", ["$window", "$scope", "$timeout", "model", "transferCache", "fileSystem", function($window, $scope, $timeout, model, transferCache, fileSystem) {
 	switch($scope.$location.path()) {
 	case '/shezhi':
 		//Get latest version
 		$scope.hasNewVersion = false;
-		if (window.localStorage) {
+		if ($window.localStorage) {
 			var wiffi = localStorage["autoUpdateOnWiffi"] || false;
 			if(wiffi == "true"){
 				$scope.autoUpdateOnWiffi = true;
@@ -2191,7 +2366,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			onInstall:function(){
 				if($scope.hasNewVersion) {
 					//post to outside browser to open url
-					window.open($scope.setting.installer,"_system");
+					$window.open($scope.setting.installer,"_system");
 				}
 			},
 			setAutoUpload: function() {
@@ -2200,14 +2375,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				}else{
 					$scope.autoUpdateOnWiffi = true;
 				}
-				if (window.localStorage) 
+				if ($window.localStorage) 
 					localStorage["autoUpdateOnWiffi"] = $scope.autoUpdateOnWiffi;
 			}
 		});
 
-		if(window.device) {
+		if($window.device) {
 			var platform = 1;
-			switch(window.device.platform){
+			switch($window.device.platform){
 			case 'iPhone':
 				platform = 1;
 				break;
@@ -2237,19 +2412,29 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		$scope.$location.path('/onepage');
 		break;
 	case '/wode-gerenxinxi':
-		$scope.imgChanged = function(e) {
-			var formData = new FormData();
-			formData.append("avatarImg", (angular.element(e))[0].files[0]);
-			model.uploadFile("user/uploadAvatar.jo", formData, function(d) {
-				if (d) {
-					$scope.user.photo = d.avatarUrl;
-					$scope.user.original.avatarUrl = d.avatarUrl;
-					$scope.$apply();
-				}
-			}, function(progress) {
-				console.log(progress);
-			});
-		};
+		angular.extend($scope, {
+			imgChanged: function(e) {
+				var formData = new FormData();
+				formData.append("avatarImg", (angular.element(e))[0].files[0]);
+				model.uploadFile("user/uploadAvatar.jo", formData, function(d) {
+					if (d) {
+						$scope.user.photo = d.avatarUrl;
+						$scope.user.original.avatarUrl = d.avatarUrl;
+						$scope.$apply();
+					}
+				});
+			},
+			usingCamera: $window.FileTransfer || false,
+			imageChanged: function(url) {
+				model.user.uploadAvatar(url, function(d) {
+					if (d) {
+						$scope.user.photo = d.avatarUrl;
+						$scope.user.original.avatarUrl = d.avatarUrl;
+						$scope.$apply();
+					}
+				});
+			}
+		});
 		break;
 	case '/wode-gerenxinxi-xingming':
 		angular.extend($scope, {
@@ -2318,21 +2503,48 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			tasks: transferCache.list(),
 			xiangqing: function() {
 				$scope.closeDetail();
-				$scope.current.id = 0;
-				$scope.current.createTime = $scope.current._time;
-				$scope.current.publisherName = $scope.user.name;
-				if ($scope.current._type == "redian") {
-					if (!($scope.current.topicType)) $scope.current.topicType = 2;
-					$scope.hotfocus.current = $scope.current;
-					$scope.$location.path("/redianxiangqing");
-				}else if($scope.current._type == "spotcheck"){
-					if (!($scope.current.topicType)) $scope.current.topicType = 8;
-					$scope.trace.current = $scope.current;
-					$scope.$location.path("/spotcheck-detail");
-				}else if($scope.current._type == "issue"){
-					if (!($scope.current.topicType)) $scope.current.topicType = 3;
-					$scope.issues.currentIssue = $scope.current;
-					$scope.$location.path("/issue-details");
+				$scope.current.createTime = $scope.current.createTime || $scope.current._time;
+				$scope.current.publisherName = $scope.current.publisherName || $scope.user.name;
+				switch($scope.current._type) {
+					case 'redian':
+						if (!($scope.current.topicType)) $scope.current.topicType = 2;
+						$scope.hotfocus.current = $scope.current;
+						$scope.$location.path("/redianxiangqing");
+						break;
+					case 'spotcheck':
+						if (!($scope.current.topicType)) $scope.current.topicType = 8;
+						$scope.trace.current = $scope.current;
+						$scope.$location.path("/spotcheck-detail");
+						break;
+					case 'issue':
+						if (!($scope.current.topicType)) $scope.current.topicType = 3;
+						$scope.issues.currentIssue = $scope.current;
+						$scope.$location.path("/issue-details");
+						break;
+					case 'henji-shangchuan':
+						if (!($scope.current.topicType)) $scope.current.topicType = 8;
+						$scope.trace.henjishangchuan = $scope.current._option;
+						$scope.trace.henjishangchuan.current = $scope.current;
+						$scope.$location.path("/henji-shangchuan-xiangqing");
+						break;
+					case 'henji-gongchengjindu':
+						if (!($scope.current.topicType)) $scope.current.topicType = 8;
+						$scope.trace.gongchengjindu = $scope.current._option;
+						$scope.trace.gongchengjindu.current = $scope.current;
+						$scope.$location.path("/henji-gongchengjindu-xiangqing");
+						break;
+					case 'henji-zhiliang':
+						if (!($scope.current.topicType)) $scope.current.topicType = 8;
+						$scope.trace.zhiliang = $scope.current._option || {};
+						$scope.trace.zhiliang.current = $scope.current;
+						$scope.$location.path("/henji-zhiliang-xiangqing");
+						break;
+					case 'henji-chengzhangguocheng':
+						if (!($scope.current.topicType)) $scope.current.topicType = 8;
+						$scope.trace.chengzhangguocheng = $scope.current._option || {};
+						$scope.trace.chengzhangguocheng.current = $scope.current;
+						$scope.$location.path("/henji-chengzhangguocheng-xiangqing");
+						break;
 				}
 			},
 			transfer: function() {
@@ -2346,6 +2558,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 							op = item._update ? model.hotfocus.update : model.hotfocus.create;
 							break;
 						case "spotcheck":
+						case "henji-shangchuan":
+						case "henji-gongchengjindu":
+						case "henji-zhiliang":
+						case "henji-chengzhangguocheng":
 							op = item._update ? model.trace.update : model.trace.create;
 							break;
 						case "issue":
@@ -2362,6 +2578,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					delete item._user;
 					delete item._time;
 					delete item._update;
+					delete item._option;
 					op(item, function(d) {
 						if (d) {
 							if(isIssue){
@@ -2375,7 +2592,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 							$timeout(function() {
 								$scope.tipVisibility = "none";
 							}, 1000);
-						} else tipmessage("上传失败");
+						} else {
+							tipmessage("上传失败");
+							$scope.current._status = "o3";
+							$scope.current._statusText = "上传失败";
+						}
 					});
 				});
 			},
@@ -3371,8 +3592,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 					    			  }
 					    		  });
 					    	  }
-					    
-					    	  
 					      }, 
 					      function (error) {
 					    	  tipmessage("扫描二维码失败");
@@ -3454,8 +3673,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 				$scope.trace.current = d;
 			}
 		});
-		
-
 		break;
 	}
 }])
@@ -3561,10 +3778,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		},
 		submit: function() {
 			model.uploadAttachments($scope.newItem, function(item) {
-				delete item.videoAttachmentList;
-				(($scope.trace.henjishangchuan.current || false) ? model.trace.update : model.trace.create)(item, function(d) {
+				delete item._index;
+				delete item._type;
+				delete item._status;
+				delete item._statusText;
+				delete item._user;
+				delete item._time;
+				delete item._update;
+				delete item._option;
+				(($scope.newItem._status || false) ? ($scope.newItem._update ? model.trace.update : model.trace.create) : (($scope.trace.henjishangchuan.current || false) ? model.trace.update : model.trace.create))(item, function(d) {
 					if (d) {
 						model.removeFiles($scope.newItem.picAttachmentList);
+						if ($scope.newItem._status || false) transferCache.remove($scope.newItem);
 						tipmessage("提交成功");
 						$timeout(function() {
 							$scope.$location.back();
@@ -3574,10 +3799,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 			});
 		},
 		save: function() {
-			if ($scope.trace.henjishangchuan.current || false)
-				transferCache.push($scope.newItem, "spotcheck", "update");
-			else
-				transferCache.push($scope.newItem, "spotcheck");
+			if ($scope.trace.henjishangchuan.current || false) {
+				var opt = angular.extend({}, $scope.trace.henjishangchuan);
+				delete opt.current;
+				$scope.newItem._option = opt;
+				if ($scope.trace.shangchuan.current._status || false) {
+					if ($scope.trace.shangchuan.current._update) transferCache.push($scope.newItem, "henji-shangchuan", "update");
+					else transferCache.push($scope.newItem, "henji-shangchuan");
+				} else transferCache.push($scope.newItem, "henji-shangchuan", "update");
+			} else {
+				$scope.newItem._option = $scope.trace.henjishangchuan;
+				transferCache.push($scope.newItem, "henji-shangchuan");
+			}
 			tipmessage("保存成功");
 			$timeout(function() {
 				$scope.$location.back();
@@ -3585,7 +3818,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		}
 	});
 }])
-.controller("cHenjiShangchuanXiangqing", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
+.controller("cHenjiShangchuanXiangqing", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
 	if ($scope.trace.henjishangchuan.current.sectionId || false) {
 		model.sect.get($scope.trace.henjishangchuan.current.sectionId, function(d) {
 			if (d) $scope.sectionName = d.sectionName;
@@ -3599,17 +3832,26 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		publisherName: $scope.trace.henjishangchuan.current.publisherName || false,
 		pic: $scope.trace.henjishangchuan.current.picAttachmentList && $scope.trace.henjishangchuan.current.picAttachmentList.length > 0,
 		sectionName: "",
+		more: ($scope.user.id == $scope.trace.henjishangchuan.current.publisherId) || $scope.trace.henjishangchuan.current._status,
 		edit: function() {
 			$scope.$location.path("/henji-shangchuan-edit");
 		},
 		remove: function() {
-			model.trace.remove($scope.trace.henjishangchuan.current.id, function(d) {
-				if (d) tipmessage("删除成功");
-				else tipmessage("删除失败");
+			if ($scope.trace.henjishangchuan.current._status || false) {
+				transferCache.remove($scope.trace.henjishangchuan.current);
+				tipmessage("删除成功");
 				$timeout(function() {
 					$scope.$location.back();
 				}, 1000);
-			});
+			} else {
+				model.trace.remove($scope.trace.henjishangchuan.current.id, function(d) {
+					if (d) tipmessage("删除成功");
+					else tipmessage("删除失败");
+					$timeout(function() {
+						$scope.$location.back();
+					}, 1000);
+				});
+			}
 		},
 		fileClicked: function(name, path) {
 			$scope.files.filename = name;
@@ -3618,20 +3860,545 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		}
 	});
 }])
-.controller("cHenjiGongchengjindu", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
+.controller("cHenjiGongchengjindu", ["$scope", "model", function($scope, model) {
 	model.sect.all(function(d) {
 		if (d) {
-			console.log(d);
-			for (var i = 0; i < d.length; i++) {
-				d[i].percentTime = parseFloat(d[i].percentTime.substring(0, d[i].percentTime.length - 1)) / 100;
-				d[i].percentProject = parseFloat(d[i].percentProject.substring(0, d[i].percentProject.length - 1)) / 100;
+			var v, i;
+			for (i = 0; i < d.length; i++) {
+				v = parseFloat(d[i].percentTime.substring(0, d[i].percentTime.length - 1));
+				d[i].percentTime = v > 100 ? 100 : v;
+				v = parseFloat(d[i].percentProject.substring(0, d[i].percentProject.length - 1));
+				d[i].percentProject = v > 100 ? 100 : v;
 			}
 			$scope.sections = d;
 		}
 	});
-	$scope.list = function(id) {
-		
+	$scope.list = function(s) {
+		$scope.trace.gongchengjindu = {
+				sectionId: s.id,
+				sectionName: s.sectionName,
+				startDate: s.startDate,
+				endDate: s.endDate,
+				contractAmount: s.contractAmount,
+				paymentTotal: s.paymentTotal,
+				percentTime: s.percentTime,
+				percentProject: s.percentProject
+		};
+		$scope.$location.path("/henji-gongchengjindu-list");
 	};
+}])
+.controller("cHenjiGongchengjinduList", ["$scope", "$base64", "model", function($scope, $base64, model) {
+	function _fn(d) {
+		if (d && d.length > 0) {
+			for (var i = 0; i < d.length; i++) {
+				if (d[i].sectionId == $scope.trace.gongchengjindu.sectionId)
+					$scope.list.push(d[i]);
+			}
+			$scope.page++;
+			if ($scope.list.length < 10) $scope.load();
+		}
+	}
+	
+	angular.extend($scope, {
+		_page: 0,
+		page: 1,
+		list: [],
+		isSearching: false,
+		searching: {
+			query: "",
+			change: function() {
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.isSearching = true;
+				$scope.load();
+			},
+			cancel: function() {
+				$scope.searching.query = "";
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.isSearching = false;
+				$scope.load();
+			}
+		},
+		load: function() {
+			if ($scope._page != $scope.page) {
+				$scope._page = $scope.page;
+				if ($scope.isSearching) model.trace.search($scope.searching.query, $scope.page, 4, _fn);
+				else model.trace.reportList($scope.trace.gongchengjindu.sectionId, $scope.page, _fn);
+			}
+		},
+		itemClicked: function(t) {
+			model.trace.get(t.id, function(d) {
+				if (d) {
+					if (d.picAttachmentList) {
+						for (var i = 0; i < d.picAttachmentList.length; i++) {
+							if (d.picAttachmentList[i].content || false)
+								d.picAttachmentList[i].content = $base64.decode(d.picAttachmentList[i].content);
+						}
+					}
+					$scope.trace.gongchengjindu.current = d;
+					$scope.$location.path("/henji-gongchengjindu-xiangqing");
+				}
+			});
+		},
+		add: function() {
+			$scope.trace.gongchengjindu.current = null;
+			$scope.$location.path("/henji-gongchengjindu-edit");
+		}
+	});
+}])
+.controller("cHenjiGongchengjinduXiangqing", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
+	angular.extend($scope, {
+		more: ($scope.user.id == $scope.trace.gongchengjindu.current.publisherId) || ($scope.trace.gongchengjindu.current._status || false),
+		edit: function() {
+			$scope.$location.path("/henji-gongchengjindu-edit");
+		},
+		remove: function() {
+			if ($scope.trace.gongchengjindu.current._status || false) {
+				transferCache.remove($scope.trace.gongchengjindu.current);
+				tipmessage("删除成功");
+				$timeout(function() {
+					$scope.$location.back();
+				}, 1000);
+			} else {
+				model.trace.remove($scope.trace.gongchengjindu.current.id, function(d) {
+					if (d) tipmessage("删除成功");
+					else tipmessage("删除失败");
+					$timeout(function() {
+						$scope.$location.back();
+					}, 1000);
+				});
+			}
+		},
+		fileClicked: function(name, path) {
+			$scope.files.filename = name;
+			$scope.files.filepath = path;
+			$scope.$location.path("/onefile");
+		}
+	});
+}])
+.controller("cHenjiGongchengjinduEdit", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
+	var _last_payment = 0;
+	angular.extend($scope, {
+		newItem: (function() {
+			var r = $scope.trace.gongchengjindu.current || {
+				topicType: 8,
+				traceType: 4,
+				sectionId: $scope.trace.gongchengjindu.sectionId
+			};
+			r.picAttachmentList = r.picAttachmentList || [];
+			r.videoAttachmentList = r.videoAttachmentList || [];
+			$scope.payment = r.payment ? parseFloat(r.payment) : 0;
+			return r;
+		})(),
+		change: function() {
+			var s = $scope.payment + '';
+			if (s.match(/^\d+(\.\d{0,2})?$/g)) _last_payment = $scope.payment;
+			else 	$scope.payment = _last_payment;
+		},
+		removeImage: function(url) {
+			for (var i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
+				if ($scope.newItem.picAttachmentList[i].fileUrl == url) {
+					model.removeFiles([$scope.newItem.picAttachmentList[i]]);
+					$scope.newItem.picAttachmentList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
+		imageChanged: function(url) {
+			$scope.newItem.picAttachmentList.push({
+				fileUrl: url,
+				thumbnailUrl: url
+			});
+		},
+		submit: function() {
+			$scope.newItem.payment = $scope.payment + '';
+			model.uploadAttachments($scope.newItem, function(item) {
+				delete item._index;
+				delete item._type;
+				delete item._status;
+				delete item._statusText;
+				delete item._user;
+				delete item._time;
+				delete item._update;
+				delete item._option;
+				(($scope.newItem._status || false) ? ($scope.newItem._update ? model.trace.update : model.trace.create) : (($scope.trace.gongchengjindu.current || false) ? model.trace.update : model.trace.create))(item, function(d) {
+					if (d) {
+						model.removeFiles($scope.newItem.picAttachmentList);
+						if ($scope.newItem._status || false) transferCache.remove($scope.newItem);
+						tipmessage("提交成功");
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
+					} else tipmessage("提交失败");
+				});
+			});
+		},
+		save: function() {
+			$scope.newItem.payment = $scope.payment + '';
+			if ($scope.trace.gongchengjindu.current || false) {
+				var opt = angular.extend({}, $scope.trace.gongchengjindu);
+				delete opt.current;
+				$scope.newItem._option = opt;
+				if ($scope.trace.gongchengjindu.current._status || false) {
+					if ($scope.trace.gongchengjindu.current._update) transferCache.push($scope.newItem, "henji-gongchengjindu", "update");
+					else transferCache.push($scope.newItem, "henji-gongchengjindu");
+				} else transferCache.push($scope.newItem, "henji-gongchengjindu", "update");
+			} else {
+				$scope.newItem._option = angular.extend({}, $scope.trace.gongchengjindu);
+				transferCache.push($scope.newItem, "henji-gongchengjindu");
+			}
+			tipmessage("保存成功");
+			$timeout(function() {
+				$scope.$location.back();
+			}, 1000);
+		}
+	});
+}])
+.controller("cHenjiZhiliang", ["$scope", "model", function($scope, model) {
+	angular.extend($scope, {
+		_page: 0,
+		page: 1,
+		list: [],
+		searching: {
+			query: "",
+			change: function() {
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.load();
+			},
+			cancel: function() {
+				$scope.searching.query = "";
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.load();
+			}
+		},
+		load: function() {
+			if ($scope._page != $scope.page) {
+				$scope._page = $scope.page;
+				model.trace.search($scope.searching.query, $scope.page, 3, function(d) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.list.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
+		},
+		itemClicked: function(t) {
+			model.trace.get(t.id, function(d) {
+				if (d) {
+					$scope.trace.zhiliang = {
+							current: d
+					};
+					$scope.$location.path("/henji-zhiliang-xiangqing");
+				}
+			});
+		},
+		add: function() {
+			$scope.trace.zhiliang = {};
+			$scope.$location.path("/henji-zhiliang-edit");
+		}
+	});
+}])
+.controller("cHenjiZhiliangXiangqing", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
+	var _doc_types = ["出厂证书", "试验记录表", "现场记录表", "质量检验报告单", "质量评定表"];
+	angular.extend($scope, {
+		more: ($scope.user.id == $scope.trace.zhiliang.current.publisherId) || ($scope.trace.zhiliang.current._status || false),
+		image: $scope.trace.zhiliang.current.picAttachmentList && $scope.trace.zhiliang.current.picAttachmentList.length > 0,
+		docType: function(type) {
+			var i = type - 1;
+			if (i >= 0 && i < _doc_types.length)
+				return _doc_types[i];
+			return type;
+		},
+		edit: function() {
+			$scope.$location.path("/henji-zhiliang-edit");
+		},
+		remove: function() {
+			if ($scope.trace.zhiliang.current._status || false) {
+				transferCache.remove($scope.trace.zhiliang.current);
+				tipmessage("删除成功");
+				$timeout(function() {
+					$scope.$location.back();
+				}, 1000);
+			} else {
+				model.trace.remove($scope.trace.zhiliang.current.id, function(d) {
+					if (d) tipmessage("删除成功");
+					else tipmessage("删除失败");
+					$timeout(function() {
+						$scope.$location.back();
+					}, 1000);
+				});
+			}
+		},
+		fileClicked: function(name, path) {
+			$scope.files.filename = name;
+			$scope.files.filepath = path;
+			$scope.$location.path("/onefile");
+		}
+	});
+}])
+.controller("cHenjiZhiliangEdit", ["$window", "$scope", "$timeout", "model", "transferCache", function($window, $scope, $timeout, model, transferCache) {
+	angular.extend($scope, {
+		docTypes:  [
+    	    {id: 1, v: "出厂证书"},
+    	    {id: 2, v: "试验记录表"},
+    	    {id: 3, v: "现场记录表"},
+    	    {id: 4, v: "质量检验报告单"},
+    	    {id: 5, v: "质量评定表"}
+    	],
+		newItem: $scope.trace.zhiliang.current || {
+			topicType: 8,
+			traceType: 3,
+			picAttachmentList: [],
+			videoAttachmentList: []
+		},
+		canScan: $window.cordova && $window.cordova.plugins && cordova.plugins.barcodeScanner,
+		scan: function() {
+			cordova.plugins.barcodeScanner.scan(function(r) {
+				$scope.newItem.compId = r.text;
+				model.component.get(r.text, function(d) {
+					if (d) $scope.newItem.component = d;
+					else tipmessage("该构件编码不存在");
+				});
+			}, function(e) {
+				tipmessage("扫描二维码失败");
+			});
+		},
+		onCompIdChange: function() {
+			model.component.get($scope.newItem.compId, function(d) {
+				if (d) $scope.newItem.component = d;
+				else tipmessage("该构件编码不存在");
+			});
+		},
+		removeImage: function(url) {
+			for (var i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
+				if ($scope.newItem.picAttachmentList[i].fileUrl == url) {
+					model.removeFiles([$scope.newItem.picAttachmentList[i]]);
+					$scope.newItem.picAttachmentList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
+		imageChanged: function(url) {
+			$scope.newItem.picAttachmentList.push({
+				fileUrl: url,
+				thumbnailUrl: url
+			});
+		},
+		submit: function() {
+			model.uploadAttachments($scope.newItem, function(item) {
+				delete item._index;
+				delete item._type;
+				delete item._status;
+				delete item._statusText;
+				delete item._user;
+				delete item._time;
+				delete item._update;
+				delete item._option;
+				(($scope.newItem._status || false) ? ($scope.newItem._update ? model.trace.update : model.trace.create) : (($scope.trace.zhiliang.current || false) ? model.trace.update : model.trace.create))(item, function(d) {
+					if (d) {
+						model.removeFiles($scope.newItem.picAttachmentList);
+						if ($scope.newItem._status || false) transferCache.remove($scope.newItem);
+						tipmessage("提交成功");
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
+					}
+				});
+			});
+		},
+		save: function() {
+			if ($scope.trace.zhiliang.current || false) {
+				var opt = angular.extend({}, $scope.trace.zhiliang);
+				delete opt.current;
+				$scope.newItem._option = opt;
+				if ($scope.trace.zhiliang.current._status || false) {
+					if ($scope.trace.zhiliang.current._update) transferCache.push($scope.newItem, "henji-zhiliang", "update");
+					else transferCache.push($scope.newItem, "henji-zhiliang");
+				} else transferCache.push($scope.newItem, "henji-zhiliang", "update");
+			} else {
+				$scope.newItem._option = $scope.trace.zhiliang;
+				transferCache.push($scope.newItem, "henji-zhiliang");
+			}
+			tipmessage("保存成功");
+			$timeout(function() {
+				$scope.$location.back();
+			}, 1000);
+		}
+	});
+}])
+.controller("cHenjiChengzhangguocheng", ["$scope", "model", function($scope, model) {
+	angular.extend($scope, {
+		_page: 0,
+		page: 1,
+		list: [],
+		searching: {
+			query: "",
+			change: function() {
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.load();
+			},
+			cancel: function() {
+				$scope.searching.query = "";
+				$scope._page = 0;
+				$scope.page = 1;
+				$scope.list = [];
+				$scope.load();
+			}
+		},
+		load: function() {
+			if ($scope._page != $scope.page) {
+				$scope._page = $scope.page;
+				model.trace.search($scope.searching.query, $scope.page, 2, function(d) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++)
+							$scope.list.push(d[i]);
+						$scope.page++;
+					}
+				});
+			}
+		},
+		itemClicked: function(t) {
+			model.trace.get(t.id, function(d) {
+				if (d) {
+					$scope.trace.chengzhangguocheng = {
+							current: d
+					};
+					$scope.$location.path("/henji-chengzhangguocheng-xiangqing");
+				}
+			});
+		},
+		add: function() {
+			$scope.trace.chengzhangguocheng = {};
+			$scope.$location.path("/henji-chengzhangguocheng-edit");
+		}
+	});
+}])
+.controller("cHenjiChengzhangguochengXiangqing", ["$scope", "$timeout", "model", "transferCache", function($scope, $timeout, model, transferCache) {
+	angular.extend($scope, {
+		more: ($scope.user.id == $scope.trace.chengzhangguocheng.current.publisherId) || ($scope.trace.chengzhangguocheng.current._status || false),
+		image: $scope.trace.chengzhangguocheng.current.picAttachmentList && $scope.trace.chengzhangguocheng.current.picAttachmentList.length > 0,
+		edit: function() {
+			$scope.$location.path("/henji-chengzhangguocheng-edit");
+		},
+		remove: function() {
+			if ($scope.trace.chengzhangguocheng.current._status || false) {
+				transferCache.remove($scope.trace.chengzhangguocheng.current);
+				tipmessage("删除成功");
+				$timeout(function() {
+					$scope.$location.back();
+				}, 1000);
+			} else {
+				model.trace.remove($scope.trace.chengzhangguocheng.current.id, function(d) {
+					if (d) tipmessage("删除成功");
+					else tipmessage("删除失败");
+					$timeout(function() {
+						$scope.$location.back();
+					}, 1000);
+				});
+			}
+		},
+		fileClicked: function(name, path) {
+			$scope.files.filename = name;
+			$scope.files.filepath = path;
+			$scope.$location.path("/onefile");
+		}
+	});
+}])
+.controller("cHenjiChengzhangguochengEdit", ["$window", "$scope", "$timeout", "model", "transferCache", function($window, $scope, $timeout, model, transferCache) {
+	angular.extend($scope, {
+		newItem: $scope.trace.chengzhangguocheng.current || {
+			topicType: 8,
+			traceType: 2,
+			picAttachmentList: [],
+			videoAttachmentList: []
+		},
+		canScan: $window.cordova && $window.cordova.plugins && cordova.plugins.barcodeScanner,
+		scan: function() {
+			cordova.plugins.barcodeScanner.scan(function(r) {
+				$scope.newItem.compId = r.text;
+				model.component.get(r.text, function(d) {
+					if (d) $scope.newItem.component = d;
+					else tipmessage("该构件编码不存在");
+				});
+			}, function(e) {
+				tipmessage("扫描二维码失败");
+			});
+		},
+		onCompIdChange: function() {
+			model.component.get($scope.newItem.compId, function(d) {
+				if (d) $scope.newItem.component = d;
+				else tipmessage("该构件编码不存在");
+			});
+		},
+		removeImage: function(url) {
+			for (var i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
+				if ($scope.newItem.picAttachmentList[i].fileUrl == url) {
+					model.removeFiles([$scope.newItem.picAttachmentList[i]]);
+					$scope.newItem.picAttachmentList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
+		imageChanged: function(url) {
+			$scope.newItem.picAttachmentList.push({
+				fileUrl: url,
+				thumbnailUrl: url
+			});
+		},
+		submit: function() {
+			model.uploadAttachments($scope.newItem, function(item) {
+				delete item._index;
+				delete item._type;
+				delete item._status;
+				delete item._statusText;
+				delete item._user;
+				delete item._time;
+				delete item._update;
+				delete item._option;
+				(($scope.newItem._status || false) ? ($scope.newItem._update ? model.trace.update : model.trace.create) : (($scope.trace.chengzhangguocheng.current || false) ? model.trace.update : model.trace.create))(item, function(d) {
+					if (d) {
+						model.removeFiles($scope.newItem.picAttachmentList);
+						if ($scope.newItem._status || false) transferCache.remove($scope.newItem);
+						tipmessage("提交成功");
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
+					}
+				});
+			});
+		},
+		save: function() {
+			if ($scope.trace.chengzhangguocheng.current || false) {
+				var opt = angular.extend({}, $scope.trace.chengzhangguocheng);
+				delete opt.current;
+				$scope.newItem._option = opt;
+				if ($scope.trace.chengzhangguocheng.current._status || false) {
+					if ($scope.trace.chengzhangguocheng.current._update) transferCache.push($scope.newItem, "henji-chengzhangguocheng", "update");
+					else transferCache.push($scope.newItem, "henji-chengzhangguocheng");
+				} else transferCache.push($scope.newItem, "henji-chengzhangguocheng", "update");
+			} else {
+				$scope.newItem._option = $scope.trace.chengzhangguocheng;
+				transferCache.push($scope.newItem, "henji-chengzhangguocheng");
+			}
+			tipmessage("保存成功");
+			$timeout(function() {
+				$scope.$location.back();
+			}, 1000);
+		}
+	});
 }])
 .config(["myRouteProvider", function(myRouteProvider) {
 	myRouteProvider
@@ -3817,6 +4584,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 		templateUrl: "partials/henji-gongchengjindu.html",
 		controller: "cHenjiGongchengjindu"
 	})
+	.when("/henji-gongchengjindu-list", {
+		templateUrl: "partials/henji-gongchengjindu-list.html",
+		controller: "cHenjiGongchengjinduList"
+	})
+	.when("/henji-gongchengjindu-xiangqing", {
+		templateUrl: "partials/henji-gongchengjindu-xiangqing.html",
+		controller: "cHenjiGongchengjinduXiangqing"
+	})
+	.when("/henji-gongchengjindu-edit", {
+		templateUrl: "partials/henji-gongchengjindu-edit.html",
+		controller: "cHenjiGongchengjinduEdit"
+	})
 	.when("/henji-shangchuan", {
 		templateUrl: "partials/henji-shangchuan.html",
 		controller: "cHenjiShangchuan"
@@ -3832,6 +4611,30 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator"])
 	.when("/henji-shangchuan-xiangqing", {
 		templateUrl: "partials/henji-shangchuan-xiangqing.html",
 		controller: "cHenjiShangchuanXiangqing"
+	})
+	.when("/henji-zhiliang", {
+		templateUrl: "partials/henji-zhiliang.html",
+		controller: "cHenjiZhiliang"
+	})
+	.when("/henji-zhiliang-xiangqing",{
+		templateUrl: "partials/henji-zhiliang-xiangqing.html",
+		controller: "cHenjiZhiliangXiangqing"
+	})
+	.when("/henji-zhiliang-edit", {
+		templateUrl: "partials/henji-zhiliang-edit.html",
+		controller: "cHenjiZhiliangEdit"
+	})
+	.when("/henji-chengzhangguocheng", {
+		templateUrl: "partials/henji-chengzhangguocheng.html",
+		controller: "cHenjiChengzhangguocheng"
+	})
+	.when("/henji-chengzhangguocheng-xiangqing", {
+		templateUrl: "partials/henji-chengzhangguocheng-xiangqing.html",
+		controller: "cHenjiChengzhangguochengXiangqing"
+	})
+	.when("/henji-chengzhangguocheng-edit", {
+		templateUrl: "partials/henji-chengzhangguocheng-edit.html",
+		controller: "cHenjiChengzhangguochengEdit"
 	})
 	.otherwise({
         redirectTo: "/"

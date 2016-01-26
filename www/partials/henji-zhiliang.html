@@ -1,8 +1,7 @@
 <div class="pt60">
-<!--header-->
 <header class="bg1">
 	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
-	<p class="title">{{::trace.henjishangchuan.title}}</p>
+	<p class="title">质量记录</p>
 	<span class="search"><img src="img/icon-search.png"/></span><span class="jia" ng-click="add()"><img src="img/icon-jia.png"/></span><span ng-click="searching.cancel()" class="nochoose" style="display:none;">取消</span>
 </header>
 <section class="searchblock"><input type="text" ng-model="searching.query" ng-change="searching.change()"/></section>
@@ -10,11 +9,11 @@
 	<ul class="list-2015-1-11">
 		<li class="clearfix" ng-repeat="t in list track by t.id">
             <a ng-click="itemClicked(t)" href="">
-                <span class="i"><img ng-src="{{::t.publisherAvatarUrl}}"/></span>
+                <span class="i"><img ng-src="{{t.publisherAvatarUrl}}"/></span>
                 <span class="r">
-                    <span class="txt">{{::t.title}}</span>
+                    <span class="txt">{{t.title}}</span><span class="title">{{t.compId}}</span>
                 </span>
-                <span class="time">{{::formatDate(t.createTime)}} <span class="name">{{::t.publisherName}}</span></span>
+                <span class="time">{{formatDate(t.createTime)}} <span class="name">{{t.publisherName}}</span></span>
             </a>
         </li>
     </ul>

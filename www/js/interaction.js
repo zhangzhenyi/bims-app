@@ -21,9 +21,9 @@ function changeTipmessage(message,id){
 }
 function closetipmessage1(id){
 	setTimeout(function(){$("#"+id).animate({opacity:0},300);setTimeout(function(){$("#"+id).remove();
-	if($("#loadingContainer").childNodes.length <= 0){
+	//if($("#loadingContainer").childNodes.length <= 0){
 		$("#loadingContainer").hide();
-	}
+	//}
 	},100);},2000);
 	
 }
