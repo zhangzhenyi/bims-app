@@ -540,6 +540,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	}
 	
 	function _selectMedia(uri, scope, change) {
+		if (uri.toLowerCase().indexOf("file:///") == -1) uri = "file:///" + uri;
 		fileSystem.create(uri, function(url) {
 			scope.$apply(change(scope, {$uri: url}));
 		});
