@@ -540,6 +540,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	}
 	
 	function _selectMedia(uri, scope, change) {
+		if (uri.toLowerCase().indexOf("file:///") == -1) uri = "file:///" + uri;
 		fileSystem.create(uri, function(url) {
 			scope.$apply(change(scope, {$uri: url}));
 		});
@@ -2548,6 +2549,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				}
 			},
 			transfer: function() {
+				var isIssue;
 				$scope.closeDetail();
 				$scope.current._status = "o2";
 				$scope.current._statusText = "上传中";
@@ -2573,6 +2575,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 						default:
 							op = angular.noop;
 					}
+					
 					delete item._index;
 					delete item._type;
 					delete item._status;
@@ -2581,6 +2584,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					delete item._time;
 					delete item._update;
 					delete item._option;
+					
 					op(item, function(d) {
 						if (d) {
 							if(isIssue){
