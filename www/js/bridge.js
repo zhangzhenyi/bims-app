@@ -2567,7 +2567,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 							op = item._update ? model.trace.update : model.trace.create;
 							break;
 						case "issue":
-							isIssue = true;
 							delete item.topicType;
 							isIssue = true;
 							op = item._update ? model.issues.update : model.issues.create;
