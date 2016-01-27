@@ -6,9 +6,15 @@
 <section class="mt10 mlr10">
 	<ul class="list-9">
 		<li class="clearfix" ng-repeat="task in tasks track by task._index | orderBy:'-_time'">
-		<a ng-click="detail(task)" href="">
+		<a ng-click="detail(task)" href="" ng-if="task.topicType != 3">
+		
 			<span class="title">{{::task.title}}<i class="{{(task._status || 'o1')}}">{{(task._statusText || '未上传')}}</i></span>
 			<span class="txt" style="word-break:break-all;">{{::task.content}}</span>
+			<span class="time time1">{{::formatDate(task._time)}}</span>
+		</a>
+		<a ng-click="detail(task)" href="" ng-if="task.topicType == 3">
+			<span class="title">{{::task.issueTitle}}<i class="{{(task._status || 'o1')}}">{{(task._statusText || '未上传')}}</i></span>
+			<span class="txt" style="word-break:break-all;">{{::task.issueDesc}}</span>
 			<span class="time time1">{{::formatDate(task._time)}}</span>
 		</a>
 		</li>
@@ -26,9 +32,13 @@
 	</div>
 	<div class="online-blockmessage-1" style="display:{{detailVisibility}};z-index:999999;">
 		<div class="ob">
-			<div class="tb">
+			<div class="tb" ng-if="task.topicType != 3">
 				<p class="title">{{current.title}}</p>
 				<p class="txt">{{current.content}}</p>
+			</div>
+			<div class="tb" ng-if="task.topicType == 3">
+				<p class="title">{{current.issueTitle}}</p>
+				<p class="txt">{{current.issueDesc}}</p>
 			</div>
 			<ul>
 				<li><a ng-click="xiangqing()"href="">详情</a></li>

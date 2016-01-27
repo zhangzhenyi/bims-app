@@ -1582,6 +1582,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			item._statusText = "上传中";
 			model.uploadAttachments(item, function(i) {
 				var op;
+				var isIssue = false;
 				switch(i._type) {
 					case "redian":
 						op = i._update ? model.hotfocus.update : model.hotfocus.create;
@@ -1595,6 +1596,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 						break;
 					case "issue":
 						delete i.topicType;
+						isIssue = true;
 						op = i._update ? model.issues.update : model.issues.create;
 						break;
 					default:
@@ -1610,9 +1612,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				delete i._option;
 				op(i, function(d) {
 					if (d) {
+					if(isIssue){
+						model.removeFiles(item.issuePicAttachmentList.concat(item.issueVideoAttachmentList));
+					}else{
 						model.removeFiles(item.picAttachmentList.concat(item.videoAttachmentList));
-						transferCache.remove(item);
 					}
+						tipmessage("上传成功");
+						transferCache.remove(item);
+					}else tipmessage("上传失败");
 				});
 			}, function(url, transfer) {
 				if (transfer) _transfers[url] = transfer;
@@ -2318,6 +2325,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			
 		},
 		save: function() {
+		if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			transferCache.push($scope.newItem, "redian");
 			tipmessage("保存成功");
 			$timeout(function() {
@@ -2554,6 +2565,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 							op = item._update ? model.trace.update : model.trace.create;
 							break;
 						case "issue":
+							delete item.topicType;
 							op = item._update ? model.issues.update : model.issues.create;
 							break;
 						default:
@@ -2571,7 +2583,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					
 					op(item, function(d) {
 						if (d) {
-							model.removeFiles($scope.current.picAttachmentList.concat($scope.current.videoAttachmentList));
+							if(isIssue){
+								model.removeFiles($scope.current.issuePicAttachmentList.concat($scope.current.issueVideoAttachmentList));
+							}else{
+								model.removeFiles($scope.current.picAttachmentList.concat($scope.current.videoAttachmentList));
+							}
+							
 							tipmessage("上传成功");
 							transferCache.remove($scope.current);
 							$timeout(function() {
@@ -2850,7 +2867,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		});
 	};
 }])
-.controller("cIssueEdit", ["$scope", "model", "$timeout", function($scope, model, $timeout){
+.controller("cIssueEdit", ["$scope", "model", "$timeout","transferCache", function($scope, model, $timeout, transferCache){
 	$scope.newIssue = {
 	};
 	$scope.tipVisibility = "none";
@@ -2956,7 +2973,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		
 	};
 }])
-.controller("cIssueCreate", ["$scope", "model", "$timeout", function($scope, model, $timeout){
+.controller("cIssueCreate", ["$scope", "model", "$timeout","transferCache", function($scope, model, $timeout,transferCache){
 	
 	function _upload(file, blob, c) {
 		var formData = new FormData();
@@ -3028,8 +3045,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
+			tipmessage1(message="保存中",id="tipimg");
 		transferCache.push($scope.newIssue, "issue");
-			tipmessage("保存成功");//是否需要返回值？
+			changeTipmessage("保存成功",id="tipimg");
+			closetipmessage1("tipimg");
 			$timeout(function() {
 				$scope.$location.back();
 			}, 1000);
