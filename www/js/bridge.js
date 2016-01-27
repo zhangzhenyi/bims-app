@@ -2548,6 +2548,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				}
 			},
 			transfer: function() {
+				var isIssue;
 				$scope.closeDetail();
 				$scope.current._status = "o2";
 				$scope.current._statusText = "上传中";
@@ -2565,6 +2566,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 							op = item._update ? model.trace.update : model.trace.create;
 							break;
 						case "issue":
+							isIssue = true;
 							delete item.topicType;
 							op = item._update ? model.issues.update : model.issues.create;
 							break;
