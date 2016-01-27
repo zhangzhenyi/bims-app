@@ -2552,6 +2552,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				$scope.closeDetail();
 				$scope.current._status = "o2";
 				$scope.current._statusText = "上传中";
+				var isIssue = false;
 				model.uploadAttachments($scope.current, function(item) {
 					var op;
 					switch(item._type) {
@@ -2568,6 +2569,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 						case "issue":
 							isIssue = true;
 							delete item.topicType;
+							isIssue = true;
 							op = item._update ? model.issues.update : model.issues.create;
 							break;
 						default:
