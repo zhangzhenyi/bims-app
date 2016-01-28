@@ -543,7 +543,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	}
 	
 	function _selectMedia(uri, scope, change) {
-		fileSystem.create(_fixPath(uri), function(url) {
+		if (uri.toLowerCase().indexOf("content:/")  >= 0) {
+			if ($window.FilePath) {
+				FilePath.resolveNativePath(uri, function(path) {
+					fileSystem.create(_fixPath(path), function(url) {
+						scope.$apply(change(scope, {$uri: url}));
+					});
+				}, _error);
+			}
+		} else fileSystem.create(_fixPath(uri), function(url) {
 			scope.$apply(change(scope, {$uri: url}));
 		});
 	}
