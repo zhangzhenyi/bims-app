@@ -2589,12 +2589,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					
 					op(item, function(d) {
 						if (d) {
-							if(isIssue){
-								model.removeFiles($scope.current.issuePicAttachmentList.concat($scope.current.issueVideoAttachmentList));
-							}else{
-								model.removeFiles($scope.current.picAttachmentList.concat($scope.current.videoAttachmentList));
-							}
-							
+							if (isIssue) model.removeFiles($scope.current.issuePicAttachmentList.concat($scope.current.issueVideoAttachmentList));
+							else 	model.removeFiles($scope.current.picAttachmentList.concat($scope.current.videoAttachmentList));
 							tipmessage("上传成功");
 							transferCache.remove($scope.current);
 							$timeout(function() {
