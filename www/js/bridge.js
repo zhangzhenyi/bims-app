@@ -3356,6 +3356,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		    		  	if(d){
 		    		  		tipmessage("获得构件信息");
 		    		  		$scope.component.current = d;
+		    		  		alert("component : "+ JSON.stringigy($scope.component.current));
 		    		  		$scope.$location.path('/henji-scan')
 		    		  	}else{
 			    		  	tipmessage("该构件编码不存在", "_notFoundCompId");
@@ -4370,6 +4371,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	alert("henji page");
 	alert("s: "+JSON.stringigy($scope.component.current));
 	alert("henji page end");
+	//成长过程
+	//质量记录
+	//现场签认
+	
 }])
 .controller("cHenjiChengzhangguochengEdit", ["$window", "$scope", "$timeout", "model", "transferCache", function($window, $scope, $timeout, model, transferCache) {
 	angular.extend($scope, {
