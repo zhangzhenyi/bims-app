@@ -4364,16 +4364,31 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 .controller("cHenjiScan", ["$scope", "$timeout", "model", function($scope, $timeout, model){
 	angular.extend($scope, {
 		newItem:{
-			compId:""
+			compId:$scope.component.current.id,
+			component:$scope.component.current
 		}
 	});
 	alert("henji page");
 	alert("s: "+JSON.stringigy($scope.component.current));
 	alert("henji page end");
 	//成长过程
+	model.trace.getByCompId(getByCompId, 0, 3, function(d){
+		if(d){
+			$scope.newItem.process = d;
+		}
+	});
 	//质量记录
+	model.trace.getByCompId(getByCompId, 0, 2, function(d){
+		if(d){
+			$scope.newItem.qualityRecord = d;
+		}
+	});
 	//现场签认
-	
+	model.trace.getByCompId(getByCompId, 0, 1, function(d){
+		if(d){
+			$scope.newItem.spotcheck = d;
+		}
+	});
 }])
 .controller("cHenjiChengzhangguochengEdit", ["$window", "$scope", "$timeout", "model", "transferCache", function($window, $scope, $timeout, model, transferCache) {
 	angular.extend($scope, {
