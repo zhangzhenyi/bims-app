@@ -440,7 +440,8 @@ public class CameraLauncher extends CordovaPlugin implements MediaScannerConnect
                     !this.correctOrientation) {
                 writeUncompressedImage(uri);
 
-                this.callbackContext.success(uri.toString());
+                //this.callbackContext.success(uri.toString());
+                this.callbackContext.success(FileHelper.getRealPath(uri, cordova));
             } else {
                 bitmap = getScaledBitmap(FileHelper.stripFileProtocol(imageUri.toString()));
 
@@ -468,8 +469,8 @@ public class CameraLauncher extends CordovaPlugin implements MediaScannerConnect
 
 
                 // Send Uri back to JavaScript for viewing image
-                this.callbackContext.success(uri.toString());
-
+               // this.callbackContext.success(uri.toString());
+                this.callbackContext.success(FileHelper.getRealPath(uri, cordova));
             }
         } else {
             throw new IllegalStateException();
@@ -545,14 +546,16 @@ private String ouputModifiedBitmap(Bitmap bitmap, Uri uri) throws IOException {
         // If you ask for video or all media type you will automatically get back a file URI
         // and there will be no attempt to resize any returned data
         if (this.mediaType != PICTURE) {
-            this.callbackContext.success(uri.toString());
+            //this.callbackContext.success(uri.toString());
+        	this.callbackContext.success(FileHelper.getRealPath(uri, cordova));
         }
         else {
             // This is a special case to just return the path as no scaling,
             // rotating, nor compressing needs to be done
             if (this.targetHeight == -1 && this.targetWidth == -1 &&
                     (destType == FILE_URI || destType == NATIVE_URI) && !this.correctOrientation) {
-                this.callbackContext.success(uri.toString());
+                //this.callbackContext.success(uri.toString());
+            	this.callbackContext.success(FileHelper.getRealPath(uri, cordova));
             } else {
                 String uriString = uri.toString();
                 // Get the path to the image. Makes loading so much easier.
@@ -610,7 +613,8 @@ private String ouputModifiedBitmap(Bitmap bitmap, Uri uri) throws IOException {
                         }
                     }
                     else {
-                        this.callbackContext.success(uri.toString());
+                        //this.callbackContext.success(uri.toString());
+                    	this.callbackContext.success(FileHelper.getRealPath(uri, cordova));
                     }
                 }
                 if (bitmap != null) {

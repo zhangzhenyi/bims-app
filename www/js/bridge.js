@@ -529,19 +529,22 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		});
 	}
 
+	function _fixPath(path) {
+		alert(path);
+		var r = path.toLowerCase().indexOf("file:/") == -1 ? "file:///" + path : path;
+		return (r.split("?"))[0];
+	}
+	
 	function _captureVideo(files, scope, change) {
-		tipmessage1(message="文件生成中",id="tipimg");
 		for (var i = 0; i < files.length; i++) {
-			fileSystem.create("file:///" + files[i].fullPath, function(url) {
+			fileSystem.create(_fixPath(files[i].fullPath), function(url) {
 				scope.$apply(change(scope, {$uri: url}));
 			});
 		}
-		closetipmessage1("tipimg");
 	}
 	
 	function _selectMedia(uri, scope, change) {
-		if (uri.toLowerCase().indexOf("file:///") == -1) uri = "file:///" + uri;
-		fileSystem.create(uri, function(url) {
+		fileSystem.create(_fixPath(uri), function(url) {
 			scope.$apply(change(scope, {$uri: url}));
 		});
 	}
