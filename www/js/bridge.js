@@ -530,7 +530,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	}
 
 	function _fixPath(path) {
-		alert(path);
 		var r = path.toLowerCase().indexOf("file:/") == -1 ? "file:///" + path : path;
 		return (r.split("?"))[0];
 	}
