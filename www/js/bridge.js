@@ -3338,10 +3338,46 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	});
 }])
-.controller("cHenji", ["$scope", function($scope){
+.controller("cHenji", ["$scope", "model", function($scope, model){
 	angular.extend($scope, {
 		popTempTip:function(){
 			tipmessage("攻城师努力建设中...");
+		},
+		onScan:function(){
+			cordova.plugins.barcodeScanner.scan(
+		      function (result) {
+		    	  if(result.cancelled == 0){
+		    		  alert("scan result : "+result.text);
+		    		  //Get component info
+		    		  model.component.get(result.text, function(d){
+		    		  	if(d){
+		    		  		tipmessage("获得构件信息");
+		    		  		$scope.component.current = d;
+		    		  		$scope.$location.path('/henji-scan')
+		    		  	}else{
+			    		  	tipmessage("该构件编码不存在", "_notFoundCompId");
+		    		  	}
+		    		  });
+		    		  /*
+model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+		    			  if(d){
+		    				  tipmessage("该构件签认已完成", "_FoundCompId");
+		    				  //Jump to sign details
+		    				  $scope.component.current = d;
+		    				  $scope.$location.path("/spotcheck-detail");
+		    			  }else{
+		    				  tipmessage("该构件允许签认", "_FoundCompId");
+		    			  }
+		    		  });
+*/
+		    	  }
+		    
+		    	  
+		      }, 
+		      function (error) {
+		    	  tipmessage("扫描二维码失败");
+		      }
+			);
 		}
 	});
 }])
@@ -4328,39 +4364,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			compId:""
 		}
 	});
-	cordova.plugins.barcodeScanner.scan(
-		      function (result) {
-		    	  if(result.cancelled == 0){
-		    		  $scope.newItem.compId = result.text;
-		    		  tipmessage("二维码提取成功");
-		    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
-		    			  if(d){
-		    				  tipmessage("该构件签认已完成", "_FoundCompId");
-		    				  //Jump to sign details
-		    				  $scope.trace.current = d;
-		    				  $scope.$location.path("/spotcheck-detail");
-		    			  }else{
-		    				  tipmessage("该构件允许签认", "_FoundCompId");
-		    				  //Get component info
-//		    				  model.component.get($scope.newItem.compId, function(d){
-//		    					  if(d){
-//		    						  tipmessage("获得构件信息", "_FoundCompId");
-//		    						  $scope.newItem.component = d;
-//		    					  }else{
-//		    						  tipmessage("该构件编码不存在", "_notFoundCompId");
-//		    					  }
-//		    				  });
-		    			  }
-		    		  });
-		    	  }
-		    
-		    	  
-		      }, 
-		      function (error) {
-		    	  tipmessage("扫描二维码失败");
-		      }
-	);
-
+	alert("henji page");
+	alert("s: "+JSON.stringigy($scope.component.current));
+	alert("henji page end");
 }])
 .controller("cHenjiChengzhangguochengEdit", ["$window", "$scope", "$timeout", "model", "transferCache", function($window, $scope, $timeout, model, transferCache) {
 	angular.extend($scope, {
