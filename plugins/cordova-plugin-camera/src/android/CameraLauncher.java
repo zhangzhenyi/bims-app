@@ -544,7 +544,6 @@ private String ouputModifiedBitmap(Bitmap bitmap, Uri uri) throws IOException {
         // and there will be no attempt to resize any returned data
         if (this.mediaType != PICTURE) {
             this.callbackContext.success(uri.toString());
-        	//this.callbackContext.success(FileHelper.getRealPath(uri, this.cordova));
         } else {
             // This is a special case to just return the path as no scaling,
             // rotating, nor compressing needs to be done
