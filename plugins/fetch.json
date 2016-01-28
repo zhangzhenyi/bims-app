@@ -25,9 +25,8 @@
     },
     "cordova-plugin-file": {
         "source": {
-            "type": "git",
-            "url": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-file.git",
-            "subdir": "."
+            "type": "registry",
+            "id": "cordova-plugin-file"
         },
         "is_top_level": true,
         "variables": {}
@@ -53,6 +52,14 @@
         "source": {
             "type": "registry",
             "id": "cordova-plugin-network-information"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "com.hiddentao.cordova.filepath": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-filepath"
         },
         "is_top_level": true,
         "variables": {}

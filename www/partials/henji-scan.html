@@ -16,7 +16,7 @@
     <span class="lll"><img src="img/icon-25.png">成长过程</span>	
     <ul class="list-2015-1-11">
 		<li class="clearfix" ng-repeat="item in newItem.process track by item.id">
-            <a href="#.html">
+            <a href="" ng-click=>
                 <span class="i"><img ng-src="{{::(item.publisherAvatarUrl || 'img/tem-img/img-person.jpg')}}"></span>
                 <span class="r">
                     <span class="txt">{{::item.title|cutTail:false:10:" ..."}}</span><span class="title">{{::item.compId}}</span>
@@ -24,109 +24,28 @@
                 <span class="time">{{::formatDate(item.createTime)}} <span class="name">{{::item.publisherName}}</span></span>
             </a>
         </li>
-        <li class="clearfix">
-            <a href="#.html">
-                <span class="i"><img src="img/tem-img/img-100100-2.jpg"></span>
-                <span class="r">
-                    <span class="txt">啊啊啊。</span><span class="title">comp_xxx_122</span>
-                </span>
-                <span class="time">九天前 2015-11-12 <span class="name">Xgirl</span></span>
-            </a>
-        </li>
-        <li class="clearfix">
-            <a href="#.html">
-                <span class="i"><img src="img/tem-img/img-100100-2.jpg"></span>
-                <span class="r">
-                    <span class="txt">啊啊啊。</span><span class="title">comp_xxx_122</span>
-                </span>
-                <span class="time">九天前 2015-11-12 <span class="name">Xgirl</span></span>
-            </a>
-        </li>
-        <li class="clearfix">
-            <a href="#.html">
-                <span class="i"><img src="img/tem-img/img-100100-2.jpg"></span>
-                <span class="r">
-                    <span class="txt">啊啊啊。</span><span class="title">comp_xxx_122</span>
-                </span>
-                <span class="time">九天前 2015-11-12 <span class="name">Xgirl</span></span>
-            </a>
-        </li>
     </ul>
     <span class="lll"><img src="img/icon-26.png">质量记录</span>	
     <ul class="list-2015-1-11">
-		<li class="clearfix">
-            <a href="#.html">
-                <span class="i"><img src="img/tem-img/img-100100-2.jpg"></span>
+		<li class="clearfix" ng-repeat="item in newItem.qualityRecord track by item.id">
+            <a href="">
+                <span class="i"><img ng-src="{{::(item.publisherAvatarUrl || 'img/tem-img/img-person.jpg')}}"></span>
                 <span class="r">
-                    <span class="txt">啊啊啊。</span><span class="title">comp_xxx_122</span>
+                    <span class="txt">{{::item.title|cutTail:false:10:" ..."}}</span><span class="title">{{::item.compId}}</span>
                 </span>
-                <span class="time">九天前 2015-11-12 <span class="name">Xgirl</span></span>
-            </a>
-        </li>
-        <li class="clearfix">
-            <a href="#.html">
-                <span class="i"><img src="img/tem-img/img-100100-2.jpg"></span>
-                <span class="r">
-                    <span class="txt">啊啊啊。</span><span class="title">comp_xxx_122</span>
-                </span>
-                <span class="time">九天前 2015-11-12 <span class="name">Xgirl</span></span>
-            </a>
-        </li>
-        <li class="clearfix">
-            <a href="#.html">
-                <span class="i"><img src="img/tem-img/img-100100-2.jpg"></span>
-                <span class="r">
-                    <span class="txt">啊啊啊。</span><span class="title">comp_xxx_122</span>
-                </span>
-                <span class="time">九天前 2015-11-12 <span class="name">Xgirl</span></span>
-            </a>
-        </li>
-        <li class="clearfix">
-            <a href="#.html">
-                <span class="i"><img src="img/tem-img/img-100100-2.jpg"></span>
-                <span class="r">
-                    <span class="txt">啊啊啊。</span><span class="title">comp_xxx_122</span>
-                </span>
-                <span class="time">九天前 2015-11-12 <span class="name">Xgirl</span></span>
+                <span class="time">{{::formatDate(item.createTime)}} <span class="name">{{::item.publisherName}}</span></span>
             </a>
         </li>
     </ul>
 	<span class="lll"><img src="img/icon-1.png">现场签认</span>	
     <ul class="list-2015-1-11">
-		<li class="clearfix">
+		<li class="clearfix" ng-repeat="item in newItem.spotcheck track by item.id">
             <a href="#.html">
-                <span class="i"><img src="img/tem-img/img-100100-2.jpg"></span>
+                <span class="i"><img ng-src="{{::(item.publisherAvatarUrl || 'img/tem-img/img-person.jpg')}}"></span>
                 <span class="r">
-                    <span class="txt">啊啊啊。</span><span class="title">comp_xxx_122</span>
+                    <span class="txt">{{::item.title|cutTail:false:10:" ..."}}</span><span class="title">{{::item.compId}}</span>
                 </span>
-                <span class="time">九天前 2015-11-12 <span class="name">Xgirl</span></span>
-            </a>
-        </li>
-        <li class="clearfix">
-            <a href="#.html">
-                <span class="i"><img src="img/tem-img/img-100100-2.jpg"></span>
-                <span class="r">
-                    <span class="txt">啊啊啊。</span><span class="title">comp_xxx_122</span>
-                </span>
-                <span class="time">九天前 2015-11-12 <span class="name">Xgirl</span></span>
-            </a>
-        </li>
-        <li class="clearfix">
-            <a href="#.html">
-                <span class="i"><img src="img/tem-img/img-100100-2.jpg"></span>
-                <span class="r">
-                    <span class="txt">啊啊啊。</span><span class="title">comp_xxx_122</span>
-                </span>
-                <span class="time">九天前 2015-11-12 <span class="name">Xgirl</span></span>
-            </a>
-        </li>
-        <li class="clearfix">
-            <a href="#.html">
-                <span class="i"><img src="img/tem-img/img-100100-2.jpg"></span>
-                <span class="r">
-                    <span class="txt">啊啊啊。</span><span class="title">comp_xxx_122</span>
-                </span>
-                <span class="time">九天前 2015-11-12 <span class="name">Xgirl</span></span>
+                <span class="time">{{::formatDate(item.createTime)}} <span class="name">{{::item.publisherName}}</span></span>
             </a>
         </li>
     </ul>

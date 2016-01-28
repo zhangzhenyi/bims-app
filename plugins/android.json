@@ -24,6 +24,12 @@
         },
         "cordova-plugin-network-information": {
             "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "com.hiddentao.cordova.filepath": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
         }
     },
     "dependent_plugins": {}
