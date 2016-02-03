@@ -23,6 +23,7 @@
     <preference name="disable-cursor" value="false" />
     <preference name="android-minSdkVersion" value="14" />
     <preference name="android-installLocation" value="auto" />
+    <preference name="AndroidPersistentFileLocation" value="Compatibility" />
     <gap:plugin name="org.apache.cordova.battery-status" />
     <gap:plugin name="org.apache.cordova.camera" />
     <gap:plugin name="org.apache.cordova.media-capture" />
@@ -81,8 +82,8 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
-    <engine name="android" spec="~4.1.1" />
     <engine name="ios" spec="~3.9.2" />
-    <plugin name="File" value="CDVFile"/>
-    <plugin name="FileTransfer" value="CDVFileTransfer"/>
+    <plugin name="File" value="CDVFile" />
+    <plugin name="FileTransfer" value="CDVFileTransfer" />
+    <engine name="android" spec="~4.1.1" />
 </widget>

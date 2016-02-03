@@ -7,28 +7,31 @@
         "files": {}
     },
     "installed_plugins": {
-        "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "com.srcpoint.bims"
-        },
-        "cordova-plugin-device": {
+        "com.hiddentao.cordova.filepath": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         },
         "cordova-plugin-camera": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         },
-        "cordova-plugin-file-transfer": {
-            "PACKAGE_NAME": "com.srcpoint.bims"
-        },
-        "phonegap-plugin-barcodescanner": {
-            "PACKAGE_NAME": "com.srcpoint.bims"
-        },
-        "cordova-plugin-network-information": {
+        "cordova-plugin-device": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         },
         "cordova-plugin-file": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         },
-        "com.hiddentao.cordova.filepath": {
+        "cordova-plugin-file-transfer": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "cordova-plugin-media-capture": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "cordova-plugin-network-information": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "phonegap-plugin-barcodescanner": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         }
     },

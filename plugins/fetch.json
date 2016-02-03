@@ -63,5 +63,21 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "cordova-plugin-media-capture": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-media-capture"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-media": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-media@~2.1.0"
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }
