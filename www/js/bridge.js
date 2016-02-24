@@ -933,6 +933,22 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		};
 	})();
 	
+	document.addEventListener("deviceready", function() {
+		var __backTimes = 0;
+		document.addEventListener("backbutton", function() {
+			if ($rootScope.$location.path() == "/") {
+				__backTimes++;
+				if (__backTimes > 1) {
+					__backTimes = 0;
+					//TODO: exit app
+				} else tipmessage("再点击一次退出应用");
+			} else {
+				__backTimes = 0;
+				$rootScope.$location.back();
+			}
+		}, false);
+	}, false);
+	
 	function _req(o,c) {
 		$rootScope.loading = true;
 		o.url = _base + (o.url || "");
