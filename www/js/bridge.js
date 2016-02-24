@@ -903,7 +903,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	$rootScope.issues = {};
 	$rootScope.issue = {};
 	$rootScope.onepage = {id: "about"};
-	$rootScope.sousuo = {canExit: false};
 
 	$rootScope.setting ={
 			installer : "",
@@ -936,13 +935,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	
 	function _androidBackButton() {
 		var p = $rootScope.$location.path();
-		if (p == "/" || p == "/login" || p == "/henji" || (p == "/sousuo" &&  $rootScope.sousuo.canExit)|| p == "/wode" || p == "/faxian") {
+		if (p == "/" || p == "/login" || p == "/henji" || (p == "/sousuo" &&  $rootScope.files.parentId <= 1) || p == "/wode" || p == "/faxian") {
 			tipmessage("再点击一次退出应用");
 			document.removeEventListener("backbutton", _androidBackButton, false);
 			$timeout(function() {
 				document.addEventListener("backbutton", _androidBackButton, false);
 			}, 3000);
-		} else $rootScope.$location.back();
+		} else {
+			if (p == "/sousuo") $rootScope.files.parentId = $rootScope.files.current.parentId;
+			$rootScope.$location.back();
+		}
 	}
 	
 	document.addEventListener("deviceready", function() {
@@ -3340,7 +3342,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			$scope.items = d.dirList.concat(d.filesList);
 		}
 	});
-	$scope.sousuo.canExit = ($scope.files.parentId <= 1);
 	angular.extend($scope, {
 		backClick: function() {
 			$scope.files.parentId = $scope.files.current.parentId;
