@@ -934,7 +934,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	})();
 	
 	function _androidBackButton() {
-		if ($rootScope.$location.path() == "/") {
+		if ($rootScope.$location.path() == "/" 
+			|| $rootScope.$location.path() == "/login"
+				|| $rootScope.$location.path() == "/henji"
+					|| $rootScope.$location.path() == "/sousuo"
+						|| $rootScope.$location.path() == "/wode"
+							|| $rootScope.$location.path() == "/faxian") {
+			
 			tipmessage("再点击一次退出应用");
 			document.removeEventListener("backbutton", _androidBackButton, false);
 			$timeout(function() {
