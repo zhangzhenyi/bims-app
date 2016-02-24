@@ -3353,13 +3353,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			cordova.plugins.barcodeScanner.scan(
 		      function (result) {
 		    	  if(result.cancelled == 0){
-		    		  alert("scan result : "+result.text);
+//		    		  alert("scan result : "+result.text);
 		    		  //Get component info
 		    		  model.component.get(result.text, function(d){
 		    		  	if(d){
 		    		  		tipmessage("获得构件信息");
 		    		  		$scope.component.current = d;
-		    		  		alert("component : "+ JSON.stringigy($scope.component.current));
+//		    		  		alert("component : "+ JSON.stringigy($scope.component.current));
 		    		  		$scope.$location.path('/henji-scan')
 		    		  	}else{
 			    		  	tipmessage("该构件编码不存在", "_notFoundCompId");
@@ -4372,9 +4372,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			component:$scope.component.current
 		}
 	});
-	alert("henji page");
-	alert("s: "+JSON.stringigy($scope.component.current));
-	alert("henji page end");
+//	alert("henji page");
+//	alert("s: "+JSON.stringigy($scope.component.current));
+//	alert("henji page end");
 	//成长过程
 	model.trace.getByCompId(getByCompId, 0, 3, function(d){
 		if(d){
