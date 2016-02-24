@@ -933,20 +933,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		};
 	})();
 	
+	function _androidBackButton() {
+		if ($rootScope.$location.path() == "/") {
+			tipmessage("再点击一次退出应用");
+			document.removeEventListener("backbutton", _androidBackButton, false);
+			$timeout(function() {
+				document.addEventListener("backbutton", _androidBackButton, false);
+			}, 3000);
+		} else $rootScope.$location.back();
+	}
+	
 	document.addEventListener("deviceready", function() {
-		var __backTimes = 0;
-		document.addEventListener("backbutton", function() {
-			if ($rootScope.$location.path() == "/") {
-				__backTimes++;
-				if (__backTimes > 1) {
-					__backTimes = 0;
-					//TODO: exit app
-				} else tipmessage("再点击一次退出应用");
-			} else {
-				__backTimes = 0;
-				$rootScope.$location.back();
-			}
-		}, false);
+		document.addEventListener("backbutton", _androidBackButton, false);
 	}, false);
 	
 	function _req(o,c) {
