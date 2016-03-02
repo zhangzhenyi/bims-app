@@ -28,6 +28,9 @@
         "cordova-plugin-network-information": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         },
+        "cordova-plugin-splashscreen": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
+        },
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         },

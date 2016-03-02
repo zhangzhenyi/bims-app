@@ -279,8 +279,8 @@ nav a.on span.i5,nav a:hover span.i5{ background: url(../img/nav-i5on.png) no-re
 .loginblock{width:270px;margin-left:auto;margin-right:auto;position:relative;top:-24px;}
 .loginblock .i-f{border:1px solid #e0dede;position:relative;border-radius:10px;height:48px;margin-bottom:10px;background:#fcfcfc;}
 .loginblock .i-f img{width:20px;height:20px;position:absolute;top:14px;left:14px;}
-.loginblock .i-f input{width:100%;font-size:18px;line-height:32px;color:#aba8a8;text-indent:45px;height:32px;border:none;margin-top:8px;}
-.loginblock .i-f input::-webkit-input-placeholder{font-size:18px; line-height:32px;}
+.loginblock .i-f input{font-size:18px;line-height:20px;color:#aba8a8;text-indent:0px;height:20px;border:none;margin-top:8px;width:80%;margin-left:45px;padding:6px 0}
+.loginblock .i-f input::-webkit-input-placeholder{font-size:18px; line-height:20px;}
 
 .ztblock{width:200px;position:relative;height:10px;margin-left:auto;margin-right:auto;background:#f5f5f5;margin-top:40px;}
 .ztblock .jj,.ztblock .zy,.ztblock .pt{ background:#f5f5f5; width:35px; height:35px; position:absolute; display:block; font-size: 14px; line-height: 35px; color: #5f7f97; text-align: center;border-radius:35px;}
@@ -393,8 +393,8 @@ nav a.on span.i5,nav a:hover span.i5{ background: url(../img/nav-i5on.png) no-re
 .list-2015-1-11 .r{padding:0;padding-left:70px;display:block;min-height:62px;}
 .list-2015-1-11 span.i{width:60px;height:60px;margin-right:5px;display:block;position:absolute;left:10px;top:10px;}
 .list-2015-1-11 span.i img{width:100%;}
-.list-2015-1-11 span.title{display:block;font-size:16px;line-height:20px;font-weight:bold;color:#333;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; position:absolute; top:20px; right:10px;}
-.list-2015-1-11 span.txt{display:block;font-size: 14px; line-height:18px; color: #969696;margin-bottom:3px; margin-top:10px;}
+.list-2015-1-11 span.title{display:block;font-size:16px;line-height:20px;font-weight:bold;color:#333;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; position:absolute; top:20px; right:10px;width:120px;}
+.list-2015-1-11 span.txt{display:block;font-size: 14px; line-height:18px; color: #969696;margin-bottom:3px; margin-top:10px;margin-right:130px;}
 .list-2015-1-11 span.time{display:block;font-size: 12px; line-height: 16px;color: #c7c7c7;position:absolute; width:95%; left:0; bottom:5px; padding-left:10px;}
 .list-2015-1-11 span.time span.name{display: inline-block;font-size: 14px;line-height: 16px;position:absolute;right:0;top:0;}
 .list-2015-1-11 span.time span.c1{display: inline-block;color: #a2d9ff;font-size: 14px;line-height: 18px;position:absolute;right:0;top:-2px;padding-left:8px;padding-right:8px;border:1px solid #b7d4e6;border-radius:5px;}
@@ -417,6 +417,8 @@ nav a.on span.i5,nav a:hover span.i5{ background: url(../img/nav-i5on.png) no-re
 .list3-2015-1-11{ overflow:hidden; padding:10px;}
 .list3-2015-1-11 li{ width:50%;float:left; }
 .list3-2015-1-11 li .pic{ display:block;border:1px solid #d4d4d4;margin-right:5px; margin-bottom:5px;padding-bottom: 5px;}
+.list3-2015-1-11 li .pic span{display:block;width:94%;margin:5px auto;border-radius:5px;height:150px;overflow:hidden;background:#fff;}
+
 .list3-2015-1-11 li .mr{margin-right:0px;}
-.list3-2015-1-11 li .pic img{ display:block; width:130px; margin:5px auto; border-radius:5px;}
+.list3-2015-1-11 li .pic img{ display:block;width:100%;}
 .list3-2015-1-11 li .pic .title{ color:#2f3130; text-align:center; font-size:14px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; padding:0 5px;}

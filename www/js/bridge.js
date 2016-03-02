@@ -837,7 +837,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	};
 }])
 .factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute) {
-	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
+//	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
+	var _host = "http://120.24.99.94", _path="/bims", _base = _host + _path + "/rest/", _sessionId;
+	
 	function _fn() {
 		$.get( _base + 'login/createToken.jo' + (_sessionId ? ";jsessionid=" + _sessionId : ""), function(data) {
 			_sessionId = data;
@@ -863,7 +865,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		return (new Date(time)).format("yyyy-MM-dd");
 	};
 	
-	$rootScope.origionVersion = "0.0.4.0109_beta";
+	$rootScope.origionVersion = "1.3.0";
 	$rootScope.hasChecked = false;
 	$rootScope.autoUpdateOnWiffi = false;
 	$rootScope.Constants = {
@@ -903,7 +905,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	$rootScope.issues = {};
 	$rootScope.issue = {};
 	$rootScope.onepage = {id: "about"};
-	$rootScope.sousuo = {canExit: false};
 
 	$rootScope.setting ={
 			installer : "",
@@ -936,17 +937,24 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	
 	function _androidBackButton() {
 		var p = $rootScope.$location.path();
-		if (p == "/" || p == "/login" || p == "/henji" || (p == "/sousuo" &&  $rootScope.sousuo.canExit)|| p == "/wode" || p == "/faxian") {
+		if (p == "/" || p == "/login" || p == "/henji" || (p == "/sousuo" &&  $rootScope.files.parentId <= 1) || p == "/wode" || p == "/faxian") {
 			tipmessage("再点击一次退出应用");
 			document.removeEventListener("backbutton", _androidBackButton, false);
 			$timeout(function() {
 				document.addEventListener("backbutton", _androidBackButton, false);
 			}, 3000);
-		} else $rootScope.$location.back();
+		} else {
+			if (p == "/sousuo") $rootScope.files.parentId = $rootScope.files.current.parentId;
+			$rootScope.$location.back();
+		}
 	}
 	
 	document.addEventListener("deviceready", function() {
 		document.addEventListener("backbutton", _androidBackButton, false);
+		if($window.navigator){
+			navigator.splashscreen.hide();
+		}
+		
 	}, false);
 	
 	function _req(o,c) {
@@ -2653,7 +2661,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 .controller("cOnePage", ["$scope", "model", function($scope, model) {
 	model.getOnePage(function(d) {
 		$scope.title = d.title;
-		$scope.content = d.content.replace(/img src="\/bims-test/g, "img src=\"" + model.base());
+		$scope.content = d.content.replace(/img src="\/bims-test/g, "img src=\"" + model.base())
+		.replace(/img src="\/bims/g, "img src=\"" + model.base());
 	});
 }])
 .controller("cNews", ["$scope", "model", function($scope, model) {
@@ -3340,7 +3349,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			$scope.items = d.dirList.concat(d.filesList);
 		}
 	});
-	$scope.sousuo.canExit = ($scope.files.parentId <= 1);
 	angular.extend($scope, {
 		backClick: function() {
 			$scope.files.parentId = $scope.files.current.parentId;
