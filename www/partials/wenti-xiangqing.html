@@ -11,7 +11,7 @@
 	<ul>
 		<li ng-show="issueItem.issueStatus == 1 && user.id == issueItem.publisherId"><a href="" ng-click="$location.path('/issue-edit')" ><img src="img/icon-edit201512.png"/> 编辑</a></li>
 		<li ng-show="user.id == issueItem.publisherId"><a href="javascript:void(0))" id="del" ><img src="img/icon-del201512.png"/> 删除</a></li>
-		<li ng-show="issueItem.issueStatus == 1"><a href="" ng-click="$location.path('/issue-handle')" ><img src="img/icon-m201512.png"/> 处理</a></li>
+		<li ng-show="issueItem.issueStatus == 1 || issueItem.issueStatus == 5"><a href="" ng-click="$location.path('/issue-handle')" ><img src="img/icon-m201512.png"/> 处理</a></li>
 		<li ng-if="issueItem.issueStatus == 2"><a href="" ng-click="$location.path('/issue-check')" ><img src="img/icon-m201512.png"/> 验收</a></li>
 		
 	</ul>
