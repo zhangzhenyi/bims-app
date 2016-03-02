@@ -871,6 +871,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	$rootScope.Constants = {
 			ISSUETYPE_QUALITY:1,
 			ISSUETYPE_SECURITY:2,
+			ISSUETYPE_MATERIAL:3,
 			TOPICTYPE_NOTICE:1,
 			TOPICTYPE_HOTFOCUS:2,
 			TOPICTYPE_NEWS:7,
@@ -886,6 +887,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			ISSUESTATUS_HANDLED:2,//已处理
 			ISSUESTATUS_ACCEPTED:3,//已验收
 			ISSUESTATUS_HOUSEKEEP:4,//已存档
+			ISSUESTATUS_REFUSED:5,//验收未通过，重新处理
 			ATTACHMENTTYPE_COMMON:1,
 			ATTACHMENTTYPE_PICTURE:2,
 			ATTACHMENTTYPE_VIDEO:3,
@@ -3128,13 +3130,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				$scope.remain = 150 - $scope.issueItem.acceptDesc.length;
 			}
 		},
-		submit: function(i){
+		submit: function(s){
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
 			var _item = {
 					id: $scope.issueItem.id,
+					isAcceptStatus: s,
 					acceptDesc:$scope.issueItem.acceptDesc
 			};
 			model.issues.acceptIssues(_item, function(d) {
@@ -3288,6 +3291,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	//Set the issue number of per section
 	$scope.issues.currentIssueType = $scope.Constants.ISSUETYPE_SECURITY;
 	model.sect.list($scope.Constants.ISSUETYPE_SECURITY, 0, function(d) {
+		if(d) $scope.sect.data = d;
+	});
+	//****************************************
+	$scope.sectClick = function(s) {
+		$scope.issues.currentSectId = s;
+		$scope.$location.path("/issueList");
+	};
+}])
+.controller("cIssusSect3", ["$scope", "model", function($scope, model){
+	//Set the issue number of per section
+	$scope.issues.currentIssueType = $scope.Constants.ISSUETYPE_MATERIAL;
+	model.sect.list($scope.Constants.ISSUETYPE_MATERIAL, 0, function(d) {
 		if(d) $scope.sect.data = d;
 	});
 	//****************************************
@@ -4634,6 +4649,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	.when("/issues-feedback-safe", {
 		templateUrl: "partials/wentifankui.html",
 		controller: "cIssusSect2"
+	})
+	.when("/issues-feedback-material", {
+		templateUrl: "partials/wentifankui.html",
+		controller: "cIssusSect3"
 	})
 	.when("/issueList", {
 		templateUrl: "partials/wenti-list.html",
