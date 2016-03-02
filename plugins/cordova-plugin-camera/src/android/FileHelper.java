@@ -79,29 +79,38 @@ public class FileHelper {
     @SuppressLint("NewApi")
     public static String getRealPathFromURI_API19(Context context, Uri uri) {
         String filePath = "";
-        try {
-            String wholeID = DocumentsContract.getDocumentId(uri);
-
-            // Split at colon, use second item in the array
-            String id = wholeID.indexOf(":") > -1 ? wholeID.split(":")[1] : wholeID.indexOf(";") > -1 ? wholeID
-                    .split(";")[1] : wholeID;
-
-            String[] column = { MediaStore.Images.Media.DATA };
-
-            // where id is equal to
-            String sel = MediaStore.Images.Media._ID + "=?";
-
-            Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, column,
-                    sel, new String[] { id }, null);
-
-            int columnIndex = cursor.getColumnIndex(column[0]);
-
-            if (cursor.moveToFirst()) {
-                filePath = cursor.getString(columnIndex);
-            }
-            cursor.close();
-        } catch (Exception e) {
-            filePath = "";
+        if (DocumentsContract.isDocumentUri(context, uri)) {
+	        try {
+	            String wholeID = DocumentsContract.getDocumentId(uri);
+	
+	            // Split at colon, use second item in the array
+	            String id = wholeID.indexOf(":") > -1 ? wholeID.split(":")[1] : wholeID.indexOf(";") > -1 ? wholeID
+	                    .split(";")[1] : wholeID;
+	
+	            String[] column = { MediaStore.Images.Media.DATA };
+	
+	            // where id is equal to
+	            String sel = MediaStore.Images.Media._ID + "=?";
+	
+	            Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, column,
+	                    sel, new String[] { id }, null);
+	
+	            int columnIndex = cursor.getColumnIndex(column[0]);
+	
+	            if (cursor.moveToFirst()) {
+	                filePath = cursor.getString(columnIndex);
+	            }
+	            cursor.close();
+	        } catch (Exception e) {
+	            filePath = "";
+	        }
+        } else {
+        	String[] projection = { MediaStore.Images.Media.DATA };
+        	Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        	int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        	cursor.moveToFirst();
+        	filePath = cursor.getString(column_index);
+        	cursor.close();
         }
         return filePath;
     }
