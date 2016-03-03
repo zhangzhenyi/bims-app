@@ -837,8 +837,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	};
 }])
 .factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute) {
-//	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
-	var _host = "http://120.24.99.94", _path="/bims", _base = _host + _path + "/rest/", _sessionId;
+	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
+//	var _host = "http://120.24.99.94", _path="/bims", _base = _host + _path + "/rest/", _sessionId;
 	
 	function _fn() {
 		$.get( _base + 'login/createToken.jo' + (_sessionId ? ";jsessionid=" + _sessionId : ""), function(data) {
