@@ -2585,7 +2585,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				}
 			},
 			transfer: function() {
-				var isIssue;
 				$scope.closeDetail();
 				$scope.current._status = "o2";
 				$scope.current._statusText = "上传中";
@@ -3137,7 +3136,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	        }
 			var _item = {
 					id: $scope.issueItem.id,
-					isAcceptStatus: s,
+					acceptStatus: s,
 					acceptDesc:$scope.issueItem.acceptDesc
 			};
 			model.issues.acceptIssues(_item, function(d) {
@@ -3400,7 +3399,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		    		  		tipmessage("获得构件信息");
 		    		  		$scope.component.current = d;
 //		    		  		alert("component : "+ JSON.stringigy($scope.component.current));
-		    		  		$scope.$location.path('/henji-scan')
+		    		  		$scope.$location.path('/henji-scan');
 		    		  	}else{
 			    		  	tipmessage("该构件编码不存在", "_notFoundCompId");
 		    		  	}
