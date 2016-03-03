@@ -89,7 +89,7 @@
 		<li class="first clearfix">
 			<img ng-src="{{::(issueItem.accepterAvatarUrl || 'img/i-xq-person.jpg')}}/" class="i-person"/>
 			<p class="name">{{::issueItem.accepterName}}</p><p class="time">{{::formatDate(issueItem.acceptTime)}}</p>
-			<span ng-show="issueItem.issueStatus==3"><b>已解决</b><i><img src="img/i-pass.png"/></i></span>
+			<span ng-show="issueItem.issueStatus==3 || issueItem.issueStatus==4"><b>已解决</b><i><img src="img/i-pass.png"/></i></span>
 			<b style="color:#fe4f4f;" ng-show="issueItem.issueStatus==5">验收未通过，重新处理</b>
 		</li>
 		<li class="clearfix">
