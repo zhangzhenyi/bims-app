@@ -2701,10 +2701,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 .controller("cIssues", ["$scope", "model", function($scope, model) {
 	var s = $scope.issues.currentSectId,
 	t = $scope.issues.currentIssueType,
-	lastLoaded = 0;
+	lastLoaded = -1;
 
 	angular.extend($scope, {
-		page: 1,
+		page: 0,
 		items: [],
 		myPublisherCat: 0,
 		filterChanged:false,
