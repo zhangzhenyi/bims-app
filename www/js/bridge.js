@@ -865,7 +865,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		return (new Date(time)).format("yyyy-MM-dd");
 	};
 	
-	$rootScope.origionVersion = "1.3.0";
+	$rootScope.origionVersion = "0.0.4.0109_beta";
+//    $rootScope.origionVersion = "1.3.0";
 	$rootScope.hasChecked = false;
 	$rootScope.autoUpdateOnWiffi = false;
 	$rootScope.Constants = {
@@ -2774,9 +2775,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	model.issues.getIssue(id, function(d) {
 		if(d) {
 			$scope.issueItem = d;
-		    var issueCats = ["制度／方案缺陷","交底培训缺陷","有章不循"];
-		    if($scope.issueItem.issueCategory >0 && $scope.issueItem.issueCategory <4){
-		    	$scope.issueItem.issueCategoryRemark = issueCats[$scope.issueItem.issueCategory-1]; 
+		    var issueCats = ["制度／方案缺陷","交底培训缺陷","有章不循","未识别的危险源"];
+			
+		    if($scope.issueItem.issueCategory >= 0 && $scope.issueItem.issueCategory <4){
+		    	$scope.issueItem.issueCategoryRemark = issueCats[$scope.issueItem.issueCategory]; 
+		    }
+		    if($scope.issueItem.handleProcessList.length > 0)
+		    for(w in $scope.issueItem.handleProcessList){
+//		    	alert(JSON.stringify($scope.issueItem.handleProcessList[w]));
+		    	if($scope.issueItem.handleProcessList[w].issueCategory >= 0 && 
+		    			$scope.issueItem.handleProcessList[w].issueCategory <4){
+		    		$scope.issueItem.handleProcessList[w].issueCategoryRemark = issueCats[$scope.issueItem.handleProcessList[w].issueCategory]; 
+			    }
 		    }
 
 		    $scope.voteMembers = (isBlankString($scope.issueItem.voteUsersX))?[]:$scope.issueItem.voteUsersX.split(",");

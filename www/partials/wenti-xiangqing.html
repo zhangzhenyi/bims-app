@@ -31,7 +31,7 @@
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-1.jpg"/>问题编号</span><span class="r">{{::issueItem.code}}</span>
 		</li>
-		<li class="clearfix">
+		<li class="clearfix"  ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
 			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span><span class="r">{{issueItem.location}}</span>
 		</li>
 		<li class="clearfix">
@@ -46,7 +46,7 @@
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r"><a ng-repeat="itemP in issueItem.issuePicAttachmentList" ng-click="fileClicked('相片', itemP.fileUrl)" href="" class="pic" ng-if="itemP.fileType==Constants.ATTACHMENTTYPE_PICTURE"><img ng-src="{{::(itemP.thumbnailUrl || 'img/tem-img/img-100100-1.jpg')}}"/></a></span>
 		</li>
-		<li class="clearfix">
+		<li class="clearfix"  ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
 			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r"><a ng-repeat="v in issueItem.issueVideoAttachmentList" ng-click="fileClicked('视频', v.fileUrl)" href="" target="_blank" class="pic"><img ng-src="{{::(v.thumbnailUrl || 'img/tem-img/img-100100-1.jpg')}}"/></a></span>
 		</li>
 		<li class="clearfix">
@@ -54,49 +54,54 @@
 		</li>
 	</ul>
 </section>
-
-<section class="mt10" ng-if="issueItem.issueStatus >= 2">
+<span ng-repeat="issueHandle in issueItem.handleProcessList track by issueHandle.id">
+<section class="mt10" ng-if="issueHandle.issueStatus >= 2">
 	<ul class="list-4">
 		<li class="first clearfix">
-			<img ng-src="{{::(issueItem.handlerAvatarUrl || 'img/i-xq-person.jpg')}}" class="i-person"/>
-			<p class="name">{{::issueItem.handlerName}}</p><p class="time">{{::formatDate(issueItem.publishTime)}}</p>
+			<img ng-src="{{::(issueHandle.handlerAvatarUrl || 'img/i-xq-person.jpg')}}" class="i-person"/>
+			<p class="name">{{::issueHandle.handlerName}}</p><p class="time">{{::formatDate(issueHandle.handledTime)}}</p>
 			<b>已解决</b><i><img src="img/i-pass.png"/></i>
 		</li>
 		<li class="clearfix">
-			<span class="l1"><img src="img/i-xq-12.jpg"/>整改落实<br/>情况</span><span class="r">{{::issueItem.handleDesc}}</span>
+			<span class="l1"><img src="img/i-xq-12.jpg"/>整改落实<br/>情况</span><span class="r">{{::issueHandle.handleDesc}}</span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r"><a ng-repeat="itemH in issueItem.handlePicList" ng-click="fileClicked('相片', itemH.fileUrl)" href="" class="pic"><img ng-src="{{::(itemH.thumbnailUrl||'img/tem-img/img-100100-1.jpg')}}"/></a></span>
+			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r"><a ng-repeat="itemH in issueHandle.handlePicList" ng-click="fileClicked('相片', itemH.fileUrl)" href="" class="pic"><img ng-src="{{::(itemH.thumbnailUrl||'img/tem-img/img-100100-1.jpg')}}"/></a></span>
 		</li>
-		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r"><a ng-repeat="v in issueItem.handleVideoList" ng-click="fileClicked('视频', v.fileUrl)" href="" target="_blank" class="pic"><img ng-src="{{::(v.thumbnailUrl || 'img/tem-img/img-100100-1.jpg')}}"/></a></span>
+		<li class="clearfix" ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
+			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r"><a ng-repeat="v in issueHandle.handleVideoList" ng-click="fileClicked('视频', v.fileUrl)" href="" target="_blank" class="pic"><img ng-src="{{::(v.thumbnailUrl || 'img/tem-img/img-100100-1.jpg')}}"/></a></span>
 		</li>
-		<li class="clearfix">
-			<span class="l1"><img src="img/i-xq-8.jpg"/>人员教育<br/>情况</span><span class="r">{{::issueItem.lessonDesc}}</span>
+		<li class="clearfix" ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
+			<span class="l1"><img src="img/i-xq-8.jpg"/>人员教育<br/>情况</span><span class="r">{{::issueHandle.lessonDesc}}</span>
 		</li>
-		<li class="clearfix">
-			<span class="l1"><img src="img/i-xq-9.jpg"/>同类问题<br/>防治措施</span><span class="r">{{::issueItem.preventionDesc}}</span>
+		<li class="clearfix" ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
+			<span class="l1"><img src="img/i-xq-9.jpg"/>同类问题<br/>防治措施</span><span class="r">{{::issueHandle.preventionDesc}}</span>
 		</li>
-		<li class="clearfix">
+		<li class="clearfix" ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
 			<span class="l"><img src="img/i-xq-10.jpg"/>隐患类型</span>
-			<span class="r">{{::issueItem.issueCategoryRemark}}</span>
+			<span class="r">{{::issueHandle.issueCategoryRemark}}</span>
 		</li>
 	</ul>
 </section>
 
-<section class="mt10" ng-if="issueItem.issueStatus >= 3">
+<section class="mt10" ng-if="issueHandle.issueStatus >= 3">
 	<ul class="list-4">
 		<li class="first clearfix">
-			<img ng-src="{{::(issueItem.accepterAvatarUrl || 'img/i-xq-person.jpg')}}/" class="i-person"/>
-			<p class="name">{{::issueItem.accepterName}}</p><p class="time">{{::formatDate(issueItem.acceptTime)}}</p>
-			<span ng-show="issueItem.issueStatus==3"><b>已解决</b><i><img src="img/i-pass.png"/></i></span>
-			<b style="color:#fe4f4f;" ng-show="issueItem.issueStatus==5">验收未通过，重新处理</b>
+			<img ng-src="{{::(issueHandle.accepterAvatarUrl || 'img/i-xq-person.jpg')}}" class="i-person"/>
+			<p class="name">{{::issueHandle.accepterName}}</p><p class="time">{{::formatDate(issueHandle.acceptTime)}}</p>
+			<span ng-show="issueHandle.issueStatus==3"><b>已验收</b><i><img src="img/i-pass.png"/></i></span>
+			<span ng-show="issueHandle.issueStatus==5"> <b style="color:#fe4f4f;">重新处理</b><i></i></span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-11.jpg"/>验收意见</span><span class="r">{{::issueItem.acceptDesc}}</span>
+			<span class="l"><img src="img/i-xq-11.jpg"/>验收意见</span><span class="r">{{::issueHandle.acceptDesc}}</span>
 		</li>
 	</ul>
 </section>
+
+</span>
+
+
+
 
 <section class="mt10 mlr10">
 	<div class="clearfix snsblock"><a href="" class="c"><img src="img/i-commend.png"/>{{issueItem.totalCommentNum}} 评论</a>
