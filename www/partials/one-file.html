@@ -1,6 +1,7 @@
 <div class="pb75 pt60 ng-scope">
 <header class="bg1">
 	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<span class="nochoose"><a ng-href="{{::files.filepath}}" href="" target="_blank" download="{{::files.filename}}" style="color:#fff;">下载</a></span>
 	<p class="title">{{::files.filename}}</p>
 </header>
 	<section class="mt15 mlr10" ng-if="img">
