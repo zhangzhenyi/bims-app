@@ -452,6 +452,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					(c || angular.noop)(f.toURL());
 				}, _error);
 			}, _error);
+		},
+		download: function(source, name) {
+			if (_root) {
+				_root.getFile(name, {create: true, exclusive: false}, function(f) {
+					var ft = new FileTransfer();
+					ft.download(encodeURI(source), f.toURL(), function(entry) {
+						tipmessage("下载成功", entry.fullPath);
+					}, _error);
+				}, _error);
+			}
 		}
 	};
 }])
@@ -836,7 +846,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		save: _save
 	};
 }])
-.factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute) {
+.factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", "fileSystem", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute, fileSystem) {
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
 	function _fn() {
 		$.get( _base + 'login/createToken.jo' + (_sessionId ? ";jsessionid=" + _sessionId : ""), function(data) {
@@ -931,6 +941,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			parentId: 1,
 			getIcon: function(name, dir) {
 				return "img/" + (_icons[name] || (dir ? "icon-24" : "icon-11")) + ".png";
+			},
+			download: function(src, name) {
+				fileSystem.download(src, name);
 			}
 		};
 	})();
