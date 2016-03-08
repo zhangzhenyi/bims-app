@@ -424,12 +424,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				tipmessage("发生错误, Code:" + error.code, "erroTip");
 		}
 	}
-	
+	alert("file system");
 	if ($window.requestFileSystem) {
+		alert("file system requestFileSystem");
 		$window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
+			alert("fileSystem.root");
 			_root = fileSystem.root;
 			_root.getDirectory(_dirName, {create: true, exclusive: false}, function(dirEntry) {
 				_dir = dirEntry;
+				alert("fileSystem.dir");
 			}, _error);
 		}, _error);
 	}
@@ -455,12 +458,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		},
 		download: function(source, name) {
 			if (_root) {
+				tipmessage("保存图片中", "tip");
 				_root.getFile(name, {create: true, exclusive: false}, function(f) {
 					var ft = new FileTransfer();
 					ft.download(encodeURI(source), f.toURL(), function(entry) {
 						tipmessage("下载成功", entry.fullPath);
 					}, _error);
 				}, _error);
+			}else{
+				tipmessage("获取不到文件系统", "tip");
 			}
 		}
 	};
