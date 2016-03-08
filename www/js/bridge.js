@@ -452,16 +452,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					(c || angular.noop)(f.toURL());
 				}, _error);
 			}, _error);
-		},
-		download: function(source, name) {
-			if (_root) {
-				_root.getFile(name, {create: true, exclusive: false}, function(f) {
-					var ft = new FileTransfer();
-					ft.download(encodeURI(source), f.toURL(), function(entry) {
-						tipmessage("下载成功", entry.fullPath);
-					}, _error);
-				}, _error);
-			}
 		}
 	};
 }])
@@ -846,8 +836,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		save: _save
 	};
 }])
-.factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", "fileSystem", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute, fileSystem) {
+.factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute) {
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
+//	var _host = "http://120.24.99.94", _path="/bims", _base = _host + _path + "/rest/", _sessionId;
+	
 	function _fn() {
 		$.get( _base + 'login/createToken.jo' + (_sessionId ? ";jsessionid=" + _sessionId : ""), function(data) {
 			_sessionId = data;
@@ -874,6 +866,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	};
 	
 	$rootScope.origionVersion = "0.0.4.0109_beta";
+//    $rootScope.origionVersion = "1.3.0";
 	$rootScope.hasChecked = false;
 	$rootScope.autoUpdateOnWiffi = false;
 	$rootScope.Constants = {
@@ -941,9 +934,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			parentId: 1,
 			getIcon: function(name, dir) {
 				return "img/" + (_icons[name] || (dir ? "icon-24" : "icon-11")) + ".png";
-			},
-			download: function(src, name) {
-				fileSystem.download(src, name);
 			}
 		};
 	})();
@@ -964,6 +954,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	
 	document.addEventListener("deviceready", function() {
 		document.addEventListener("backbutton", _androidBackButton, false);
+		if($window.navigator){
+			navigator.splashscreen.hide();
+		}
+		
 	}, false);
 	
 	function _req(o,c) {
@@ -2669,7 +2663,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 .controller("cOnePage", ["$scope", "model", function($scope, model) {
 	model.getOnePage(function(d) {
 		$scope.title = d.title;
-		$scope.content = d.content.replace(/img src="\/bims-test/g, "img src=\"" + model.base());
+		$scope.content = d.content.replace(/img src="\/bims-test/g, "img src=\"" + model.base())
+		.replace(/img src="\/bims/g, "img src=\"" + model.base());
 	});
 }])
 .controller("cNews", ["$scope", "model", function($scope, model) {
@@ -2780,9 +2775,18 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	model.issues.getIssue(id, function(d) {
 		if(d) {
 			$scope.issueItem = d;
-		    var issueCats = ["制度／方案缺陷","交底培训缺陷","有章不循"];
-		    if($scope.issueItem.issueCategory >0 && $scope.issueItem.issueCategory <4){
-		    	$scope.issueItem.issueCategoryRemark = issueCats[$scope.issueItem.issueCategory-1]; 
+		    var issueCats = ["制度／方案缺陷","交底培训缺陷","有章不循","未识别的危险源"];
+			
+		    if($scope.issueItem.issueCategory >= 0 && $scope.issueItem.issueCategory <4){
+		    	$scope.issueItem.issueCategoryRemark = issueCats[$scope.issueItem.issueCategory]; 
+		    }
+		    if($scope.issueItem.handleProcessList.length > 0)
+		    for(w in $scope.issueItem.handleProcessList){
+//		    	alert(JSON.stringify($scope.issueItem.handleProcessList[w]));
+		    	if($scope.issueItem.handleProcessList[w].issueCategory >= 0 && 
+		    			$scope.issueItem.handleProcessList[w].issueCategory <4){
+		    		$scope.issueItem.handleProcessList[w].issueCategoryRemark = issueCats[$scope.issueItem.handleProcessList[w].issueCategory]; 
+			    }
 		    }
 
 		    $scope.voteMembers = (isBlankString($scope.issueItem.voteUsersX))?[]:$scope.issueItem.voteUsersX.split(",");
