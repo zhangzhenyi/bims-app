@@ -39,6 +39,9 @@
         },
         "cordova-plugin-splashscreen": {
             "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "org.devgeeks.Canvas2ImagePlugin": {
+            "PACKAGE_NAME": "com.bridgesoft.bims"
         }
     },
     "dependent_plugins": {}
