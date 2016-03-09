@@ -363,9 +363,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		link: function (scope, element, attrs) {
 			var _scale = 1, _translateX = 0, _translateY = 0, scale = "", translate = "";
 
-			touch.on(element, "touchstart", function(e) {
-				e.preventDefault();
-			});
 			touch.on(element, "pinchstart", function(e) {
 				_translateX = 0;
 				_translateY = 0;
@@ -407,7 +404,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				touch.off(element, "swiping");
 				touch.off(element, "pinch");
 				touch.off(element, "pinchstart");
-				touch.off(element, "touchstart");
 			});
 		}
 	};
@@ -3449,6 +3445,30 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			$scope.img = (ext == 'png' || ext == 'jpg' || ext == 'gif' || ext == 'jpeg' || $scope.files.filepath.indexOf("image/") > 0);
 			$scope.pdf = ext == 'pdf';
 			$scope.video = (ext == "mp4" || ext =="ogg" || ext == "3gp" || ext == "mov");
+			if ($scope.img) {
+				$scope.saveas = function(url) {
+					var img = new Image(), canvas = document.createElement("canvas"), imgData;
+					img.crossOrigin = "*" ;
+					img.onload = function() {
+						canvas.width = img.width;
+				        canvas.height = img.height;
+				        canvas.getContext("2d").drawImage(img, 0, 0);
+				        try {
+				        	imgData = canvas.toDataURL("image/jpeg", 1.0).replace(/data:image\/jpeg;base64,/,  "");
+				        	if (window.cordova) {
+				        		cordova.exec(function() {
+				        			tipmessage("下载成功");
+				        		}, function() {
+				        			tipmessage("下载失败");
+				        		}, "Canvas2ImagePlugin", "saveImageDataToLibrary", [imgData]);
+				        	}
+				        } catch(error) {
+				        	tipmessage("下载失败");
+				        }
+					};
+					img.src = url;
+				};
+			}
 		}
 		if ($scope.files.filename && $scope.files.filename.length > 8)
 			$scope.files.filename = $scope.files.filename.substring(0, 8) + " ...";
