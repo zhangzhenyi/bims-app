@@ -16,26 +16,31 @@
 		</li>
 		
 		<li class="clearfix">
+			<span class="l"><img src="img/icon-10.png"/>分配问题到人</span>
+			<span class="r"><my-chosen placeholder="选择人员..." ng-model="newIssue.at" data="user.list" text="name" value="username"></my-chosen></span>
+		</li>
+		
+		<li class="clearfix">
 			<span class="l" ng-if="newIssue.issueType != Constants.ISSUETYPE_MATERIAL">
 			<img src="img/icon-23.png"/>标题</span>
 			<span class="l" ng-if="newIssue.issueType == Constants.ISSUETYPE_MATERIAL">
 			<img src="img/icon-23.png"/>资料名称</span>
-			<span class="r"><input ng-model="newIssue.issueTitle"  type="text" class="fromtxt" placeholder="点此输入" required ng-maxlength="50" maxlength="50"/></span>
+			<span class="r"><input ng-model="newIssue.issueTitle"  type="text" class="fromtxt" placeholder="点此输入" required="required" ng-maxlength="50" maxlength="50"/></span>
 		</li>
 		
 		<li class="clearfix"  ng-if="newIssue.issueType != Constants.ISSUETYPE_MATERIAL">
-			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span><span class="r"><input ng-model="newIssue.location"  type="text" class="fromtxt" placeholder="点此输入" required ng-maxlength="50" maxlength="50"/></span>
+			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span><span class="r"><input ng-model="newIssue.location"  type="text" class="fromtxt" placeholder="点此输入" required="required" ng-maxlength="50" maxlength="50"/></span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-3.jpg"/>问题描述</span>
 			<span class="r"><label for="issueDesc" ng-model="issueDescTip"  style="color:#aaa;">您还可输入{{remain}}个字符</label>
-			<textarea ng-model="newIssue.issueDesc" id="issueDesc" cols="" rows="" class="fromarea" ng-change="changed()" placeholder="点此输入" required ng-maxlength="150" maxlength="150">
+			<textarea ng-model="newIssue.issueDesc" id="issueDesc" cols="" rows="" class="fromarea" ng-change="changed()" placeholder="点此输入" required="required" ng-maxlength="150" maxlength="150">
 			</textarea></span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-4.jpg"/>整改要求</span><span class="r">
 			<label for="issueRectification" ng-model="issueRectifyTip" style="color:#aaa;">您还可输入{{remain1}}个字符</label>
-			<textarea ng-model="newIssue.issueRectification" id="issueRectification" cols="" rows="" class="fromarea" placeholder="" ng-change="changed()" placeholder="点此输入" required ng-maxlength="150" maxlength="150"></textarea></span>
+			<textarea ng-model="newIssue.issueRectification" id="issueRectification" class="fromarea" ng-change="changed()" placeholder="点此输入" required="required" maxlength="150"></textarea></span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r pr"><span ng-repeat="pic in newIssue.issuePicAttachmentList" class="pic" style="margin-right:5px;">
