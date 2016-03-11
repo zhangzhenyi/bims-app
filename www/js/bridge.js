@@ -983,6 +983,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	$rootScope.sect = {};
 	$rootScope.issues = {};
 	$rootScope.issue = {};
+	$rootScope.message = {};
 	$rootScope.onepage = {id: "about"};
 
 	$rootScope.setting ={
@@ -1220,6 +1221,38 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					method: "get",
 					url: "user/ list.jo"
 				},  angular.isFunction(c) ? c : angular.noop);
+			}
+		},
+		message:{
+			getAllMessage:function(c){
+				_req({
+					method: "get",
+					url: "message/getAllMessage.jo"
+				},  angular.isFunction(c) ? c : angular.noop);
+			},
+			loadMessage:function(n, c){
+				_req({
+					method: "get",
+					url: "message/loadMessagesByPageNum.jo",
+					params: {
+						pageNum : n
+					}
+				},  angular.isFunction(c) ? c : angular.noop);
+			},
+			readMessage:function(idstr, c){
+				_req({
+					method: "post",
+					url: "message/read.jo",
+					data: {
+						ids: idstr
+					}
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			getUnreadMessageCount:function(c){
+				_req({
+					method: "post",
+					url: "message/getUnreadMessages.jo"
+				}, angular.isFunction(c) ? c : angular.noop);
 			}
 		},
 		notice: {
@@ -3523,6 +3556,65 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		}
 	});
 }])
+.controller("cMessage", ["$scope", "model", function($scope, model){
+	
+	lastLoaded = -1;
+	
+	angular.extend($scope, {
+		items:[],
+		page:0,
+		load: function() {
+			if ($scope.page != lastLoaded) {
+				lastLoaded = $scope.page;
+				var msgIds = "";
+				model.message.loadMessage($scope.page, function(d) {
+					if (d && d.length > 0) {
+						for (var i = 0; i < d.length; i++){
+							$scope.items.push(d[i]);
+							if(d[i].read == 0){
+								if(msgIds.length <= 0){
+								}else{
+									msgIds += ",";
+								}
+								msgIds += d[i].id;
+							}
+							
+						}
+							
+						$scope.page++;
+					}
+				});
+				
+				if(msgIds.length > 0){
+					model.message.readMessage(msgIds, function(d){
+						if(d || false){
+							tipmessage("消息更新为已读");
+						}
+					});
+				}
+			}
+		},
+		jumpTo: function(item){
+			switch(item.type){
+			case "0101"://quality
+			case "0102"://Safe
+			case "0103"://Document
+				$scope.issues.currentIssue.id = item.refId;
+				$scope.$location.path('/issue-details');
+				break;
+			case "0201"://Task message
+				break;
+			case "0001":
+//				break;
+			default:
+				//jump to system	
+//				tipmessage("");
+			}
+		}
+	});
+	
+	
+}])
 .controller("cOneFile", ["$scope", "model", function($scope, model) {
 	if ($scope.files) {
 		if ($scope.files.filepath) {
@@ -4880,6 +4972,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	.when("/henji-scan", {
 		templateUrl: "partials/henji-scan.html",
 		controller: "cHenjiScan"
+	})
+	.when("/message-list", {
+		templateUrl: "partials/message-list.html",
+		controller: "cMessage"
 	})
 	.otherwise({
         redirectTo: "/"
