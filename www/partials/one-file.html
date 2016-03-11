@@ -5,7 +5,7 @@
 	<p class="title">{{::files.filename}}</p>
 </header>
 	<section class="mt15 mlr10" ng-if="img">
-		<img ng-src="{{::files.filepath}}" title="{{::files.filename}}" style="width:100%;" my-touch-zoom/>
+		<img ng-src="{{::files.filepath}}" title="{{::files.filename}}" style="width:100%;" my-touch-zoom=""/>
 	</section>
 	<section class="mt15" ng-if="pdf">
 		<my-pdf src="files.filepath"></my-pdf>

@@ -212,6 +212,29 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		    return value + (tail || ' …');
 	  };
 }])
+.directive("myChosen", ["$timeout", function($timeout) {
+	return {
+		restrict: "AE",
+		transclude: true,
+		replace: true,
+		template: "<select multiple='multiple' class='my-select-class'></select>",
+		compile: function(t, a) {
+			t.attr("placeholder", a.placeholder).SumoSelect({
+				csvDispCount: 4,
+				triggerChangeCombined : true,
+				search: true,
+				searchText: "Enter here"
+			});
+			return {
+				post: function(scope) {
+					scope.addOption = function(value, text) {
+						t[0].sumo.add(value, text);
+					};
+				}
+			};
+		}
+	};
+}])
 .directive("myRadialIndicator", ["$parse", function($parse) {
 	return {
 		restrict: "AE",
@@ -965,7 +988,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		$http(o)
 		.success(function(d) {
 			$rootScope.loading = false;
-			c(d);
+			c(d || {});
 		})
 		.error(function() {
 			$rootScope.loading = false;
@@ -2734,10 +2757,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 .controller("cIssues", ["$scope", "model", function($scope, model) {
 	var s = $scope.issues.currentSectId,
 	t = $scope.issues.currentIssueType,
-	lastLoaded = -1;
+	lastLoaded = 0;
 
 	angular.extend($scope, {
-		page: 0,
+		page: 1,
 		items: [],
 		myPublisherCat: 0,
 		filterChanged:false,
@@ -3144,8 +3167,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				model.issues.create(item, function(d) {
 					if (d) {
 						changeTipmessage("创建成功",id="tipimg");
-			model.removeFiles($scope.newIssue.issuePicAttachmentList.concat($scope.newIssue.issueVideoAttachmentList));
-
+						model.removeFiles($scope.newIssue.issuePicAttachmentList.concat($scope.newIssue.issueVideoAttachmentList));
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
