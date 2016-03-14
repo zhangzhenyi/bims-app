@@ -1222,7 +1222,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			list: function(c) {
 				_req({
 					method: "get",
-					url: "user/ list.jo"
+					url: "user/list.jo"
 				},  angular.isFunction(c) ? c : angular.noop);
 			}
 		},
@@ -1856,7 +1856,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
         	return;
         }
 		model.user.login($scope.username, $scope.password, function(d) {
-			if (d) {
+			if (d && d.id) {
 				$scope.user.original = d;
 				if (window.localStorage) {
 					localStorage["username"] = $scope.username;
@@ -3620,8 +3620,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			case "0101"://quality
 			case "0102"://Safe
 			case "0103"://Document
-				$scope.issues.currentIssue.id = item.refId;
-				$scope.$location.path('/issue-details');
+//				$scope.issues.currentIssue.id = item.refId;
+				$scope.issues.currentIssue = {id:item.refId};
+				$scope.$location.path("/issue-details");
 				break;
 			case "0201"://Task message
 				break;

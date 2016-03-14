@@ -10,9 +10,9 @@
 <section class="mt15" my-scroll="load()">
 	<ul class="list-2">
 		<li ng-repeat="item in items track by item.id">
-			<a ng-click="messageClick(item)" href="">
+			<a ng-click="jumpTo(item)" href="">
 			<span class="clearfix">
-				<i><img src="img/i-pass.png"/></i>
+				<i><img src="img/icon-10.png"/></i>
 				{{::item.title}}
 		<!-- 	<strong class="no" ng-show="item.issueStatus== {{::Constants.ISSUESTATUS_PUBLISHED}}">{{::item.issueStatusDescStr}}</strong> -->
 				<strong class="yes" ng-show="item.read == 1">已读</strong>
