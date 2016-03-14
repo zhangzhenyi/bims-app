@@ -1,0 +1,44 @@
+
+<div class="pb75 pt60 ng-scope">
+<!--header-->
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">我的消息</p>
+	
+</header>
+
+<section class="mt15" my-scroll="load()">
+	<ul class="list-2">
+		<li ng-repeat="item in items track by item.id">
+			<a ng-click="messageClick(item)" href="">
+			<span class="clearfix">
+				<i><img src="img/i-pass.png"/></i>
+				{{::item.title}}
+		<!-- 	<strong class="no" ng-show="item.issueStatus== {{::Constants.ISSUESTATUS_PUBLISHED}}">{{::item.issueStatusDescStr}}</strong> -->
+				<strong class="yes" ng-show="item.read == 1">已读</strong>
+				<strong class="pass" ng-show="item.read == 2">未读</strong>
+				<span class="txt">{{::item.content}}</span>
+			</span>
+			<span class="mt3 clearfix">
+				<span class="name">来自：{{::item.sender}}</span>
+				<span class="time">{{::formatDate(item.sendDate)}}</span>
+			</span>
+			</a>
+		</li>
+		
+	</ul>
+</section>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	searchtool();
+	$(".tabnav1 li a").click(function(){
+		$(".tabnav1 li a").removeClass("on");
+		$(this).addClass("on");
+		$(".loading").fadeIn();
+		setTimeout(function(){$(".loading").fadeOut();},3000);		//切换数据，loading显示，完成消失
+	})
+})
+</script>
+
+</div>
