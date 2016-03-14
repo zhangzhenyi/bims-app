@@ -1222,7 +1222,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			list: function(c) {
 				_req({
 					method: "get",
-					url: "user/ list.jo"
+					url: "user/list.jo"
 				},  angular.isFunction(c) ? c : angular.noop);
 			}
 		},
