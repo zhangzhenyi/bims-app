@@ -1752,7 +1752,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					model.message.getUnreadMessageCount(function(d){
 						if(d && d.code == 0 ){
 							$rootScope.messages.unreadCount = d.resultNum;
-							$rootScope.messages.unreadCount = 1;
+//							$rootScope.messages.unreadCount = 1;
 						}
 //						tipmessage("Message number "+$rootScope.messages.unreadCount);
 					});
