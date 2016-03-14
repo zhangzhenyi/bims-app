@@ -13,6 +13,7 @@
 	<a ng-click="$location.path('/henji', true)" href="" class="{{status[1]}}"><span class="i2"></span>痕迹</a>
 	<a ng-click="$location.path('/', true)" href="" class="{{status[2]}}"><span class="i3"></span>首页</a>
 	<a ng-click="$location.path('/faxian', true)" href="" class="{{status[3]}}"><span class="i4"></span>发现</a>
-	<a ng-click="$location.path('/wode', true)" href="" class="{{status[4]}}"><span class="i5"></span>个人</a>
+	<a ng-click="$location.path('/wode', true)" href="" class="{{status[4]}}"><span class="i5">
+	<span style="background-color:rgba(256,0,0,0.8); border-radius:10px;color:#FFF;width:20px;height:20px;text-align:center;margin-left:15px;margin-bottom:10px;">{{$root.messages.unreadCount}}</span></span>个人</a>
 </nav>
 </div>

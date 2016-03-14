@@ -927,7 +927,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	$rootScope.sect = {};
 	$rootScope.issues = {};
 	$rootScope.issue = {};
-	$rootScope.message = {};
+	$rootScope.messages = {
+		unreadCount:0
+	};
+
 	$rootScope.onepage = {id: "about"};
 
 	$rootScope.setting ={
@@ -1189,7 +1192,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			},
 			getUnreadMessageCount:function(c){
 				_req({
-					method: "post",
+					method: "get",
 					url: "message/getUnreadMessages.jo"
 				}, angular.isFunction(c) ? c : angular.noop);
 			}
@@ -1737,11 +1740,28 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 						});
 						_transfers = {};
 					}
+					
+					
 				}
 			}, attrs.interval ? parseInt(attrs.interval) : 2000, 0, false);
 			
+			var idMsg =  $interval(function() {
+				if($rootScope.user && $rootScope.user.name) {
+					//检查是否有未读消息
+//					tipmessage("检查消息");
+					model.message.getUnreadMessageCount(function(d){
+						if(d && d.code == 0 ){
+							$rootScope.messages.unreadCount = d.resultNum;
+							$rootScope.messages.unreadCount = 1;
+						}
+//						tipmessage("Message number "+$rootScope.messages.unreadCount);
+					});
+				}
+			}, 10000, 0, false);
+			
 			scope.$on("$destroy", function() {
 				$interval.cancel(id);
+				$interval.cancel(idMsg);
 			});
 		}
 	};
@@ -1845,6 +1865,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	}
 	else $rootScope.autoUpdateOnWiffi = false;
 	
+//	$scope.messages.unreadCount = $rootScope.messages.unreadCount;
 	angular.extend($scope, {
 		items: [],
 		itemClass: function(item) {
