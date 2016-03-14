@@ -212,30 +212,86 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		    return value + (tail || ' …');
 	  };
 }])
-.directive("myChosen", ["$timeout", function($timeout) {
+.directive("myChosen", ["$parse", "$timeout", function($parse, $timeout) {
 	return {
 		restrict: "AE",
 		transclude: true,
 		replace: true,
-		template: "<select multiple='multiple' class='my-select-class'></select>",
+		template: "<select multiple='multiple'></select>",
 		compile: function(t, a) {
 			t.attr("placeholder", a.placeholder).SumoSelect({
 				csvDispCount: 4,
-				triggerChangeCombined : true,
 				search: true,
-				searchText: "Enter here"
+				searchText: a.placeholder,
+				okCancelInMulti: true,
+				triggerChangeCombined : true,
+				forceCustomRendering: true,
+				locale: ['确定', '取消', '全选']
 			});
+
+			function _getSelected() {
+				var r = new Array();
+				angular.element("option:selected", t[0]).each(function() {
+					r.push(angular.element(this).val());
+				});
+				return r.join(",");
+			}
+			
+			function _setSelected(s) {
+				var a = angular.isString(s) ? s.split(",") : (angular.isArray(s) ? s : []), opts = t[0].options, i, j, b;
+				for (j = 0; j < opts.length; j++) {
+					b = false;
+					for(i = 0; i < a.length; i++) {
+						if (a[i] == angular.element(opts[j]).val()) {
+							t[0].sumo.selectItem(j);
+							b = true;
+							break;
+						}
+					}
+					if (!b) t[0].sumo.unSelectItem(j);
+				}
+			}
+			
 			return {
-				post: function(scope) {
-					scope.addOption = function(value, text) {
-						t[0].sumo.add(value, text);
+				pre:  function(scope, element, attrs) {
+					if (attrs.data) {
+						$timeout(function() {
+							var a = ($parse(attrs.data))(scope), i, n = attrs.text || "text", v = attrs.value || "value";
+							if (angular.isArray(a)) {
+								for (i = 0; i < a.length; i++)
+									t[0].sumo.add((a[i])[v], (a[i])[n]);
+							}
+						});
+					}
+					scope.setSelected = function(s) {
+						$timeout(function() {
+							_setSelected(s);
+						});
 					};
+				},
+				post: function(scope, element, attrs) {
+					if (attrs.ngModel) {
+						$timeout(function() {
+							var m = $parse(attrs.ngModel);
+							_setSelected(m(scope) || "");
+							if ("true" == attrs.disable) t[0].sumo.disable();
+							else {
+								angular.element(t[0]).bind("change", function() {
+									(m.assign)(scope, _getSelected());
+								});
+							}
+						});
+					}
+					scope.$on("$destroy", function() {
+						angular.element(t[0]).unbind("change");
+						t[0].sumo.unload();
+					});
 				}
 			};
 		}
 	};
 }])
-.directive("myRadialIndicator", ["$parse", function($parse) {
+.directive("myRadialIndicator", function() {
 	return {
 		restrict: "AE",
 		transclude: true,
@@ -276,7 +332,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			.appendTo(t);
 		}
 	};
-}])
+})
 .directive("myTouchRemove", ["$window", "$document", "$parse", function($window, $document, $parse) {
 	var _selected,
 	_bk = angular.element("<div></div>").css({
@@ -981,7 +1037,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		if($window.navigator){
 			navigator.splashscreen.hide();
 		}
-		
 	}, false);
 	
 	function _req(o,c) {
@@ -1162,6 +1217,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				_req({
 					method: "get",
 					url: "login/getAllDepartment.jo"
+				},  angular.isFunction(c) ? c : angular.noop);
+			},
+			list: function(c) {
+				_req({
+					method: "get",
+					url: "user/ list.jo"
 				},  angular.isFunction(c) ? c : angular.noop);
 			}
 		},
@@ -1807,6 +1868,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				$scope.user.roles = (d.roles || {}).name || "App游客";
 				$scope.user.id = d.id;
 				$scope.$location.path("/");
+				
+				model.user.list(function(d) {
+					if (d) $scope.user.list = d;
+				});
 			} else {
 				tipmessage("无效的用户名和密码。", "invalidUP");
 			}
@@ -2852,6 +2917,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	model.issues.getIssue(id, function(d) {
 		if(d) {
 			$scope.issueItem = d;
+			$scope.setSelected($scope.issueItem.at);
 		    var issueCats = ["制度／方案缺陷","交底培训缺陷","有章不循","未识别的危险源"];
 			
 		    if($scope.issueItem.issueCategory >= 0 && $scope.issueItem.issueCategory <4){
@@ -2991,13 +3057,17 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	};
 }])
 .controller("cIssueEdit", ["$scope", "model", "$timeout","transferCache", function($scope, model, $timeout, transferCache){
-	$scope.newIssue = {
-	};
+	model.issues.getIssue($scope.issues.currentIssue.id, function(d) {
+		if(d) {
+			$scope.newIssue = d;
+			$scope.setSelected($scope.newIssue.at);
+			$scope.newIssue.topicType = 3;
+			$scope.changed();
+		}
+	});
 	$scope.tipVisibility = "none";
-	
 	$scope.remain= 150;
 	$scope.remain1= 150;
-	
 	$scope.changed = function() {
 		if($scope.newIssue.issueDesc!= null){
 			$scope.remain = 150 - $scope.newIssue.issueDesc.length;
@@ -3005,18 +3075,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		if($scope.newIssue.issueRectification!= null){
 			$scope.remain1 = 150 - $scope.newIssue.issueRectification.length;
 		}
-		
 	};
-	//Get issue data
-	var id = $scope.issues.currentIssue.id;
-	model.issues.getIssue(id, function(d) {
-		if(d) {
-			$scope.newIssue = d;
-			$scope.newIssue.topicType = 3;
-			$scope.changed();
-		}
-	});
-	
+
 //	$scope.newIssue = $scope.issues.currentIssue;
 //	$scope.newIssue.deadlineTime = new Date($scope.newIssue.deadlineTime);
 //	$scope.issues.currentIssue.issuePicAttachmentList = $scope.issues.currentIssue.issuePicAttachmentList;
@@ -3036,7 +3096,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			fileUrl: uri,
 			thumbnailUrl: "img/icon-15.png"
 		});
-	};;
+	};
 		
 	$scope.removeImage= function(url) {
 		for (var i = 0; i < $scope.newIssue.issuePicAttachmentList.length; i++) {
@@ -3047,7 +3107,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				break;
 			}
 		}
-	},
+	};
 	$scope.removeVideo=function(url) {
 		for (var i = 0; i < $scope.newIssue.issueVideoAttachmentList.length; i++) {
 			if ($scope.newIssue.issueVideoAttachmentList[i].fileUrl == url) {
@@ -3057,33 +3117,34 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				break;
 			}
 		}
-	},
+	};
 		
-	$scope.save = function(i){
+	$scope.save = function(){
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
+			$scope.newIssue.at = $scope.newIssue.at.join();
 		transferCache.push($scope.newIssue, "issue","update");
 			tipmessage("保存成功");//是否需要返回值？
 			$timeout(function() {
 				$scope.$location.back();
 			}, 1000);
 	};
-	$scope.submit = function(i){
+	$scope.submit = function(){
 		if(!$scope.form.$valid){
         	tipmessage("请检查输入内容是否正确");
         	return;
         }
 		tipmessage1(message="上传文件中",id="tipimg");
-	
+		$scope.newIssue.at = $scope.newIssue.at.join();
 		model.uploadAttachments($scope.newIssue, function(item) {
-		changeTipmessage("开始创建","tipimg");
-		delete item.topicType;
+			changeTipmessage("开始创建","tipimg");
+			delete item.topicType;
 				model.issues.update(item, function(d) {
 					if (d) {
-			changeTipmessage("编辑成功”,”tipimg");
-	model.removeFiles($scope.newIssue.issuePicAttachmentList.concat($scope.newIssue.issueVideoAttachmentList));
+						changeTipmessage("编辑成功”,”tipimg");
+						model.removeFiles($scope.newIssue.issuePicAttachmentList.concat($scope.newIssue.issueVideoAttachmentList));
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
@@ -3092,18 +3153,17 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					}
 					closetipmessage1("tipimg");
 				});
-		});		
-		
+		});
 	};
 }])
 .controller("cIssueCreate", ["$scope", "model", "$timeout","transferCache", function($scope, model, $timeout,transferCache){
-	
 	function _upload(file, blob, c) {
 		var formData = new FormData();
 		formData.append("file", file);
 		formData.append("attachment", blob);
 		model.uploadFile("attachment/upload.jo", formData, c);
 	}
+	
 	$scope.newIssue = {
 		issuePicAttachmentList:[],
 		issueVideoAttachmentList:[],
@@ -3116,7 +3176,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		issueDesc:"",
 		important:3,
 		issueType : $scope.issues.currentIssueType,
-		sectionId : $scope.issues.currentSectId
+		sectionId : $scope.issues.currentSectId,
+		at: ""
 	};
 	
 	$scope.choiceImportant = function(i){
@@ -3163,28 +3224,31 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			}
 		},
 		
-	$scope.save = function(i){
+	$scope.save = function(){
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
 			tipmessage1(message="保存中",id="tipimg");
-		transferCache.push($scope.newIssue, "issue");
+			$scope.newIssue.at = $scope.newIssue.at.join();
+			transferCache.push($scope.newIssue, "issue");
 			changeTipmessage("保存成功",id="tipimg");
 			closetipmessage1("tipimg");
 			$timeout(function() {
 				$scope.$location.back();
 			}, 1000);
 	};
-	$scope.submit = function(i){
+	$scope.submit = function(){
 		if(!$scope.form.$valid){
         	tipmessage("请检查输入内容是否正确");
         	return;
         }
+		$scope.newIssue.at = $scope.newIssue.at.join();
 		tipmessage1(message="上传文件中",id="tipimg");
 		model.uploadAttachments($scope.newIssue, function(item) {
 			changeTipmessage("开始创建","tipimg");
 				delete item.topicType;
+				
 				model.issues.create(item, function(d) {
 					if (d) {
 						changeTipmessage("创建成功",id="tipimg");

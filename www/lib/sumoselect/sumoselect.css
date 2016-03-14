@@ -32,7 +32,7 @@
 
         .SumoSelect > .optWrapper > .options { list-style: none; display: block; padding: 0; margin: 0; overflow: auto; border-radius: 2px;position:relative;
          /*Set the height of pop up here (only for desktop mode)*/
-            max-height: 250px;
+            max-height: 150px;
              /*height*/ }
         .SumoSelect > .optWrapper > .options li.group.disabled > label{opacity:0.5;}
         .SumoSelect > .optWrapper > .options li ul li.opt{padding-left: 22px;}

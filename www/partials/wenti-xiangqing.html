@@ -30,12 +30,16 @@
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-1.jpg"/>问题编号</span><span class="r">{{::issueItem.code}}</span>
 		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/icon-10.png"/>分配问题到人</span>
+			<span class="r"><my-chosen placeholder="..." ng-model="issueItem.at" data="user.list" text="name" value="username" disable="true"></my-chosen></span>
+		</li>
 		<li class="clearfix"  ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
 			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span><span class="r">{{issueItem.location}}</span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-3.jpg"/>问题描述</span>
-			<span class="r"><textarea ng-model="issueItem.issueDesc" cols="" rows="" class="fromarea" readonly="true"/></span>
+			<span class="r"><textarea ng-model="issueItem.issueDesc" class="fromarea" readonly="true"></textarea></span>
 			
 		</li>
 		<li class="clearfix">
@@ -54,7 +58,7 @@
 	</ul>
 </section>
 <span ng-repeat="issueHandle in issueItem.handleProcessList track by issueHandle.id">
-<section class="mt10" ng-if="issueHandle.issueStatus >= 2">
+<section class="mt10" ng-if="issueHandle.issueStatus&gt;=2">
 	<ul class="list-4">
 		<li class="first clearfix">
 			<img ng-src="{{::(issueHandle.handlerAvatarUrl || 'img/i-xq-person.jpg')}}" class="i-person"/>
@@ -98,9 +102,6 @@
 </section>
 
 </span>
-
-
-
 
 <section class="mt10 mlr10">
 	<div class="clearfix snsblock"><a href="" class="c"><img src="img/i-commend.png"/>{{issueItem.totalCommentNum}} 评论</a>
