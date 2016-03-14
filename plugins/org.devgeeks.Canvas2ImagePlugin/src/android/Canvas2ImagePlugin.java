@@ -36,34 +36,36 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 			CallbackContext callbackContext) throws JSONException {
 
 		if (action.equals(ACTION)) {
-
-			String base64 = data.optString(0);
-			if (base64.equals("")) // isEmpty() requires API level 9
-				callbackContext.error("Missing base64 string");
-			
-			// Create the bitmap from the base64 string
-			Log.d("Canvas2ImagePlugin", base64);
-			byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
-			Bitmap bmp = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-			if (bmp == null) {
-				callbackContext.error("The image could not be decoded");
-			} else {
-				
-				// Save the image
-				File imageFile = savePhoto(bmp);
-				if (imageFile == null)
-					callbackContext.error("Error while saving image");
-				
-				// Update image gallery
-				scanPhoto(imageFile);
-				
-				callbackContext.success(imageFile.toString());
-			}
-			
+			cordova.getThreadPool().execute(new Runnable() {
+				@Override
+	            public void run() {
+					String base64 = data.optString(0);
+					if (base64.equals("")) // isEmpty() requires API level 9
+						callbackContext.error("Missing base64 string");
+					
+					// Create the bitmap from the base64 string
+					Log.d("Canvas2ImagePlugin", base64);
+					byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
+					Bitmap bmp = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+					if (bmp == null) {
+						callbackContext.error("The image could not be decoded");
+					} else {
+						
+						// Save the image
+						File imageFile = savePhoto(bmp);
+						if (imageFile == null)
+							callbackContext.error("Error while saving image");
+						
+						// Update image gallery
+						scanPhoto(imageFile);
+						
+						callbackContext.success(imageFile.toString());
+					}
+				}
+			});
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	private File savePhoto(Bitmap bmp) {
