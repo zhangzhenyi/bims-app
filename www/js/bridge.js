@@ -3665,7 +3665,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	
 	
 }])
-.controller("cOneFile", ["$scope", "model", function($scope, model) {
+.controller("cOneFile", ["$scope", "model","$timeout", function($scope, model, $timeout) {
 	if ($scope.files) {
 		if ($scope.files.filepath) {
 			var len = $scope.files.filepath.length - $scope.files.filepath.lastIndexOf(".") - 1;
@@ -3684,10 +3684,18 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				        try {
 				        	imgData = canvas.toDataURL("image/jpeg", 1.0).replace(/data:image\/jpeg;base64,/,  "");
 				        	if (window.cordova) {
+				        		tipmessage1("保存图片中...", "savePic");
 				        		cordova.exec(function() {
-				        			tipmessage("下载成功");
+				        			changeTipmessage("下载成功", "savePic");
+				        			$timeout(function() {
+				        				closetipmessage1("savePic");
+									}, 1000);
+				        			
 				        		}, function() {
-				        			tipmessage("下载失败");
+				        			changeTipmessage("下载失败", "savePic");
+				        			$timeout(function() {
+				        				closetipmessage1("savePic");
+									}, 1000);
 				        		}, "Canvas2ImagePlugin", "saveImageDataToLibrary", [imgData]);
 				        	}
 				        } catch(error) {
