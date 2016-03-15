@@ -221,6 +221,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		compile: function(t, a) {
 			t.attr("placeholder", a.placeholder).SumoSelect({
 				csvDispCount: 4,
+				floatWidth: 318,
 				search: true,
 				searchText: a.placeholder,
 				okCancelInMulti: true,
@@ -254,6 +255,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			
 			return {
 				pre:  function(scope, element, attrs) {
+					element.css("width", "100%");
+					angular.element(".SelectBox", element).css("width", "100%");
 					if (attrs.data) {
 						$timeout(function() {
 							var a = ($parse(attrs.data))(scope), i, n = attrs.text || "text", v = attrs.value || "value";
