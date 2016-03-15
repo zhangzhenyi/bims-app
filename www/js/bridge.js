@@ -254,8 +254,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			
 			return {
 				pre:  function(scope, element, attrs) {
-					element.css("width", "100%");
-					angular.element(".SelectBox", element).css("width", "100%");
 					if (attrs.data) {
 						$timeout(function() {
 							var a = ($parse(attrs.data))(scope), i, n = attrs.text || "text", v = attrs.value || "value";
@@ -1931,6 +1929,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	}
 	else $rootScope.autoUpdateOnWiffi = false;
+
 	
 //	$scope.messages.unreadCount = $rootScope.messages.unreadCount;
 	angular.extend($scope, {
@@ -3133,6 +3132,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				$scope.$location.back();
 			}, 1000);
 	};
+	$scope.onscan =function(){
+		cordova.plugins.barcodeScanner.scan(
+			      function (result) {
+			    	  if(result.cancelled == 0){
+			    		  $scope.newIssue.location = result.text;
+			    		  tipmessage("二维码提取成功");
+			    	  }
+			      }, 
+			      function (error) {
+			    	  tipmessage("扫描二维码失败");
+			      }
+		);
+	};
 	$scope.submit = function(){
 		if(!$scope.form.$valid){
         	tipmessage("请检查输入内容是否正确");
@@ -3225,7 +3237,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				}
 			}
 		},
-		
+	$scope.onscan =function(){
+		cordova.plugins.barcodeScanner.scan(
+			      function (result) {
+			    	  if(result.cancelled == 0){
+			    		  $scope.newIssue.location = result.text;
+			    		  tipmessage("二维码提取成功");
+			    	  }
+			      }, 
+			      function (error) {
+			    	  tipmessage("扫描二维码失败");
+			      }
+		);
+	};
 	$scope.save = function(){
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
@@ -3594,7 +3618,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					if (d && d.length > 0) {
 						for (var i = 0; i < d.length; i++){
 							$scope.items.push(d[i]);
-							if(d[i].read == 0){
+							if(!d[i].read || false){
 								if(msgIds.length <= 0){
 								}else{
 									msgIds += ",";
@@ -3605,16 +3629,18 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 						}
 							
 						$scope.page++;
+						
+						if(msgIds.length > 0){
+							model.message.readMessage(msgIds, function(d){
+								if(d || false){
+									tipmessage("消息更新为已读");
+								}
+							});
+						}
 					}
 				});
 				
-				if(msgIds.length > 0){
-					model.message.readMessage(msgIds, function(d){
-						if(d || false){
-							tipmessage("消息更新为已读");
-						}
-					});
-				}
+				
 			}
 		},
 		jumpTo: function(item){
@@ -3639,7 +3665,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	
 	
 }])
-.controller("cOneFile", ["$scope", "model", function($scope, model) {
+.controller("cOneFile", ["$scope", "model","$timeout", function($scope, model, $timeout) {
 	if ($scope.files) {
 		if ($scope.files.filepath) {
 			var len = $scope.files.filepath.length - $scope.files.filepath.lastIndexOf(".") - 1;
@@ -3658,10 +3684,18 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				        try {
 				        	imgData = canvas.toDataURL("image/jpeg", 1.0).replace(/data:image\/jpeg;base64,/,  "");
 				        	if (window.cordova) {
+				        		tipmessage1("保存图片中...", "savePic");
 				        		cordova.exec(function() {
-				        			tipmessage("下载成功");
+				        			changeTipmessage("下载成功", "savePic");
+				        			$timeout(function() {
+				        				closetipmessage1("savePic");
+									}, 1000);
+				        			
 				        		}, function() {
-				        			tipmessage("下载失败");
+				        			changeTipmessage("下载失败", "savePic");
+				        			$timeout(function() {
+				        				closetipmessage1("savePic");
+									}, 1000);
 				        		}, "Canvas2ImagePlugin", "saveImageDataToLibrary", [imgData]);
 				        	}
 				        } catch(error) {
