@@ -32,12 +32,8 @@
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/icon-10.png"/>@到：</span>
-<<<<<<< HEAD
 			<span class="r">
-			<textarea ng-model="issueItem.at" cols="" rows=""  class="clearfix" placeholder="" readonly="true"></textarea></span>
-=======
-			<span class="r" style="width:60%;"><my-chosen placeholder="选择人员..." ng-model="newIssue.at" data="user.list" text="name" value="username" disable="true"></my-chosen></span>
->>>>>>> c747c1b9db86fcd2383db9237feb4a1283b92b44
+			<textarea ng-model="issueItem.at" class="fromarea" readonly="true"></textarea></span>
 		</li>
 		<li class="clearfix"  ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
 			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span><span class="r">{{issueItem.location}}</span>
