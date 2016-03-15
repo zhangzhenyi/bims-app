@@ -221,6 +221,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		compile: function(t, a) {
 			t.attr("placeholder", a.placeholder).SumoSelect({
 				csvDispCount: 4,
+				floatWidth: 318,
 				search: true,
 				searchText: a.placeholder,
 				okCancelInMulti: true,
