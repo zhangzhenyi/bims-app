@@ -1929,6 +1929,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	}
 	else $rootScope.autoUpdateOnWiffi = false;
+
 	
 //	$scope.messages.unreadCount = $rootScope.messages.unreadCount;
 	angular.extend($scope, {
@@ -3131,6 +3132,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				$scope.$location.back();
 			}, 1000);
 	};
+	$scope.onscan =function(){
+		cordova.plugins.barcodeScanner.scan(
+			      function (result) {
+			    	  if(result.cancelled == 0){
+			    		  $scope.newIssue.location = result.text;
+			    		  tipmessage("二维码提取成功");
+			    	  }
+			      }, 
+			      function (error) {
+			    	  tipmessage("扫描二维码失败");
+			      }
+		);
+	};
 	$scope.submit = function(){
 		if(!$scope.form.$valid){
         	tipmessage("请检查输入内容是否正确");
@@ -3223,7 +3237,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				}
 			}
 		},
-		
+	$scope.onscan =function(){
+		cordova.plugins.barcodeScanner.scan(
+			      function (result) {
+			    	  if(result.cancelled == 0){
+			    		  $scope.newIssue.location = result.text;
+			    		  tipmessage("二维码提取成功");
+			    	  }
+			      }, 
+			      function (error) {
+			    	  tipmessage("扫描二维码失败");
+			      }
+		);
+	};
 	$scope.save = function(){
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
@@ -3592,7 +3618,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					if (d && d.length > 0) {
 						for (var i = 0; i < d.length; i++){
 							$scope.items.push(d[i]);
-							if(d[i].read == 0){
+							if(!d[i].read || false){
 								if(msgIds.length <= 0){
 								}else{
 									msgIds += ",";
@@ -3603,16 +3629,18 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 						}
 							
 						$scope.page++;
+						
+						if(msgIds.length > 0){
+							model.message.readMessage(msgIds, function(d){
+								if(d || false){
+									tipmessage("消息更新为已读");
+								}
+							});
+						}
 					}
 				});
 				
-				if(msgIds.length > 0){
-					model.message.readMessage(msgIds, function(d){
-						if(d || false){
-							tipmessage("消息更新为已读");
-						}
-					});
-				}
+				
 			}
 		},
 		jumpTo: function(item){

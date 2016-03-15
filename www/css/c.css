@@ -67,6 +67,8 @@ nav a.on span.i3,nav a:hover span.i3{ background: url(../img/nav-i3on.png) no-re
 nav a.on span.i4,nav a:hover span.i4{ background: url(../img/nav-i4on.png) no-repeat center center;-webkit-background-size:100% 100%;-o-background-size:100% 100%;background-size:100% 100%;}
 nav a.on span.i5,nav a:hover span.i5{ background: url(../img/nav-i5on.png) no-repeat center center;-webkit-background-size:100% 100%;-o-background-size:100% 100%;background-size:100% 100%;}
 
+select{width:80px;}
+
 .tabnav1{background:#fff;height:35px;margin-top:10px;border-radius:5px 5px 0 0;overflow:hidden;}
 .tabnav1 li{ display:block; width:33.3%; float: left; -webkit-box-sizing: border-box; -moz-box-sizing:border-box; box-sizing: border-box;text-align:center;text-decoration:none;}
 .tabnav1 li:last-child{width:33.4%;}
@@ -422,3 +424,4 @@ nav a.on span.i5,nav a:hover span.i5{ background: url(../img/nav-i5on.png) no-re
 .list3-2015-1-11 li .mr{margin-right:0px;}
 .list3-2015-1-11 li .pic img{ display:block;width:100%;}
 .list3-2015-1-11 li .pic .title{ color:#2f3130; text-align:center; font-size:14px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; padding:0 5px;}
+

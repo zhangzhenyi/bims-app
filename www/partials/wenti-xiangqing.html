@@ -31,8 +31,8 @@
 			<span class="l"><img src="img/i-xq-1.jpg"/>问题编号</span><span class="r">{{::issueItem.code}}</span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/icon-10.png"/>分配问题到人</span>
-			<span class="r"><my-chosen placeholder="..." ng-model="issueItem.at" data="user.list" text="name" value="username" disable="true"></my-chosen></span>
+			<span class="l"><img src="img/icon-10.png"/>@到：</span>
+			<span class="r">{{issueItem.at}}</span>
 		</li>
 		<li class="clearfix"  ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
 			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span><span class="r">{{issueItem.location}}</span>

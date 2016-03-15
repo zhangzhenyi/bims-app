@@ -16,7 +16,7 @@
 		</li>
 		
 		<li class="clearfix">
-			<span class="l"><img src="img/icon-10.png"/>分配问题到人</span>
+			<span class="l"><img src="img/icon-10.png"/>@到：</span>
 			<span class="r"><my-chosen placeholder="选择人员..." ng-model="newIssue.at" data="user.list" text="name" value="username"></my-chosen></span>
 		</li>
 		
@@ -30,7 +30,9 @@
 		</li>
 		
 		<li class="clearfix" ng-if="newIssue.issueType != Constants.ISSUETYPE_MATERIAL">
-			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span><span class="r"><input ng-model="newIssue.location"  type="text" class="fromtxt" placeholder="点此输入" required="required" ng-maxlength="150" maxlength="150"/></span>
+			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span>
+			<span class="rr"><input ng-model="newIssue.location"  type="text" class="fromtxt" placeholder="点此输入" required="required" ng-maxlength="150" maxlength="150"/></span>
+			<span class="ll"><a href="" ng-click="onscan()"><img src="img/scan.png"></a></span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-3.jpg"/>问题描述</span>
