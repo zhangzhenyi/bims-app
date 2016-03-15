@@ -32,7 +32,8 @@
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/icon-10.png"/>@到：</span>
-			<span class="r">{{issueItem.at}}</span>
+			<span class="r">
+			<textarea ng-model="issueItem.at" cols="" rows=""  class="clearfix" placeholder="" readonly="true"></textarea></span>
 		</li>
 		<li class="clearfix"  ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
 			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span><span class="r">{{issueItem.location}}</span>
