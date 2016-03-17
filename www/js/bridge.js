@@ -2921,7 +2921,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	model.issues.getIssue(id, function(d) {
 		if(d) {
 			$scope.issueItem = d;
-			$scope.setSelected($scope.issueItem.at);
+//			$scope.setSelected($scope.issueItem.at);
 		    var issueCats = ["制度／方案缺陷","交底培训缺陷","有章不循","未识别的危险源"];
 			
 		    if($scope.issueItem.issueCategory >= 0 && $scope.issueItem.issueCategory <4){
@@ -3229,7 +3229,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					break;
 				}
 			}
-		},
+	};
 	$scope.removeVideo=function(url) {
 			for (var i = 0; i < $scope.newIssue.issueVideoAttachmentList.length; i++) {
 				if ($scope.newIssue.issueVideoAttachmentList[i].fileUrl == url) {
@@ -3239,7 +3239,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					break;
 				}
 			}
-		},
+	};
 	$scope.onscan =function(){
 		cordova.plugins.barcodeScanner.scan(
 			      function (result) {
@@ -3330,7 +3330,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	});
 	
 }])
-.controller("cIssueHandle", ["$scope", "model", "$timeout",function($scope, model, $timeout){
+.controller("cIssueHandle", ["$scope", "model", "$timeout","transferCache", function($scope, model, $timeout,transferCache){
 
 	function _upload(file, blob, c) {
 		var formData = new FormData();
@@ -3380,24 +3380,44 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				break;
 			}
 		},
-		imgChanged : function(e) {
-			var file = (angular.element(e))[0].files[0];
+		imageChanged : function(uri) {
 			$scope.issueItem.handlePicList.push({
-				file: file,
-				thumbnailUrl: URL.createObjectURL(file)
+				fileUrl: uri,
+				thumbnailUrl: uri
 			});
 			$scope.$apply();
-			e.outerHTML = e.outerHTML;
+//			e.outerHTML = e.outerHTML;
 		},
-	    videoChanged : function(e) {
-			var file = angular.element(e)[0].files[0];
+		videoChanged : function(uri) {
+			alert(uri);
 			$scope.issueItem.handleVideoList.push({
-				file: file,
-				thumbnailUrl: URL.createObjectURL(file)
+				fileUrl: uri,
+				thumbnailUrl: "img/icon-15.png"
 			});
 			$scope.$apply();
-			e.outerHTML = e.outerHTML;
+//			e.outerHTML = e.outerHTML;
 	    },
+	    removeImage: function(url) {
+			for (var i = 0; i < $scope.issueItem.handlePicList.length; i++) {
+				if ($scope.issueItem.handlePicList[i].fileUrl == url) {
+					model.removeFiles([$scope.issueItem.handlePicList[i]]);
+					$scope.issueItem.handlePicList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
+		removeVideo:function(url) {
+			for (var i = 0; i < $scope.issueItem.handleVideoList.length; i++) {
+				if ($scope.issueItem.handleVideoList[i].fileUrl == url) {
+					model.removeFiles([$scope.issueItem.handleVideoList[i]]);
+					$scope.issueItem.handleVideoList.splice(i, 1);
+					$scope.$apply();
+					break;
+				}
+			}
+		},
+	
 	    submit: function(i){
 	    	if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
@@ -3652,8 +3672,8 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			case "0102"://Safe
 			case "0103"://Document
 //				$scope.issues.currentIssue.id = item.refId;
-				$scope.issues.currentIssue = {id:item.refId};
-				$scope.$location.path("/issue-details");
+//				$scope.issues.currentIssue = {id:item.refId};
+//				$scope.$location.path("/issue-details");
 				break;
 			case "0201"://Task message
 				break;
