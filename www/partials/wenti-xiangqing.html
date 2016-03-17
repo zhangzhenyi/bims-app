@@ -11,7 +11,7 @@
 	<ul>
 		<li ng-show="issueItem.issueStatus==1&amp;&amp;user.id==issueItem.publisherId"><a href="" ng-click="$location.path('/issue-edit')"><img src="img/icon-edit201512.png"/> 编辑</a></li>
 		<li ng-show="user.id==issueItem.publisherId"><a href="javascript:void(0);" id="del"><img src="img/icon-del201512.png"/> 删除</a></li>
-		<li ng-show="issueItem.issueStatus==1 || issueItem.issueStatus == 5"><a href="" ng-click="$location.path('/issue-handle')" ><img src="img/icon-m201512.png"/> 处理</a></li>
+		<li ng-show="issueItem.issueStatus==1 || issueItem.issueStatus == Constants.ISSUESTATUS_REFUSED"><a href="" ng-click="$location.path('/issue-handle')" ><img src="img/icon-m201512.png"/> 处理</a></li>
 		<li ng-if="issueItem.issueStatus==2"><a href="" ng-click="$location.path('/issue-check')" ><img src="img/icon-m201512.png"/> 验收</a></li>
 	</ul>
 	</div>
@@ -95,7 +95,7 @@
 			<img ng-src="{{::(issueHandle.accepterAvatarUrl || 'img/i-xq-person.jpg')}}" class="i-person"/>
 			<p class="name">{{::issueHandle.accepterName}}</p><p class="time">{{::formatDate(issueHandle.acceptTime)}}</p>
 			<span ng-show="issueHandle.issueStatus==3"><b>已验收</b><i><img src="img/i-pass.png"/></i></span>
-			<span ng-show="issueHandle.issueStatus==5"> <b style="color:#fe4f4f;">重新处理</b><i></i></span>
+			<span ng-show="issueHandle.issueStatus==Constants.ISSUESTATUS_REFUSED"> <b style="color:#fe4f4f;">重新处理</b><i></i></span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-11.jpg"/>验收意见</span><span class="r">{{::issueHandle.acceptDesc}}</span>

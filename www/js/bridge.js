@@ -967,7 +967,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			ISSUESTATUS_HANDLED:2,//已处理
 			ISSUESTATUS_ACCEPTED:3,//已验收
 			ISSUESTATUS_HOUSEKEEP:4,//已存档
-			ISSUESTATUS_REFUSED:5,//验收未通过，重新处理
+			ISSUESTATUS_REFUSED:0,//验收未通过，重新处理
 			ATTACHMENTTYPE_COMMON:1,
 			ATTACHMENTTYPE_PICTURE:2,
 			ATTACHMENTTYPE_VIDEO:3,
