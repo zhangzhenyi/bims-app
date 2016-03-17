@@ -3790,10 +3790,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					    		  $scope.newItem.compId = result.text;
 					    		  tipmessage("二维码提取成功");
 					    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
-					    			  if(d && d.component){
+					    			  if(d && d[0]){
 					    				  tipmessage("该构件签认已完成", "_FoundCompId");
 					    				  //Jump to sign details
-					    				  $scope.trace.current = d;
+					    				  $scope.trace.current = d[0];
 					    				  $scope.$location.path("/spotcheck-detail");
 					    			  }else{
 					    				  tipmessage("该构件允许签认", "_FoundCompId");
@@ -3830,10 +3830,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				/****/
 				$scope.newItem.compId = "comp_xxxx_121";
 	    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
-	    			  if(d && d.component){
+	    			  if(d && d[0]){
 	    				  tipmessage("该构件签认已完成", "_FoundCompId");
 	    				  //Jump to sign details
-	    				  $scope.trace.current = d;
+	    				  $scope.trace.current = d[0];
 	    				  $scope.$location.path("/spotcheck-detail");
 	    			  }else{
 	    				  tipmessage("该构件允许签认", "_FoundCompId");
@@ -3936,10 +3936,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					    		  $scope.newItem.compId = result.text;
 					    		  tipmessage("二维码提取成功");
 					    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
-					    			  if(d && d.component){
+					    			  if(d && d[0]){
 					    				  tipmessage("该构件签认已完成", "_FoundCompId");
 					    				  //Jump to sign details
-					    				  $scope.trace.current = d;
+					    				  $scope.trace.current = d[0];
 					    				  $scope.$location.path("/spotcheck-detail");
 					    			  }else{
 					    				  tipmessage("该构件允许签认", "_FoundCompId");
@@ -4035,8 +4035,8 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 		});
 		model.trace.get($scope.trace.current.id, function(d) {
-			if(d && d.component) {
-				$scope.trace.current = d;
+			if(d && d[0]) {
+				$scope.trace.current = d[0];
 			}
 		});
 		break;
@@ -4685,32 +4685,28 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 .controller("cHenjiScan", ["$scope", "$timeout", "model", function($scope, $timeout, model){
 	angular.extend($scope, {
 		newItem:{
-			compId:$scope.component.current.id,
+			compId:$scope.component.current.compId,
 			component:$scope.component.current
 		}
 	});
 //	alert("henji page");
-//	alert("s: "+JSON.stringigy($scope.component.current));
+//	alert("s: "+JSON.stringify($scope.component.current));
 //	alert("henji page end");
 	//成长过程
 	model.trace.getByCompId($scope.newItem.compId, 0, 3, function(d){
-		alert("成长过程 "+JSON.stringify(d));
-		if(d && d.component){
+		if(d && d[0]){
 			$scope.newItem.process = d;
 		}
 	});
 	//质量记录
 	model.trace.getByCompId($scope.newItem.compId, 0, 2, function(d){
-		alert("质量记录"+JSON.stringify(d));
-		if(d && d.component){
+		if(d && d[0]){
 			$scope.newItem.qualityRecord = d;
 		}
 	});
 	//现场签认
 	model.trace.getByCompId($scope.newItem.compId, 0, 1, function(d){
-		alert("现场签认"+JSON.stringify(d));
-		if(d && d.component){
-			$scope.newItem.
+		if(d && d[0]){
 			$scope.newItem.spotcheck = d;
 		}
 	});
