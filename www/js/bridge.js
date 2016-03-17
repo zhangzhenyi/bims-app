@@ -1077,11 +1077,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	function _uploadAttachments(item, callback, transferCallback) {
 		var pics, videos, o = angular.extend({}, item), 	total, counter = 0, i, loops;
 		if(item.topicType == 3) {
-			pics = item.issuePicAttachmentList;
-			videos = item.issueVideoAttachmentList;
-			o.issueTotalAttachmentList = [];
-			o.issuePicAttachmentList = [];
-			o.issueVideoAttachmentList = [];
+			if (item._handling_) {
+				pics = item.handlePicList;
+				videos = item.handleVideoList;
+				o.handleTotalAttachmentList = [];
+				o.handlePicList = [];
+				o.handleVideoList = [];
+			} else {
+				pics = item.issuePicAttachmentList;
+				videos = item.issueVideoAttachmentList;
+				o.issueTotalAttachmentList = [];
+				o.issuePicAttachmentList = [];
+				o.issueVideoAttachmentList = [];
+			}
 		} else {
 			pics = item.picAttachmentList;
 			videos = item.videoAttachmentList;
@@ -1094,8 +1102,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		for (i = 0; i < loops; i++) {
 			if (pics[i].id || false) {
 				if(item.topicType == 3) {
-					o.issueTotalAttachmentList.push(pics[i]);
-					o.issuePicAttachmentList.push(pics[i]);
+					if (item._handling_) {
+						o.handleTotalAttachmentList.push(pics[i]);
+						o.handlePicList.push(pics[i]);
+					} else {
+						o.issueTotalAttachmentList.push(pics[i]);
+						o.issuePicAttachmentList.push(pics[i]);
+					}
 				} else {
 					o.attachments.push(pics[i]);
 					o.picAttachmentList.push(pics[i]);
@@ -1105,8 +1118,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				(transferCallback || angular.noop)(pics[i].fileUrl, _transfer(pics[i].fileUrl, 2, item.topicType, function(d, url) {
 					if (d) {
 						if (item.topicType == 3) {
-							o.issueTotalAttachmentList.push(d);
-							o.issuePicAttachmentList.push(d);
+							if (item._handling_) {
+								o.handleTotalAttachmentList.push(d);
+								o.handlePicList.push(d);
+							} else {
+								o.issueTotalAttachmentList.push(d);
+								o.issuePicAttachmentList.push(d);
+							}
 						} else {
 							o.attachments.push(d);
 							o.picAttachmentList.push(d);
@@ -1122,8 +1140,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		for (i = 0; i < loops; i++) {
 			if (videos[i].id || false) {
 				if (item.topicType == 3) {
-					o.issueTotalAttachmentList.push(videos[i]);
-					o.issueVideoAttachmentList.push(videos[i]);
+					if (item._handling_) {
+						o.handleTotalAttachmentList.push(videos[i]);
+						o.handleVideoList.push(videos[i]);
+					} else {
+						o.issueTotalAttachmentList.push(videos[i]);
+						o.issueVideoAttachmentList.push(videos[i]);
+					}
 				} else {
 					o.attachments.push(videos[i]);
 					o.videoAttachmentList.push(videos[i]);
@@ -1133,8 +1156,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				(transferCallback || angular.noop)(videos[i].fileUrl, _transfer(videos[i].fileUrl, 3, item.topicType, function(d, url) {
 					if (d) {
 						if(item.topicType == 3) {
-							o.issueTotalAttachmentList.push(d);
-							o.issueVideoAttachmentList.push(d);
+							if (item._handling_) {
+								o.handleTotalAttachmentList.push(d);
+								o.handleVideoList.push(d);
+							} else {
+								o.issueTotalAttachmentList.push(d);
+								o.issueVideoAttachmentList.push(d);
+							}
 						} else {
 							o.attachments.push(d);
 							o.videoAttachmentList.push(d);
@@ -3173,14 +3201,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		});
 	};
 }])
-.controller("cIssueCreate", ["$scope", "model", "$timeout","transferCache", function($scope, model, $timeout,transferCache){
-	function _upload(file, blob, c) {
-		var formData = new FormData();
-		formData.append("file", file);
-		formData.append("attachment", blob);
-		model.uploadFile("attachment/upload.jo", formData, c);
-	}
-	
+.controller("cIssueCreate", ["$scope", "model", "$timeout","transferCache", function($scope, model, $timeout,transferCache){	
 	$scope.newIssue = {
 		issuePicAttachmentList:[],
 		issueVideoAttachmentList:[],
@@ -3331,13 +3352,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	
 }])
 .controller("cIssueHandle", ["$scope", "model", "$timeout","transferCache", function($scope, model, $timeout,transferCache){
-
-	function _upload(file, blob, c) {
-		var formData = new FormData();
-		formData.append("file", file);
-		formData.append("attachment", blob);
-		model.uploadFile("attachment/upload.jo", formData, c);
-	}
 	$scope.issueCats = [];
 	angular.extend($scope, {
 		issueCats:[{id:0,name:"制度／方案缺陷"}, {id:1, name:"交底培训缺陷"},{id:2,name:"有章不循"},{id:4, name:"其他"}],
@@ -3349,7 +3363,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			issueType:$scope.issues.currentIssue.issueType,
 			handlePicList: [],
 			handleVideoList: [],
-			handleTotalAttachmentList: []
+			handleTotalAttachmentList: [],
+			_handling_: true,
+			topicType: 3
 		},
 		remain:150,
 		remain1:150,
@@ -3385,17 +3401,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				fileUrl: uri,
 				thumbnailUrl: uri
 			});
-			$scope.$apply();
-//			e.outerHTML = e.outerHTML;
 		},
 		videoChanged : function(uri) {
-			alert(uri);
 			$scope.issueItem.handleVideoList.push({
 				fileUrl: uri,
 				thumbnailUrl: "img/icon-15.png"
 			});
-			$scope.$apply();
-//			e.outerHTML = e.outerHTML;
 	    },
 	    removeImage: function(url) {
 			for (var i = 0; i < $scope.issueItem.handlePicList.length; i++) {
@@ -3423,53 +3434,25 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
-			var _item = {
-					id: $scope.issueItem.id,
-					handleDesc: $scope.issueItem.handleDesc,
-					lessonDesc: $scope.issueItem.lessonDesc,
-					preventionDesc: $scope.issueItem.preventionDesc,
-					issueCategory: $scope.issueItem.issueCategory,
-					issueCategoryRemark: $scope.issueItem.issueCategoryRemark,
-					handlePicList:[],
-					handleVideoList:[],
-					handleTotalAttachmentList:[]
-			},
-				total = $scope.issueItem.handlePicList.length + $scope.issueItem.handleVideoList.length,
-				counter = 0,
-				picBlob = new Blob(['{"fileType":2,"topicType":2}'], { type: "application/json"}),
-				vidBlob = new Blob(['{"fileType":3,"topicType":2}'], { type: "application/json"}), i;
-				for (i = 0; i < $scope.issueItem.handlePicList.length; i++) {
-					_upload($scope.issueItem.handlePicList[i].file, picBlob, function(d) {
-						if (d) {
-							_item.handleTotalAttachmentList.push(d);
-							_item.handlePicList.push(d);
-						}
-						counter++;
-					});
-				}
-				for (i = 0; i < $scope.issueItem.handleVideoList.length; i++) {
-					_upload($scope.issueItem.handleVideoList[i].file, vidBlob, function(d) {
-						if (d) {
-							_item.handleTotalAttachmentList.push(d);
-							_item.handleVideoList.push(d);
-						}
-						counter++;
-					});
-				}
-				$timeout(function _fn_create() {
-					if (counter >= total) {
-						model.issues.handleIssues(_item, function(d) {
-							if (d) {
-								$scope.tipVisibility = "block";
-								$scope.tipContent = "提交成功";
-								$timeout(function() {
-									$scope.$location.back();
-								}, 1000);
-							}
-						});
-					} else $timeout(_fn_create, 200);
+	    	tipmessage1(message="上传文件中",id="tipimg");
+			model.uploadAttachments($scope.issueItem, function(item) {
+				changeTipmessage("开始创建","tipimg");
+				delete item.issueType;
+				delete item._handling_;
+				delete item.topicType;
+				model.issues.handleIssues(item, function(d) {
+					if (d) {
+						changeTipmessage("提交成功",id="tipimg");
+						model.removeFiles($scope.issueItem.handlePicList.concat($scope.issueItem.handleVideoList));
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
+					}else{
+						changeTipmessage("提交失败","tipimg");
+					}
+					closetipmessage1("tipimg");
 				});
-			
+			});			
 		}
 	});
 }])
