@@ -3594,10 +3594,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 //		    		  alert("scan result : "+result.text);
 		    		  //Get component info
 		    		  model.component.get(result.text, function(d){
-		    		  	if(d){
+		    		  	if(d && d.name){
 		    		  		tipmessage("获得构件信息");
 		    		  		$scope.component.current = d;
-//		    		  		alert("component : "+ JSON.stringigy($scope.component.current));
+//		    		  		alert("component : "+ JSON.stringify($scope.component.current));
 		    		  		$scope.$location.path('/henji-scan');
 		    		  	}else{
 			    		  	tipmessage("该构件编码不存在", "_notFoundCompId");
@@ -4710,20 +4710,24 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 //	alert("s: "+JSON.stringigy($scope.component.current));
 //	alert("henji page end");
 	//成长过程
-	model.trace.getByCompId(getByCompId, 0, 3, function(d){
-		if(d){
+	model.trace.getByCompId($scope.newItem.compId, 0, 3, function(d){
+		alert("成长过程 "+JSON.stringify(d));
+		if(d && d.component){
 			$scope.newItem.process = d;
 		}
 	});
 	//质量记录
-	model.trace.getByCompId(getByCompId, 0, 2, function(d){
-		if(d){
+	model.trace.getByCompId($scope.newItem.compId, 0, 2, function(d){
+		alert("质量记录"+JSON.stringify(d));
+		if(d && d.component){
 			$scope.newItem.qualityRecord = d;
 		}
 	});
 	//现场签认
-	model.trace.getByCompId(getByCompId, 0, 1, function(d){
-		if(d){
+	model.trace.getByCompId($scope.newItem.compId, 0, 1, function(d){
+		alert("现场签认"+JSON.stringify(d));
+		if(d && d.component){
+			$scope.newItem.
 			$scope.newItem.spotcheck = d;
 		}
 	});
