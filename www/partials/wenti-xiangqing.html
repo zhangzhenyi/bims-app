@@ -60,7 +60,7 @@
 	</ul>
 </section>
 <span ng-repeat="issueHandle in issueItem.handleProcessList track by issueHandle.id">
-<section class="mt10" ng-if="issueHandle.issueStatus&gt;=2">
+<section class="mt10" ng-if="issueHandle.issueStatus >=2 || issueHandle.issueStatus == Constants.ISSUESTATUS_REFUSED">
 	<ul class="list-4">
 		<li class="first clearfix">
 			<img ng-src="{{::(issueHandle.handlerAvatarUrl || 'img/i-xq-person.jpg')}}" class="i-person"/>
@@ -89,7 +89,7 @@
 	</ul>
 </section>
 
-<section class="mt10" ng-if="issueHandle.issueStatus >= 3">
+<section class="mt10" ng-if="issueHandle.issueStatus >= 3 || issueHandle.issueStatus == Constants.ISSUESTATUS_REFUSED">
 	<ul class="list-4">
 		<li class="first clearfix">
 			<img ng-src="{{::(issueHandle.accepterAvatarUrl || 'img/i-xq-person.jpg')}}" class="i-person"/>

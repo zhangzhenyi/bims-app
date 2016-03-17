@@ -1042,7 +1042,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	}, false);
 	
-	function _req(o,c) {
+	function _req(o,c,l) {
+		if(l){
+			$rootScope.loading
+		}else
 		$rootScope.loading = true;
 		o.url = _base + (o.url || "");
 		if (_sessionId) o.url += ";jsessionid=" + _sessionId;
@@ -1286,7 +1289,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				_req({
 					method: "get",
 					url: "message/getUnreadMessages.jo"
-				}, angular.isFunction(c) ? c : angular.noop);
+				}, angular.isFunction(c) ? c : angular.noop, false);
 			}
 		},
 		notice: {
@@ -3694,13 +3697,13 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				        			changeTipmessage("下载成功", "savePic");
 				        			$timeout(function() {
 				        				closetipmessage1("savePic");
-									}, 1000);
+									}, 2000);
 				        			
 				        		}, function() {
 				        			changeTipmessage("下载失败", "savePic");
 				        			$timeout(function() {
 				        				closetipmessage1("savePic");
-									}, 1000);
+									}, 2000);
 				        		}, "Canvas2ImagePlugin", "saveImageDataToLibrary", [imgData]);
 				        	}
 				        } catch(error) {
@@ -4032,6 +4035,11 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 						tipmessage("删除失败");
 					}
 				});
+			},
+			fileClicked: function(name, path) {
+				$scope.files.filename = name;
+				$scope.files.filepath = path;
+				$scope.$location.path("/onefile");
 			}
 		});
 		model.trace.get($scope.trace.current.id, function(d) {

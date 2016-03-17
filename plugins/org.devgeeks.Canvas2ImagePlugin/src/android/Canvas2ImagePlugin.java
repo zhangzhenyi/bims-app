@@ -32,8 +32,8 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 	public static final String ACTION = "saveImageDataToLibrary";
 
 	@Override
-	public boolean execute(String action, JSONArray data,
-			CallbackContext callbackContext) throws JSONException {
+	public boolean execute(String action, final JSONArray data,
+			final CallbackContext callbackContext) throws JSONException {
 
 		if (action.equals(ACTION)) {
 			cordova.getThreadPool().execute(new Runnable() {
