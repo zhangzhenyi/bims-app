@@ -3671,7 +3671,6 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			case "0101"://quality
 			case "0102"://Safe
 			case "0103"://Document
-//				$scope.issues.currentIssue.id = item.refId;
 //				$scope.issues.currentIssue = {id:item.refId};
 //				$scope.$location.path("/issue-details");
 				break;
@@ -3808,7 +3807,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					    		  $scope.newItem.compId = result.text;
 					    		  tipmessage("二维码提取成功");
 					    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
-					    			  if(d){
+					    			  if(d && d.component){
 					    				  tipmessage("该构件签认已完成", "_FoundCompId");
 					    				  //Jump to sign details
 					    				  $scope.trace.current = d;
@@ -3817,7 +3816,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					    				  tipmessage("该构件允许签认", "_FoundCompId");
 					    				  //Get component info
 					    				  model.component.get($scope.newItem.compId, function(d){
-					    					  if(d){
+					    					  if(d  && d.name){
 					    						  tipmessage("获得构件信息", "_FoundCompId");
 					    						  $scope.newItem.component = d;
 					    					  }else{
@@ -3848,7 +3847,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				/****/
 				$scope.newItem.compId = "comp_xxxx_121";
 	    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
-	    			  if(d){
+	    			  if(d && d.component){
 	    				  tipmessage("该构件签认已完成", "_FoundCompId");
 	    				  //Jump to sign details
 	    				  $scope.trace.current = d;
@@ -3857,7 +3856,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	    				  tipmessage("该构件允许签认", "_FoundCompId");
 	    				  //Get component info
 	    				  model.component.get($scope.newItem.compId, function(d){
-	    					  if(d){
+	    					  if(d  && d.name){
 	    						  tipmessage("获得构件信息", "_FoundCompId");
 	    						  $scope.newItem.component = d;
 	    					  }else{
@@ -3954,7 +3953,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					    		  $scope.newItem.compId = result.text;
 					    		  tipmessage("二维码提取成功");
 					    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
-					    			  if(d){
+					    			  if(d && d.component){
 					    				  tipmessage("该构件签认已完成", "_FoundCompId");
 					    				  //Jump to sign details
 					    				  $scope.trace.current = d;
@@ -3963,7 +3962,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					    				  tipmessage("该构件允许签认", "_FoundCompId");
 					    				  //Get component info
 					    				  model.component.get($scope.newItem.compId, function(d){
-					    					  if(d){
+					    					  if(d && d.name){
 					    						  tipmessage("获得构件信息", "_FoundCompId");
 					    						  $scope.newItem.component = d;
 					    					  }else{
@@ -4031,7 +4030,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 		});
 		model.trace.get($scope.trace.current.id, function(d) {
-			if(d) {
+			if(d && d.component) {
 				$scope.newItem = d;
 			}
 		});
@@ -4043,6 +4042,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				model.trace.remove($scope.trace.current.id, function(d){
 					if(d){
 						tipmessage("删除成功");
+						$timeout(function(){
+							$scope.$location.path("/spotcheck-list");
+						} ,1000);
 					}else{
 						tipmessage("删除失败");
 					}
@@ -4050,7 +4052,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 		});
 		model.trace.get($scope.trace.current.id, function(d) {
-			if(d) {
+			if(d && d.component) {
 				$scope.trace.current = d;
 			}
 		});

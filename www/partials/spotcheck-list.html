@@ -15,8 +15,8 @@
             <a ng-click="itemClick(item)" href="">
                 <span class="i"><img ng-src="{{::(item.publisherAvatarUrl || 'img/tem-img/img-person.jpg')}}"></span>
                 <span class="r">
-                    <span class="title">{{::item.title|cutTail:false:10:" ..."}}</span>
-                    <span class="txt">{{::item.compId}}</span>
+                    <span class="txt">{{::item.title|cutTail:false:10:" ..."}}</span>
+                    <span class="title">{{::item.compId}}</span>
                 </span>
                 <span class="time">{{::formatDate(item.createTime)}} <span class="name">{{::item.publisherName}}</span></span>
             </a>
