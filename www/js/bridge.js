@@ -1044,7 +1044,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	
 	function _req(o,c,l) {
 		if(l){
-			$rootScope.loading
+			$rootScope.loading = false;
 		}else
 		$rootScope.loading = true;
 		o.url = _base + (o.url || "");
