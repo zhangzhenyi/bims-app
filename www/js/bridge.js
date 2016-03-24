@@ -1247,7 +1247,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					params: {
 						username: u
 					}
-				},  angular.isFunction(c) ? c : angular.noop);
+				},  function(a) {
+					if (angular.isFunction(c)) {
+						if (angular.isObject(a)) c(false);
+						else c(true);
+					}
+				});
 			},
 			register: function(u, c) {
 				_req({
