@@ -979,8 +979,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			ISSUE_PUBLISHER_CATEGORY_YE_ZHU:1,
 			ISSUE_PUBLISHER_CATEGORY_JIAN_LI:2,
 			ISSUE_PUBLISHER_CATEGORY_OTHER:3,
-			USER_ROLE_AUTHORITY_PUBLISH_ISSUE_REVIEW:"/reviewIssueForHandle.jo",
-			USER_ROLE_AUTHORITY_HANDLE_ISSUE_REVIEW:"/reviewIssueForPublish.jo",
+			USER_ROLE_AUTHORITY_PUBLISH_ISSUE_REVIEW:"/reviewIssueForPublish.jo",
+			USER_ROLE_AUTHORITY_HANDLE_ISSUE_REVIEW:"/reviewIssueForHandle.jo",
 			USER_ROLE_AUTHORITY_ISSUE_PUBLISH:"/publishissue.jo",
 			USER_ROLE_AUTHORITY_ISSUE_HANDLE:"/handleissue.jo",
 			USER_ROLE_AUTHORITY_ISSUE_ACCEPT:"/acceptissue.jo"
@@ -1316,7 +1316,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				_req({
 					method: "get",
 					url: "message/getUnreadMessages.jo"
-				}, angular.isFunction(c) ? c : angular.noop, false);
+				}, angular.isFunction(c) ? c : angular.noop, true);
 			}
 		},
 		notice: {
@@ -1679,7 +1679,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			reviewPublishIssue:function(i, c){
 				_req({
 					method: "post",
-					url: "issue//reviewIssueForPublish.jo",
+					url: "issue/reviewIssueForPublish.jo",
 					data:i
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
@@ -1693,7 +1693,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			reviewHandleIssue:function(i, c){
 				_req({
 					method: "post",
-					url: "issue//reviewIssueForHandle.jo",
+					url: "issue/reviewIssueForHandle.jo",
 					data:i
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
@@ -3043,6 +3043,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					$scope.authoAcceptIssue = false;
 				}
 			});
+	//＊＊＊＊＊＊＊如果是新创建待审核的问题，公司领导可以审核 TODO ＊＊＊＊＊＊＊＊＊＊＊
 	model.issues.getIssue(id, function(d) {
 		if(d) {
 			$scope.issueItem = d;
@@ -3450,12 +3451,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 }])
 
 .controller("cIssueReview", ["$scope", "model", "$timeout",function($scope, model, $timeout){
-	alert(JSON.stringify($scope.issues.currentIssue));
 	if($scope.issues.currentIssue.issueStatus != $scope.Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW
 			&& $scope.issues.currentIssue.issueStatus != $scope.Constants.ISSUESTATUS_HANDLED_WAITING_REVIEW){
 		$scope.$location.back();
 	}
 	angular.extend($scope, {
+		reviewDesc:"",
 		issueItem:{
 			id : $scope.issues.currentIssue.id,
 			reviewDesc:""
@@ -3476,11 +3477,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	        	return;
 	        }
 			var _item = {
-					id: $scope.issueItem.id,
-					reviewStatus: s,
-					reviewDesc:$scope.issueItem.reviewDesc
+					id: $scope.issueItem.id
 			};
+			
 			if($scope.isPublishReview || false){
+				_item.publishReviewDesc = $scope.reviewDesc;
+				_item.publishReviewStatus = s;
 				model.issues.reviewPublishIssue(_item, function(d) {
 					if (d) {
 						$scope.tipVisibility = "block";
@@ -3490,6 +3492,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					}
 				});
 			}else if($scope.isHandleReview || false){
+				_item.handleReviewDesc =  $scope.reviewDesc;
+				_item.handleReviewStatus = s;
 				model.issues.reviewHandleIssue(_item, function(d) {
 					if (d) {
 						$scope.tipVisibility = "block";

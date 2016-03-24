@@ -9,10 +9,10 @@
 	<div class="pop-window1">
 	<img src="img/icon-jian5.png" class="j"/><div class="cb"></div>
 	<ul>
-		<li ng-show="(issueItem.issueStatus==ISSUESTATUS_PUBLISH_WAITING_REVIEW || issueItem.issueStatus==ISSUESTATUS_PUBLISH_REVIEW_REFUSED) && user.id==issueItem.publisherId"><a href="" ng-click="$location.path('/issue-edit')"><img src="img/icon-edit201512.png"/> 编辑</a></li>
+		<li ng-show="(issueItem.issueStatus==Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW || issueItem.issueStatus==Constants.ISSUESTATUS_PUBLISH_REVIEW_REFUSED) && user.id==issueItem.publisherId"><a href="" ng-click="$location.path('/issue-edit')"><img src="img/icon-edit201512.png"/> 编辑</a></li>
 		<li ng-show="user.id==issueItem.publisherId"><a href="javascript:void(0);" id="del"><img src="img/icon-del201512.png"/> 删除</a></li>
-		<li ng-if="issueItem.issueStatus==Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW "><a href="" ng-click="$location.path('/issue-review')" ><img src="img/icon-m201512.png"/> 审核</a></li>
-		<li ng-show="authoHandleIssue == true && (issueItem.issueStatus==ISSUESTATUS_HANDLE_REVIEW_REFUSED || issueItem.issueStatus==Constants.ISSUESTATUS_PUBLISHED || issueItem.issueStatus == Constants.ISSUESTATUS_REFUSED)"><a href="" ng-click="$location.path('/issue-handle')" ><img src="img/icon-m201512.png"/> 处理</a></li>
+		<li ng-if="issueItem.issueStatus==Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW && authoReviewPublishIssue == true"><a href="" ng-click="$location.path('/issue-review')" ><img src="img/icon-m201512.png"/> 审核</a></li>
+		<li ng-show="authoHandleIssue == true && (issueItem.issueStatus==Constants.ISSUESTATUS_HANDLE_REVIEW_REFUSED || issueItem.issueStatus==Constants.ISSUESTATUS_PUBLISHED || issueItem.issueStatus == Constants.ISSUESTATUS_REFUSED)"><a href="" ng-click="$location.path('/issue-handle')" ><img src="img/icon-m201512.png"/> 处理</a></li>
 		<li ng-if="issueItem.issueStatus==Constants.ISSUESTATUS_HANDLED_WAITING_REVIEW && authoReviewHandleIssue == true"><a href="" ng-click="$location.path('/issue-review')" ><img src="img/icon-m201512.png"/> 审核</a></li>
 		<li ng-if="authoAcceptIssue==true && issueItem.issueStatus==Constants.ISSUESTATUS_HANDLED"><a href="" ng-click="$location.path('/issue-check')" ><img src="img/icon-m201512.png"/> 验收</a></li>
 	</ul>
@@ -61,13 +61,27 @@
 		</li>
 	</ul>
 </section>
+<section class="mt10" ng-if="issueItem.issueStatus != Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW ">
+	<ul class="list-4">
+		<li class="first clearfix">
+			<img ng-src="{{::(issueItem.publishReviewerAvatarUrl || 'img/i-xq-person.jpg')}}" class="i-person"/>
+			<p class="name">{{::issueItem.publishReviewerName}}</p><p class="time">{{::formatDate(issueItem.publishReviewTime)}}</p>
+			<span ng-show="issueItem.issueStatus!=Constants.ISSUESTATUS_PUBLISH_REVIEW_REFUSED"><b>已审核</b><i><img src="img/i-pass.png"/></i></span>
+			<span ng-show="issueItem.issueStatus==Constants.ISSUESTATUS_PUBLISH_REVIEW_REFUSED"> <b style="color:#fe4f4f;">审核未通过</b><i></i></span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-11.jpg"/>审核意见</span><span class="r">{{::issueItem.publishReviewDesc}}</span>
+		</li>
+	</ul>
+</section>
 <span ng-repeat="issueHandle in issueItem.handleProcessList track by issueHandle.id">
-<section class="mt10" ng-if="issueHandle.issueStatus >=2 || issueHandle.issueStatus == Constants.ISSUESTATUS_REFUSED">
+<section class="mt10" ng-if="issueHandle.issueStatus >=Constants.ISSUESTATUS_HANDLED || issueHandle.issueStatus == Constants.ISSUESTATUS_REFUSED || issueHandle.issueStatus == Constants.ISSUESTATUS_HANDLED_WAITING_REVIEW || issueHandle.issueStatus == Constants.ISSUESTATUS_HANDLE_REVIEW_REFUSED">
 	<ul class="list-4">
 		<li class="first clearfix">
 			<img ng-src="{{::(issueHandle.handlerAvatarUrl || 'img/i-xq-person.jpg')}}" class="i-person"/>
 			<p class="name">{{::issueHandle.handlerName}}</p><p class="time">{{::formatDate(issueHandle.handledTime)}}</p>
-			<b>已解决</b><i><img src="img/i-pass.png"/></i>
+			<b >已解决</b>
+			<i><img src="img/i-pass.png"/></i>
 		</li>
 		<li class="clearfix">
 			<span class="l1"><img src="img/i-xq-12.jpg"/>整改落实<br/>情况</span><span class="r">{{::issueHandle.handleDesc}}</span>
@@ -90,7 +104,19 @@
 		</li>
 	</ul>
 </section>
-
+<section class="mt10" ng-if="issueHandle.issueStatus == Constants.ISSUESTATUS_HANDLE_REVIEW_REFUSED || issueHandle.issueStatus == Constants.ISSUESTATUS_HANDLED|| issueHandle.issueStatus == Constants.ISSUESTATUS_REFUSED">
+	<ul class="list-4">
+		<li class="first clearfix">
+			<img ng-src="{{::(issueHandle.handleReviewerAvatarUrl || 'img/i-xq-person.jpg')}}" class="i-person"/>
+			<p class="name">{{::issueHandle.handleReviewerName}}</p><p class="time">{{::formatDate(issueHandle.handleReviewTime)}}</p>
+			<span ng-show="issueHandle.issueStatus==Constants.ISSUESTATUS_HANDLED"><b>已审核</b><i><img src="img/i-pass.png"/></i></span>
+			<span ng-show="issueHandle.issueStatus==Constants.ISSUESTATUS_HANDLE_REVIEW_REFUSED"> <b style="color:#fe4f4f;">重新处理</b><i></i></span>
+		</li>
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-11.jpg"/>审核意见</span><span class="r">{{::issueHandle.handleReviewDesc}}</span>
+		</li>
+	</ul>
+</section>
 <section class="mt10" ng-if="issueHandle.issueStatus >= 3 || issueHandle.issueStatus == Constants.ISSUESTATUS_REFUSED">
 	<ul class="list-4">
 		<li class="first clearfix">

@@ -28,11 +28,7 @@
 				<span class="z1" ng-show="item.important==3">紧急</span>
 				</i>
 {{::item.issueTitle|cutTail:false:10:" ..."}}
-			<strong class="no" ng-show="item.issueStatus== {{::Constants.ISSUESTATUS_PUBLISHED}}">{{::item.issueStatusDescStr}}</strong>
-				<strong class="yes" ng-show="item.issueStatus ==Constants.ISSUESTATUS_HANDLED">已处理，待验收</strong>
-				<strong class="pass" ng-show="item.issueStatus == Constants.ISSUESTATUS_ACCEPTED">已验收</strong>
-				<strong class="pass" ng-show="item.issueStatus == Constants.ISSUESTATUS_HOUSEKEEP">已存档</strong>
-				<strong class="no" ng-show="item.issueStatus == Constants.ISSUESTATUS_REFUSED">验收未通过</strong>
+			<strong class="no" >{{::item.issueStatusDescStr}}</strong>
 				<span class="txt">{{::item.issueDesc|cutTail:false:10:" ..."}}</span>
 			</span>
 			<span class="mt3 clearfix">
