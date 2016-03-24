@@ -963,8 +963,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			ISSUE_IMPORTANT_1:1,
 			ISSUE_IMPORTANT_2:2,
 			ISSUE_IMPORTANT_3:3,
+			ISSUESTATUS_PUBLISH_WAITING_REVIEW:-100,//等待验收
+			ISSUESTATUS_PUBLISH_REVIEW_REFUSED:-2,//验收拒绝
 			ISSUESTATUS_PUBLISHED:1,//
-			ISSUESTATUS_HANDLED:2,//已处理
+			ISSUESTATUS_HANDLE_REVIEW_REFUSED:-1,//处理审核未通过
+			ISSUESTATUS_HANDLED_WAITING_REVIEW:-101,//已处理，待审核
+			ISSUESTATUS_HANDLED:2,//已处理，已审核
 			ISSUESTATUS_ACCEPTED:3,//已验收
 			ISSUESTATUS_HOUSEKEEP:4,//已存档
 			ISSUESTATUS_REFUSED:0,//验收未通过，重新处理
@@ -974,7 +978,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			ATTACHMENTTYPE_AUDIO:4,
 			ISSUE_PUBLISHER_CATEGORY_YE_ZHU:1,
 			ISSUE_PUBLISHER_CATEGORY_JIAN_LI:2,
-			ISSUE_PUBLISHER_CATEGORY_OTHER:3
+			ISSUE_PUBLISHER_CATEGORY_OTHER:3,
+			USER_ROLE_AUTHORITY_PUBLISH_ISSUE_REVIEW:"/reviewIssueForHandle.jo",
+			USER_ROLE_AUTHORITY_HANDLE_ISSUE_REVIEW:"/reviewIssueForPublish.jo",
+			USER_ROLE_AUTHORITY_ISSUE_PUBLISH:"/publishissue.jo",
+			USER_ROLE_AUTHORITY_ISSUE_HANDLE:"/handleissue.jo",
+			USER_ROLE_AUTHORITY_ISSUE_ACCEPT:"/acceptissue.jo"
 	};
 	
 	$rootScope.user = {};
@@ -1044,7 +1053,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	
 	function _req(o,c,l) {
 		if(l){
-			$rootScope.loading
+			$rootScope.loading = false;
 		}else
 		$rootScope.loading = true;
 		o.url = _base + (o.url || "");
@@ -1258,6 +1267,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					method: "get",
 					url: "user/list.jo"
 				},  angular.isFunction(c) ? c : angular.noop);
+			},
+			checkAutority: function(auth, c){
+				var roles = $rootScope.user.roles;
+				for(r in roles){
+					var authorities = roles[r].urls;
+					for(a in authorities){
+						if(authorities[a] && authorities[a].indexOf(auth) > 0){
+							angular.isFunction(c) ? c(true) : angular.noop;
+							return;
+						}
+					}
+				}
+				angular.isFunction(c) ? c(false) : angular.noop;
 			}
 		},
 		message:{
@@ -1649,10 +1671,24 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					data:m
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
+			reviewPublishIssue:function(i, c){
+				_req({
+					method: "post",
+					url: "issue//reviewIssueForPublish.jo",
+					data:i
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
 			handleIssues: function(i, c) {//
 				_req({
 					method: "post",
 					url: "issue/handleissue.jo",
+					data:i
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			reviewHandleIssue:function(i, c){
+				_req({
+					method: "post",
+					url: "issue//reviewIssueForHandle.jo",
 					data:i
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
@@ -1899,7 +1935,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				$scope.user.name = d.name;
 				$scope.user.photo = d.avatarUrl || "img/tem-img/img-person.jpg";
 				$scope.user.department = (d.department || {}).name || "n/a";
-				$scope.user.roles = (d.roles || {}).name || "App游客";
+				
+//				alert(JSON.stringify($scope.user.department));
+				if(d.roles && d.roles.length > 0){
+					$scope.user.roles = d.roles;
+				}else{
+					$scope.user.roles =  [{"name":"App游客"}];
+				}
+				
+//				alert(JSON.stringify($scope.user.roles));
 				$scope.user.id = d.id;
 				$scope.$location.path("/");
 				
@@ -2879,8 +2923,17 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	var s = $scope.issues.currentSectId,
 	t = $scope.issues.currentIssueType,
 	lastLoaded = 0;
-
+	var createAuth = false;
+	model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_ISSUE_PUBLISH,function(d)
+			{
+				if(d || false){
+					createAuth = true;
+				}else{
+					createAuth = false;
+				}
+			});
 	angular.extend($scope, {
+		authoCreateIssue: createAuth,
 		page: 1,
 		items: [],
 		myPublisherCat: 0,
@@ -2949,6 +3002,42 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	$scope.isVote = false;
 	$scope.voteMembers = [];
 	$scope.voteMemberStr = "";
+	$scope.authoHandleIssue=false;
+	$scope.authoAcceptIssue=false;
+	$scope.authoReviewPublishIssue=false;
+	$scope.authoReviewHandleIssue=false;
+	model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_PUBLISH_ISSUE_REVIEW,function(d)
+			{
+				if(d || false){
+					$scope.authoReviewPublishIssue = true;
+				}else{
+					$scope.authoReviewPublishIssue = false;
+				}
+			});
+	model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_HANDLE_ISSUE_REVIEW,function(d)
+			{
+				if(d || false){
+					$scope.authoReviewHandleIssue = true;
+				}else{
+					$scope.authoReviewHandleIssue = false;
+				}
+			});
+	model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_ISSUE_HANDLE,function(d)
+			{
+				if(d || false){
+					$scope.authoHandleIssue = true;
+				}else{
+					$scope.authoHandleIssue = false;
+				}
+			});
+	model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_ISSUE_ACCEPT,function(d)
+			{
+				if(d || false){
+					$scope.authoAcceptIssue = true;
+				}else{
+					$scope.authoAcceptIssue = false;
+				}
+			});
 	model.issues.getIssue(id, function(d) {
 		if(d) {
 			$scope.issueItem = d;
@@ -3350,6 +3439,62 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					}, 1000);
 				}
 			});
+		}
+	});
+	
+}])
+
+.controller("cIssueReview", ["$scope", "model", "$timeout",function($scope, model, $timeout){
+	alert(JSON.stringify($scope.issues.currentIssue));
+	if($scope.issues.currentIssue.issueStatus != $scope.Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW
+			&& $scope.issues.currentIssue.issueStatus != $scope.Constants.ISSUESTATUS_HANDLED_WAITING_REVIEW){
+		$scope.$location.back();
+	}
+	angular.extend($scope, {
+		issueItem:{
+			id : $scope.issues.currentIssue.id,
+			reviewDesc:""
+		},
+		isPublishReview:$scope.issues.currentIssue.issueStatus == $scope.Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW,
+		isHandleReview:$scope.issues.currentIssue.issueStatus == $scope.Constants.ISSUESTATUS_HANDLED_WAITING_REVIEW,
+		tipVisibility: "none",
+		tipContent:"提交成功",
+		remain:150,
+		contentChanged:function(){
+			if($scope.issueItem.reviewDesc!= null){
+				$scope.remain = 150 - $scope.issueItem.reviewDesc.length;
+			}
+		},
+		submit: function(s){
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
+			var _item = {
+					id: $scope.issueItem.id,
+					reviewStatus: s,
+					reviewDesc:$scope.issueItem.reviewDesc
+			};
+			if($scope.isPublishReview || false){
+				model.issues.reviewPublishIssue(_item, function(d) {
+					if (d) {
+						$scope.tipVisibility = "block";
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
+					}
+				});
+			}else if($scope.isHandleReview || false){
+				model.issues.reviewHandleIssue(_item, function(d) {
+					if (d) {
+						$scope.tipVisibility = "block";
+						$timeout(function() {
+							$scope.$location.back();
+						}, 1000);
+					}
+				});
+			}
+			
 		}
 	});
 	
@@ -4963,6 +5108,11 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		templateUrl: "partials/wenti-check.html",
 		controller: "cIssueCheck"
 	})
+	.when("/issue-review",{
+		templateUrl: "partials/wenti-review.html",
+		controller: "cIssueReview"
+	})
+	
 	.when("/onepage", {
 		templateUrl: "partials/one-page.html",
 		controller: "cOnePage"

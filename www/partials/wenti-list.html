@@ -7,7 +7,7 @@
 	<p class="title" ng-if="issues.currentIssueType == Constants.ISSUETYPE_QUALITY">质量问题</p>
 	<p class="title" ng-if="issues.currentIssueType == Constants.ISSUETYPE_MATERIAL">资料</p>
 	<span class="search"><img src="img/icon-search.png"/></span>
-	<a ng-click="$location.path('/issue-create')" href=""><span class="jia"><img src="img/icon-jia.png"/></span></a><span class="nochoose" style="display:none;">取消</span>
+	<a ng-if="authoCreateIssue == true" ng-click="$location.path('/issue-create')" href=""><span class="jia"><img src="img/icon-jia.png"/></span></a><span class="nochoose" style="display:none;">取消</span>
 </header>
 <section class="mlr10 searchblock"><input name="" type="text" ng-model="filterTitle" ng-change="search()"/></section>
 
