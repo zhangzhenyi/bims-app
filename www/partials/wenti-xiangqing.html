@@ -109,7 +109,7 @@
 		<li class="first clearfix">
 			<img ng-src="{{::(issueHandle.handleReviewerAvatarUrl || 'img/i-xq-person.jpg')}}" class="i-person"/>
 			<p class="name">{{::issueHandle.handleReviewerName}}</p><p class="time">{{::formatDate(issueHandle.handleReviewTime)}}</p>
-			<span ng-show="issueHandle.issueStatus==Constants.ISSUESTATUS_HANDLED"><b>已审核</b><i><img src="img/i-pass.png"/></i></span>
+			<span ng-show="issueHandle.issueStatus==Constants.ISSUESTATUS_HANDLED||issueHandle.issueStatus==Constants.ISSUESTATUS_REFUSED"><b>已审核</b><i><img src="img/i-pass.png"/></i></span>
 			<span ng-show="issueHandle.issueStatus==Constants.ISSUESTATUS_HANDLE_REVIEW_REFUSED"> <b style="color:#fe4f4f;">重新处理</b><i></i></span>
 		</li>
 		<li class="clearfix">

@@ -3286,13 +3286,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			delete item.topicType;
 				model.issues.update(item, function(d) {
 					if (d) {
-						changeTipmessage("编辑成功”,”tipimg");
+						changeTipmessage("编辑成功", "tipimg");
 						model.removeFiles($scope.newIssue.issuePicAttachmentList.concat($scope.newIssue.issueVideoAttachmentList));
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
 					}else{
-						changeTipmessage("编辑失败”,”tipimg");
+						changeTipmessage("编辑失败","tipimg");
 					}
 					closetipmessage1("tipimg");
 				});
