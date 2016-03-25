@@ -3000,6 +3000,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	});
 }])
 .controller("cIssueDetails", ["$scope", "model", "$timeout", function($scope, model, $timeout) {
+	$scope.noAnyMenu = true;
 	var id = $scope.issues.currentIssue.id;
 	$scope.issueItem = $scope.issues.currentIssue;
 	$scope.tipVisibility = "none";
@@ -3047,6 +3048,53 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	model.issues.getIssue(id, function(d) {
 		if(d) {
 			$scope.issueItem = d;
+			//判断显示menu
+			if(($scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW 
+					|| $scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_PUBLISH_REVIEW_REFUSED) 
+					&& $scope.user.id==$scope.issueItem.publisherId){
+				$scope.hasEditMenu = true;
+			}else{
+				$scope.hasEditMenu = false;
+			}
+			
+			if($scope.user.id==$scope.issueItem.publisherId){
+				$scope.hasDeleteMenu = true;
+			}else{
+				$scope.hasDeleteMenu = false;
+			}
+			if($scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW 
+					&& $scope.authoReviewPublishIssue == true){
+				$scope.hasReviewPublishMenu = true;
+			}else{
+				$scope.hasReviewPublishMenu = false;
+			}
+			if($scope.authoHandleIssue == true 
+					&& ($scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_HANDLE_REVIEW_REFUSED 
+							|| $scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_PUBLISHED 
+							|| $scope.issueItem.issueStatus == $scope.Constants.ISSUESTATUS_REFUSED)){
+				$scope.hasHandleMenu = true;
+			}else{
+				$scope.hasHandleMenu = false;
+			}
+			if($scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_HANDLED_WAITING_REVIEW 
+					&& $scope.authoReviewHandleIssue == true){
+				$scope.hasReviewHandleMenu = true;
+			}else{
+				$scope.hasReviewHandleMenu = false;
+			}
+			if($scope.authoAcceptIssue==true && $scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_HANDLED){
+				$scope.hasAcceptMenu = true;
+			}else{
+				$scope.hasAcceptMenu = false;
+			}
+			//如果没有任何menu，不显示。。。。
+			if($scope.hasEditMenu == false && $scope.hasEditMenu == false
+					&& $scope.hasReviewPublishMenu == false && $scope.hasHandleMenu == false
+					&& $scope.hasReviewHandleMenu == false && $scope.hasAcceptMenu == false){
+				$scope.noAnyMenu = true;
+			}else{
+				$scope.noAnyMenu = false;
+			}
 //			$scope.setSelected($scope.issueItem.at);
 		    var issueCats = ["制度／方案缺陷","交底培训缺陷","有章不循","未识别的危险源"];
 			

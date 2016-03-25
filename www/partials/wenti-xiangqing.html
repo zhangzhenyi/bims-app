@@ -5,16 +5,16 @@
 <header class="bg1">
 	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
 	<p class="title">问题详情</p>
-	<span class="more" ><img src="img/icon-more-1.png" style="width:24px;height:20px;"/></span>
+	<span class="more"  ng-show="noAnyMenu == false"><img src="img/icon-more-1.png" style="width:24px;height:20px;"/></span>
 	<div class="pop-window1">
 	<img src="img/icon-jian5.png" class="j"/><div class="cb"></div>
 	<ul>
-		<li ng-show="(issueItem.issueStatus==Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW || issueItem.issueStatus==Constants.ISSUESTATUS_PUBLISH_REVIEW_REFUSED) && user.id==issueItem.publisherId"><a href="" ng-click="$location.path('/issue-edit')"><img src="img/icon-edit201512.png"/> 编辑</a></li>
-		<li ng-show="user.id==issueItem.publisherId"><a href="javascript:void(0);" id="del"><img src="img/icon-del201512.png"/> 删除</a></li>
-		<li ng-if="issueItem.issueStatus==Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW && authoReviewPublishIssue == true"><a href="" ng-click="$location.path('/issue-review')" ><img src="img/icon-m201512.png"/> 审核</a></li>
-		<li ng-show="authoHandleIssue == true && (issueItem.issueStatus==Constants.ISSUESTATUS_HANDLE_REVIEW_REFUSED || issueItem.issueStatus==Constants.ISSUESTATUS_PUBLISHED || issueItem.issueStatus == Constants.ISSUESTATUS_REFUSED)"><a href="" ng-click="$location.path('/issue-handle')" ><img src="img/icon-m201512.png"/> 处理</a></li>
-		<li ng-if="issueItem.issueStatus==Constants.ISSUESTATUS_HANDLED_WAITING_REVIEW && authoReviewHandleIssue == true"><a href="" ng-click="$location.path('/issue-review')" ><img src="img/icon-m201512.png"/> 审核</a></li>
-		<li ng-if="authoAcceptIssue==true && issueItem.issueStatus==Constants.ISSUESTATUS_HANDLED"><a href="" ng-click="$location.path('/issue-check')" ><img src="img/icon-m201512.png"/> 验收</a></li>
+		<li ng-show="hasEditMenu == true"><a href="" ng-click="$location.path('/issue-edit')"><img src="img/icon-edit201512.png"/> 编辑</a></li>
+		<li ng-show="hasDeleteMenu == true"><a href="javascript:void(0);" id="del"><img src="img/icon-del201512.png"/> 删除</a></li>
+		<li ng-if="hasReviewPublishMenu == true"><a href="" ng-click="$location.path('/issue-review')" ><img src="img/icon-m201512.png"/> 审核</a></li>
+		<li ng-show="hasHandleMenu == true"><a href="" ng-click="$location.path('/issue-handle')" ><img src="img/icon-m201512.png"/> 处理</a></li>
+		<li ng-if="hasReviewHandleMenu == true"><a href="" ng-click="$location.path('/issue-review')" ><img src="img/icon-m201512.png"/> 审核</a></li>
+		<li ng-if="hasAcceptMenu == true"><a href="" ng-click="$location.path('/issue-check')" ><img src="img/icon-m201512.png"/> 验收</a></li>
 	</ul>
 	</div>
 </header>
