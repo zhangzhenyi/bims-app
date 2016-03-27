@@ -1985,6 +1985,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 							$scope.tipVisibility = "block";
 							$timeout(function() {
 								$scope.tipVisibility = "none";
+								$scope.$location.back()
 							}, 2000);
 						}
 					});
