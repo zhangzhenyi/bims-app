@@ -3994,7 +3994,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					      function (result) {
 					    	  if(result.cancelled == 0){
 					    		  $scope.newItem.compId = result.text;
-					    		  tipmessage("二维码提取成功");
+//					    		  tipmessage("二维码提取成功");
 					    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					    			  if(d && d[0]){
 					    				  tipmessage("该构件签认已完成", "_FoundCompId");
@@ -4002,7 +4002,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					    				  $scope.trace.current = d[0];
 					    				  $scope.$location.path("/spotcheck-detail");
 					    			  }else{
-					    				  tipmessage("该构件允许签认", "_FoundCompId");
+//					    				  tipmessage("该构件允许签认", "_FoundCompId");
 					    				  //Get component info
 					    				  model.component.get($scope.newItem.compId, function(d){
 					    					  if(d  && d.name){
@@ -4022,6 +4022,19 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					    	  tipmessage("扫描二维码失败");
 					      }
 				);
+			},
+			onCompIdChange: function() {
+				model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+	    			  if(d && d[0]){
+	    				  tipmessage("该构件签认已完成", "_FoundCompId");
+	    			  }else{
+	    				  model.component.get($scope.newItem.compId, function(d) {
+	    						if (d && d.name) $scope.newItem.component = d;
+	    						else tipmessage("该构件编码不存在");
+	    					});
+	    			  }
+				});
+				
 			},
 			changed: function() {
 				$scope.remain = 150 - $scope.newItem.content.length;
@@ -4078,6 +4091,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				else if(isBlankString($scope.newItem.compId)){
 					tipmessage("请检查构件是否存在");
 		        	return;
+				}else if(!$scope.newItem.component || !$scope.newItem.component.name || $scope.newItem.component.name.length <= 0){
+					tipmessage("请检查构件是否存在");
+		        	return;
 				}
 				tipmessage1(message="上传文件中",id="tipimg");
 	
@@ -4105,6 +4121,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		        	return;
 		        }
 				else if(isBlankString($scope.newItem.compId)){
+					tipmessage("请检查构件是否存在");
+		        	return;
+				}else if(!$scope.newItem.component || !$scope.newItem.component.name || $scope.newItem.component.name.length <= 0){
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
@@ -4170,6 +4189,18 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			changed: function() {
 				$scope.remain = 150 - $scope.newItem.content.length;
 			},
+			onCompIdChange: function() {
+				model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+	    			  if(d && d[0]){
+	    				  tipmessage("该构件签认已完成", "_FoundCompId");
+	    			  }else{
+	    				  model.component.get($scope.newItem.compId, function(d) {
+	    						if (d && d.name) $scope.newItem.component = d;
+	    						else tipmessage("该构件编码不存在");
+	    					});
+	    			  }
+				});
+			},
 			imageChanged: function(uri) {
 				$scope.newItem.picAttachmentList.push({
 					fileUrl: uri,
@@ -4181,6 +4212,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
 		        }else if(isBlankString($scope.newItem.compId)){
+					tipmessage("请检查构件是否存在");
+		        	return;
+				}else if(!$scope.newItem.component || !$scope.newItem.component.name || $scope.newItem.component.name.length <= 0){
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
@@ -4208,6 +4242,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
 		        }else if(isBlankString($scope.newItem.compId)){
+					tipmessage("请检查构件是否存在");
+		        	return;
+				}else if(!$scope.newItem.component || !$scope.newItem.component.name || $scope.newItem.component.name.length <= 0){
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
@@ -4750,9 +4787,15 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		onCompIdChange: function() {
-			model.component.get($scope.newItem.compId, function(d) {
-				if (d) $scope.newItem.component = d;
-				else tipmessage("该构件编码不存在");
+			model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+  			  if(d && d[0]){
+  				  tipmessage("该构件签认已完成", "_FoundCompId");
+  			  }else{
+  				  model.component.get($scope.newItem.compId, function(d) {
+  						if (d && d.name) $scope.newItem.component = d;
+  						else tipmessage("该构件编码不存在");
+  					});
+  			  }
 			});
 		},
 		removeImage: function(url) {
@@ -4772,6 +4815,16 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		submit: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }else if(isBlankString($scope.newItem.compId)){
+				tipmessage("请检查构件是否存在");
+	        	return;
+			}else if(!$scope.newItem.component || !$scope.newItem.component.name || $scope.newItem.component.name.length <= 0){
+				tipmessage("请检查构件是否存在");
+	        	return;
+			}
 			model.uploadAttachments($scope.newItem, function(item) {
 				delete item._index;
 				delete item._type;
@@ -4794,6 +4847,16 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		save: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }else if(isBlankString($scope.newItem.compId)){
+				tipmessage("请检查构件是否存在");
+	        	return;
+			}else if(!$scope.newItem.component || !$scope.newItem.component.name || $scope.newItem.component.name.length <= 0){
+				tipmessage("请检查构件是否存在");
+	        	return;
+			}
 			if ($scope.trace.zhiliang.current || false) {
 				var opt = angular.extend({}, $scope.trace.zhiliang);
 				delete opt.current;
@@ -4943,9 +5006,15 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		onCompIdChange: function() {
-			model.component.get($scope.newItem.compId, function(d) {
-				if (d) $scope.newItem.component = d;
-				else tipmessage("该构件编码不存在");
+			model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+  			  if(d && d[0]){
+  				  tipmessage("该构件签认已完成", "_FoundCompId");
+  			  }else{
+  				  model.component.get($scope.newItem.compId, function(d) {
+  						if (d && d.name) $scope.newItem.component = d;
+  						else tipmessage("该构件编码不存在");
+  					});
+  			  }
 			});
 		},
 		removeImage: function(url) {
@@ -4965,6 +5034,16 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		submit: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }else if(isBlankString($scope.newItem.compId)){
+				tipmessage("请检查构件是否存在");
+	        	return;
+			}else if(!$scope.newItem.component || !$scope.newItem.component.name || $scope.newItem.component.name.length <= 0){
+				tipmessage("请检查构件是否存在");
+	        	return;
+			}
 			model.uploadAttachments($scope.newItem, function(item) {
 				delete item._index;
 				delete item._type;
@@ -4987,6 +5066,16 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		save: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }else if(isBlankString($scope.newItem.compId)){
+				tipmessage("请检查构件是否存在");
+	        	return;
+			}else if(!$scope.newItem.component || !$scope.newItem.component.name || $scope.newItem.component.name.length <= 0){
+				tipmessage("请检查构件是否存在");
+	        	return;
+			}
 			if ($scope.trace.chengzhangguocheng.current || false) {
 				var opt = angular.extend({}, $scope.trace.chengzhangguocheng);
 				delete opt.current;

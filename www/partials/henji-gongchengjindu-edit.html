@@ -5,10 +5,11 @@
 	<span class="txt1"><a ng-click="save()" href="">保存</a></span><span class="nochoose"><a ng-click="submit()" href="">提交</a></span>
 </header>
 <section class="mt10">
+<form name="form">
 	<ul class="list-3">
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-14.jpg"/>标题</span>
-			<span class="r"><my-title-picker ng-model="newItem.title"></my-title-picker></span>
+			<span class="r"><my-title-picker ng-model="newItem.title" required></my-title-picker></span>
 		</li>
 		<li class="clearfix">
 			<span class="t"><img src="img/i-xq-2.jpg"/>总体概况</span>
@@ -51,5 +52,6 @@
 			</div>
 		</li>
 	</ul>
+	</form>
 </section>
 </div>
