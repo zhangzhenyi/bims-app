@@ -4276,6 +4276,8 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		});
 		break;
 	case "/spotcheck-edit":
+		var oldComp = {compId:"--"};
+		
 		angular.extend($scope, {
 			remain:150,
 			saveTitle:"spotcheck",
@@ -4299,6 +4301,11 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					      function (result) {
 					    	  if(result.cancelled == 0){
 					    		  $scope.newItem.compId = result.text;
+					    		  if(oldComp.compId == $scope.newItem.compId){
+										//编辑模式，取出的compid没变,恢复原先的component
+										$scope.newItem.component = oldComp;
+										return;
+									}
 					    		  tipmessage("二维码提取成功");
 					    		  model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					    			  if(d && d[0]){
@@ -4330,6 +4337,11 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				$scope.remain = 150 - $scope.newItem.content.length;
 			},
 			onCompIdChange: function() {
+				if(oldComp.compId == $scope.newItem.compId){
+					//编辑模式，取出的compid没变,恢复原先的component
+					$scope.newItem.component = oldComp;
+					return;
+				}
 				model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	    			  if(d && d[0]){
 	    				  tipmessage("该构件签认已完成", "_FoundCompId");
@@ -4398,6 +4410,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		model.trace.get($scope.trace.current.id, function(d) {
 			if(d && d.component) {
 				$scope.newItem = d;
+				oldComp = d.component;
 			}
 		});
 		
@@ -4501,6 +4514,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			if (d) $scope.sections = d;
 		});
 	}
+
 	angular.extend($scope, {
 		person: $scope.trace.henjishangchuan.type != 6,
 		background: $scope.trace.henjishangchuan.type > 9,
@@ -4531,6 +4545,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		submit: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			model.uploadAttachments($scope.newItem, function(item) {
 				delete item._index;
 				delete item._type;
@@ -4553,6 +4571,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		save: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			if ($scope.trace.henjishangchuan.current || false) {
 				var opt = angular.extend({}, $scope.trace.henjishangchuan);
 				delete opt.current;
@@ -4769,6 +4791,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		submit: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			$scope.newItem.payment = $scope.payment + '';
 			model.uploadAttachments($scope.newItem, function(item) {
 				delete item._index;
@@ -4792,6 +4818,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		save: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			$scope.newItem.payment = $scope.payment + '';
 			if ($scope.trace.gongchengjindu.current || false) {
 				var opt = angular.extend({}, $scope.trace.gongchengjindu);
@@ -4900,6 +4930,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	});
 }])
 .controller("cHenjiZhiliangEdit", ["$window", "$scope", "$timeout", "model", "transferCache", function($window, $scope, $timeout, model, transferCache) {
+	var oldComp = {compId:"--"};
+	if($scope.trace.zhiliang.current){
+		oldComp = $scope.trace.zhiliang.current.component;
+	}
 	angular.extend($scope, {
 		docTypes:  [
     	    {id: 1, v: "出厂证书"},
@@ -4917,17 +4951,34 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		canScan: $window.cordova && $window.cordova.plugins && cordova.plugins.barcodeScanner,
 		scan: function() {
 			cordova.plugins.barcodeScanner.scan(function(r) {
+				 if(r.cancelled != 0) return;
 				$scope.newItem.compId = r.text;
+				if(oldComp.compId == $scope.newItem.compId){
+					//编辑模式，取出的compid没变,恢复原先的component
+					$scope.newItem.component = oldComp;
+					return;
+				}
+				model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
+		  			  if(d && d[0]){
+		  				  tipmessage("该构件签认已完成", "_FoundCompId");
+		  			  }else{
 				model.component.get(r.text, function(d) {
 					if (d) $scope.newItem.component = d;
 					else tipmessage("该构件编码不存在");
+				});
+		  			  }
 				});
 			}, function(e) {
 				tipmessage("扫描二维码失败");
 			});
 		},
 		onCompIdChange: function() {
-			model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+			if(oldComp.compId == $scope.newItem.compId){
+				//编辑模式，取出的compid没变,恢复原先的component
+				$scope.newItem.component = oldComp;
+				return;
+			}
+			model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
   			  if(d && d[0]){
   				  tipmessage("该构件签认已完成", "_FoundCompId");
   			  }else{
@@ -5126,6 +5177,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	});
 }])
 .controller("cHenjiChengzhangguochengEdit", ["$window", "$scope", "$timeout", "model", "transferCache", function($window, $scope, $timeout, model, transferCache) {
+	var oldComp = {compId:"--"};
+	if($scope.trace.chengzhangguocheng.current){
+		oldComp = $scope.trace.chengzhangguocheng.current.component;
+	}
 	angular.extend($scope, {
 		newItem: $scope.trace.chengzhangguocheng.current || {
 			topicType: 8,
@@ -5136,17 +5191,35 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		canScan: $window.cordova && $window.cordova.plugins && cordova.plugins.barcodeScanner,
 		scan: function() {
 			cordova.plugins.barcodeScanner.scan(function(r) {
+				 if(r.cancelled != 0) return;
 				$scope.newItem.compId = r.text;
+				if(oldComp.compId == $scope.newItem.compId){
+					//编辑模式，取出的compid没变,恢复原先的component
+					$scope.newItem.component = oldComp;
+					return;
+				}
+				
+				model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
+		  			  if(d && d[0]){
+		  				  tipmessage("该构件签认已完成", "_FoundCompId");
+		  			  }else{
 				model.component.get(r.text, function(d) {
 					if (d) $scope.newItem.component = d;
 					else tipmessage("该构件编码不存在");
+				});
+		  			  }
 				});
 			}, function(e) {
 				tipmessage("扫描二维码失败");
 			});
 		},
 		onCompIdChange: function() {
-			model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+			if(oldComp.compId == $scope.newItem.compId){
+				//编辑模式，取出的compid没变,恢复原先的component
+				$scope.newItem.component = oldComp;
+				return;
+			}
+			model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
   			  if(d && d[0]){
   				  tipmessage("该构件签认已完成", "_FoundCompId");
   			  }else{

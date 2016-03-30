@@ -6,29 +6,30 @@
 	<span class="txt1"><a ng-click="save()" href="">保存</a></span><span class="nochoose"><a ng-click="submit()" href="">提交</a></span>
 </header>
 <section class="mt10">
+<form name="form">
 	<ul class="list-3">
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-14.jpg"/>主题</span>
 			<span class="r">
-				<input type="text" ng-model="newItem.title" class="fromtxt" placeholder="您还可以输入150个字符"/>
+				<input type="text" ng-model="newItem.title" required class="fromtxt" placeholder="您还可以输入150个字符"/>
 			</span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-2.jpg"/>地点</span>
 			<span class="r">
-				<select class="fromtxt" ng-model="newItem.location" ng-options="location.v as location.v for location in locations"></select>
+				<select class="fromtxt" ng-model="newItem.location" required ng-options="location.v as location.v for location in locations"></select>
 			</span>
 		</li>
 		<li class="clearfix" ng-if="person">
 			<span class="l"><img src="img/i-xq-8.jpg"/>人物</span>
 			<span class="r">
-				<input type="text" ng-model="newItem.person" class="fromtxt" placeholder="您还可以输入150个字符"/>
+				<input type="text" ng-model="newItem.person" required class="fromtxt" placeholder="您还可以输入150个字符"/>
 			</span>
 		</li>
 		<li class="clearfix" ng-if="background">
 			<span class="l"><img src="img/i-xq-3.jpg"/>背景</span>
 			<span class="r">
-				<input type="text" ng-model="newItem.background" class="fromtxt" placeholder="您还可以输入150个字符"/>
+				<input type="text" ng-model="newItem.background" required class="fromtxt" placeholder="您还可以输入150个字符"/>
 			</span>
 		</li>
 		<li class="clearfix" ng-if="section">
@@ -47,5 +48,6 @@
 			</span>
 		</li>
 	</ul>
+	</form>
 </section>
 </div>
