@@ -4391,6 +4391,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		submit: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			model.uploadAttachments($scope.newItem, function(item) {
 				delete item._index;
 				delete item._type;
@@ -4413,6 +4417,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		save: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			if ($scope.trace.henjishangchuan.current || false) {
 				var opt = angular.extend({}, $scope.trace.henjishangchuan);
 				delete opt.current;
@@ -4629,6 +4637,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		submit: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			$scope.newItem.payment = $scope.payment + '';
 			model.uploadAttachments($scope.newItem, function(item) {
 				delete item._index;
@@ -4652,6 +4664,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		save: function() {
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
 			$scope.newItem.payment = $scope.payment + '';
 			if ($scope.trace.gongchengjindu.current || false) {
 				var opt = angular.extend({}, $scope.trace.gongchengjindu);
@@ -4787,7 +4803,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		onCompIdChange: function() {
-			model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+			model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
   			  if(d && d[0]){
   				  tipmessage("该构件签认已完成", "_FoundCompId");
   			  }else{
@@ -5006,7 +5022,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		onCompIdChange: function() {
-			model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
+			model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
   			  if(d && d[0]){
   				  tipmessage("该构件签认已完成", "_FoundCompId");
   			  }else{
