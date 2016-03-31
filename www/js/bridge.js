@@ -2930,6 +2930,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	t = $scope.issues.currentIssueType,
 	lastLoaded = 0;
 	var createAuth = false;
+	if(t == $scope.Constants.ISSUETYPE_MATERIAL){
+		createAuth = true;
+	}else
 	model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_ISSUE_PUBLISH,function(d)
 			{
 				if(d || false){
@@ -3013,38 +3016,46 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	$scope.authoAcceptIssue=false;
 	$scope.authoReviewPublishIssue=false;
 	$scope.authoReviewHandleIssue=false;
-	model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_PUBLISH_ISSUE_REVIEW,function(d)
-			{
-				if(d || false){
-					$scope.authoReviewPublishIssue = true;
-				}else{
-					$scope.authoReviewPublishIssue = false;
-				}
-			});
-	model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_HANDLE_ISSUE_REVIEW,function(d)
-			{
-				if(d || false){
-					$scope.authoReviewHandleIssue = true;
-				}else{
-					$scope.authoReviewHandleIssue = false;
-				}
-			});
-	model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_ISSUE_HANDLE,function(d)
-			{
-				if(d || false){
-					$scope.authoHandleIssue = true;
-				}else{
-					$scope.authoHandleIssue = false;
-				}
-			});
-	model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_ISSUE_ACCEPT,function(d)
-			{
-				if(d || false){
-					$scope.authoAcceptIssue = true;
-				}else{
-					$scope.authoAcceptIssue = false;
-				}
-			});
+	if($scope.issueItem.issueType == $scope.Constants.ISSUETYPE_MATERIAL){
+		$scope.authoHandleIssue=true;
+		$scope.authoAcceptIssue=true;
+		$scope.authoReviewPublishIssue=true;
+		$scope.authoReviewHandleIssue=true;
+	}else{
+		model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_PUBLISH_ISSUE_REVIEW,function(d)
+				{
+					if(d || false){
+						$scope.authoReviewPublishIssue = true;
+					}else{
+						$scope.authoReviewPublishIssue = false;
+					}
+				});
+		model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_HANDLE_ISSUE_REVIEW,function(d)
+				{
+					if(d || false){
+						$scope.authoReviewHandleIssue = true;
+					}else{
+						$scope.authoReviewHandleIssue = false;
+					}
+				});
+		model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_ISSUE_HANDLE,function(d)
+				{
+					if(d || false){
+						$scope.authoHandleIssue = true;
+					}else{
+						$scope.authoHandleIssue = false;
+					}
+				});
+		model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_ISSUE_ACCEPT,function(d)
+				{
+					if(d || false){
+						$scope.authoAcceptIssue = true;
+					}else{
+						$scope.authoAcceptIssue = false;
+					}
+				});
+	}
+	
 	//＊＊＊＊＊＊＊如果是新创建待审核的问题，公司领导可以审核 TODO ＊＊＊＊＊＊＊＊＊＊＊
 	model.issues.getIssue(id, function(d) {
 		if(d) {
