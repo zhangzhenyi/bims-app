@@ -213,34 +213,55 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	  };
 }])
 .directive("myColumnChart", ["$parse", "$timeout", function($parse, $timeout) {
-	function _options(title, xAxis, yAxis, series) {
+	Highcharts.setOptions({ global: { useUTC: false	} });
+	
+	function _options(m) {
 		return {
-			chart: { type: 'column' },
+			chart: {type: 'column'},
 			credits: {enabled: false},
-			title: { text: title || '' },
-			xAxis: { categories: xAxis || []},
-			yAxis: { min: 0, title: { text: yAxis || ''} },
+			title: { text: m.title || '' },
+			xAxis: { categories: m.xAxis || []},
+			yAxis: { min: 0, title: { text: m.yAxis || ''} },
 			tooltip: false,
 			plotOptions: { column: { pointPadding: 0.2, borderWidth: 0 } },
-			series: series || []
+			series: m.series || []
 		};
 	}
 	
 	return {
-		restrict: "AE",
+		restrict: "E",
 		transclude: true,
 		replace: true,
 		template: "<div></div>",
 		compile: function(t, a) {
-			t.attr("id", a.model).css("margin-top", "3px");
 			return {
-				post: function(s) {
-					s.chart = function(model) {
-						if (angular.isString(model)) {
-							var m = ($parse(model))(s);
-							angular.element("#" + model).highcharts(_options(m.title, m.xAxis, m.yAxis, m.series));
-						}
-					};
+				post: function(s, e, a) {
+					$timeout(function _fn_chart_loading() {
+						var m = $parse(a.model)(s), chart;
+						if (m || false) {
+							chart = e.highcharts(_options(m)).highcharts();
+							s.$watch(
+								function() {
+									return $parse(a.model)(s);
+								},
+								function(n, o) {
+									if (n != o) {
+										if (n || false) {
+											chart.setTitle({text: n.title}, false, false);
+											chart.xAxis[0].setCategories(n.xAxis || [], false);
+											chart.yAxis[0].setTitle({text: n.yAxis || ""}, false);
+											chart.series[0].setData(n.series, true);
+										} else if (o || false) {
+											chart.setTitle({text: ""}, false, false);
+											chart.xAxis[0].setCategories([], false);
+											chart.yAxis[0].setTitle({text: ""}, false);
+											chart.series[0].setData([], true);
+										}
+									}
+								}
+							);
+						} else $timeout(_fn_chart_loading, 200);
+					});
 				}
 			};
 		}
@@ -1311,7 +1332,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			var r = {
 				title: d.title,
 				xAxis: d.horiOrdinateLabels,
-				yAxis: "Issue",
+				yAxis: "问题",
 				series: []
 			}, i, j, v;
 			if (angular.isArray(d.types)) {
@@ -5311,28 +5332,26 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 .controller("cStatisticsQuality", ["$scope", function($scope) {
 	angular.extend($scope, {
 		title: "质量问题统计",
+		charts: [],
 		go: function(b) {
+			$scope.charts = [];
 			$scope.issueStatistics.get(1, 1, function(d) {
-				if (angular.isArray(d) && d.length > 0) {
-					$scope["chart_1"] = $scope.issueStatistics.toChartModel(d[0]);
-					$scope.chart("chart_1");
-				}
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_first"] = $scope.issueStatistics.toChartModel(d[0]);
 			});
 			$scope.issueStatistics.get(1, 2, function(d) {
 				if (angular.isArray(d)) {
 					var i, n;
 					for (i = 0; i < d.length; i++) {
-						n = "chart_" + (2 + i);
+						n = "chart_" + i;
+						$scope.charts.push(n);
 						$scope[n] = $scope.issueStatistics.toChartModel(d[i]);
-						$scope.chart(n);
 					}
 				}
 			});
 			$scope.issueStatistics.get(1, 3, function(d) {
-				if (angular.isArray(d) && d.length > 0) {
-					$scope["chart_99"] = $scope.issueStatistics.toChartModel(d[0]);
-					$scope.chart("chart_99");
-				}
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_last"] = $scope.issueStatistics.toChartModel(d[0]);
 			});
 			if (b) $scope.issueStatistics.show(false,'.mydateblock');
 		}
@@ -5342,28 +5361,26 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 .controller("cStatisticsSafe", ["$scope", function($scope) {
 	angular.extend($scope, {
 		title: "安全问题统计",
+		charts: [],
 		go: function(b) {
+			$scope.charts = [];
 			$scope.issueStatistics.get(2, 1, function(d) {
-				if (d && d.length > 0) {
-					$scope["chart_1"] = $scope.issueStatistics.toChartModel(d[0]);
-					$scope.chart("chart_1");
-				}
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_first"] = $scope.issueStatistics.toChartModel(d[0]);
 			});
 			$scope.issueStatistics.get(2, 2, function(d) {
-				if (d) {
+				if (angular.isArray(d)) {
 					var i, n;
 					for (i = 0; i < d.length; i++) {
-						n = "chart_" + (2 + i);
+						n = "chart_" + i;
+						$scope.charts.push(n);
 						$scope[n] = $scope.issueStatistics.toChartModel(d[i]);
-						$scope.chart(n);
 					}
 				}
 			});
 			$scope.issueStatistics.get(2, 3, function(d) {
-				if (d && d.length > 0) {
-					$scope["chart_99"] = $scope.issueStatistics.toChartModel(d[0]);
-					$scope.chart("chart_99");
-				}
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_last"] = $scope.issueStatistics.toChartModel(d[0]);
 			});
 			if (b) $scope.issueStatistics.show(false,'.mydateblock');
 		}
@@ -5373,28 +5390,26 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 .controller("cStatisticsDoc", ["$scope", function($scope) {
 	angular.extend($scope, {
 		title: "资料问题统计",
+		charts: [],
 		go: function(b) {
+			$scope.charts = [];
 			$scope.issueStatistics.get(3, 1, function(d) {
-				if (d && d.length > 0) {
-					$scope["chart_1"] = $scope.issueStatistics.toChartModel(d[0]);
-					$scope.chart("chart_1");
-				}
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_first"] = $scope.issueStatistics.toChartModel(d[0]);
 			});
 			$scope.issueStatistics.get(3, 2, function(d) {
-				if (d) {
+				if (angular.isArray(d)) {
 					var i, n;
 					for (i = 0; i < d.length; i++) {
-						n = "chart_" + (2 + i);
+						n = "chart_" + i;
+						$scope.charts.push(n);
 						$scope[n] = $scope.issueStatistics.toChartModel(d[i]);
-						$scope.chart(n);
 					}
 				}
 			});
 			$scope.issueStatistics.get(3, 3, function(d) {
-				if (d && d.length > 0) {
-					$scope["chart_99"] = $scope.issueStatistics.toChartModel(d[0]);
-					$scope.chart("chart_99");
-				}
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_last"] = $scope.issueStatistics.toChartModel(d[0]);
 			});
 			if (b) $scope.issueStatistics.show(false,'.mydateblock');
 		}

@@ -20,13 +20,13 @@
 			</li>
 		</ul>
 	</section>
-	<my-column-chart class="mlr10" model="chart_1"></my-column-chart>
-	<my-column-chart class="mlr10" model="chart_2"></my-column-chart>
-	<my-column-chart class="mlr10" model="chart_3"></my-column-chart>
-	<my-column-chart class="mlr10" model="chart_4"></my-column-chart>
-	<my-column-chart class="mlr10" model="chart_5"></my-column-chart>
-	<my-column-chart class="mlr10" model="chart_6"></my-column-chart>
-	<my-column-chart class="mlr10" model="chart_7"></my-column-chart>
-	<my-column-chart class="mlr10" model="chart_8"></my-column-chart>
-	<my-column-chart class="mlr10" model="chart_99"></my-column-chart>
+	<div class="mlr10">
+		<my-column-chart model="chart_first"></my-column-chart>
+	</div>
+	<div class="mlr10" style="margin-top:3px;" ng-repeat="chart in charts">
+		<my-column-chart model="{{::chart}}"></my-column-chart>
+	</div>
+	<div class="mlr10" style="margin-top:3px;">
+		<my-column-chart model="chart_last"></my-column-chart>
+	</div>
 </div>
