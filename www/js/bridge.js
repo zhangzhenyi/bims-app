@@ -983,7 +983,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			USER_ROLE_AUTHORITY_HANDLE_ISSUE_REVIEW:"/reviewIssueForHandle.jo",
 			USER_ROLE_AUTHORITY_ISSUE_PUBLISH:"/publishissue.jo",
 			USER_ROLE_AUTHORITY_ISSUE_HANDLE:"/handleissue.jo",
-			USER_ROLE_AUTHORITY_ISSUE_ACCEPT:"/acceptissue.jo"
+			USER_ROLE_AUTHORITY_ISSUE_ACCEPT:"/acceptissue.jo",
+			USER_ROLE_AUTHORITY_ISSUE_PUBLISH_DOC:"/publishissueForDoc.jo",
+			USER_ROLE_AUTHORITY_ISSUE_HANDLE_DOC:"/handleissueForDoc.jo",
+			USER_ROLE_AUTHORITY_ISSUE_ACCEPT_DOC:"/acceptissueForDoc.jo"
 	};
 	
 	$rootScope.user = {};
@@ -1077,6 +1080,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		opt.fileName = fileURI.substr(fileURI.lastIndexOf('/') + 1);
 		opt.mimeType = "multipart/form-data";
 		opt.chunkedMode = false;
+		opt.headers = {
+		          Connection: "close"
+		        };
 		ft.upload(fileURI, url, function(r) {
 			callback(JSON.parse(r.response), fileURI);
 		}, function() {
@@ -1581,9 +1587,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		issues: {
 			//i is issue object
 			create: function(i, c) {
+				var u = "issue/publishissue.jo";
+				if(i.issueType == $rootScope.Constants.ISSUETYPE_MATERIAL){
+					u = "issue/publishissueForDoc.jo"
+				}
 				_req({
 					method: "post",
-					url: "issue/publishissue.jo",
+					url: u,
 					data: i
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
@@ -1684,9 +1694,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
 			handleIssues: function(i, c) {//
+				var u = "issue/handleissue.jo";
+				if(i.issueType == $rootScope.Constants.ISSUETYPE_MATERIAL){
+					u = "issue/handleissueForDoc.jo"
+				}
 				_req({
 					method: "post",
-					url: "issue/handleissue.jo",
+					url: u,
 					data:i
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
@@ -1698,9 +1712,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
 			acceptIssues: function(i, c) {//
+				var u = "issue/acceptissue.jo";
+				if(i.issueType == $rootScope.Constants.ISSUETYPE_MATERIAL){
+					u = "issue/acceptissueForDoc.jo"
+				}
 				_req({
 					method: "post",
-					url: "issue/acceptissue.jo",
+					url: u,
 					data:i
 				}, angular.isFunction(c) ? c : angular.noop);
 			}
@@ -3477,6 +3495,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	angular.extend($scope, {
 		issueItem:{
 			id : $scope.issues.currentIssue.id,
+			issueType: $scope.issues.currentIssue.issueType,
 			acceptDesc:""
 		},
 		tipVisibility: "none",
@@ -3495,6 +3514,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			var _item = {
 					id: $scope.issueItem.id,
 					acceptStatus: s,
+					issueType:$scope.issueItem.issueType,
 					acceptDesc:$scope.issueItem.acceptDesc
 			};
 			model.issues.acceptIssues(_item, function(d) {
@@ -3654,7 +3674,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	    	tipmessage1(message="上传文件中",id="tipimg");
 			model.uploadAttachments($scope.issueItem, function(item) {
 				changeTipmessage("开始创建","tipimg");
-				delete item.issueType;
+//				delete item.issueType;
 				delete item._handling_;
 				delete item.topicType;
 				model.issues.handleIssues(item, function(d) {
