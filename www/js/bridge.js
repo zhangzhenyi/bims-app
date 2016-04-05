@@ -1216,13 +1216,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					callback(false);
 				}, opt);
 			},
-			login: function(u,p,c) {
+			login: function(u,p,v,f, c) {
 				_req({
 					method: "post",
 					url: "login/loginMap.jo",
 					data: {
 						username: u || "",
-						password: p || ""
+						password: p || "",
+						version: v || "0.0.0",
+						platform: f || 1 
 					},
 					header:{
 						"contentType":"application/x-www-form-urlencoded;charset=UTF-8"
@@ -1943,40 +1945,96 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		$scope.username = localStorage["username"];
 		$scope.password = localStorage["password"];
 	}
+	$scope.onInstall =function(){
+		   if($scope.hasNewVersion){
+		   //post to outside browser to open url
+		   window.open($scope.setting.installer,"_system");
+		   }
+		   
+   };
+   $scope.popUpdateWin = function(){
+	   $("#zoomscroll").addClass("loaded").animate({opacity:1},200);
+	   $(document.body).addClass("noscroll");
+	   $(".txt-25 a").click(function(){
+                        $(".pop-window1").animate({height:0},50);
+                        $("#zoomscroll").animate({opacity:0},200);
+                        setTimeout(function(){$('#zoomscroll').removeClass('loaded');$(document.body).removeClass("noscroll");$("#zoom").html("");},400);
+                        onInstall();
+                        });
+   };
 	$scope.login = function() {
 		if(!$scope.userForm.$valid){
         	tipmessage("请输入用户名和密码");
         	return;
         }
-		model.user.login($scope.username, $scope.password, function(d) {
-			if (d && d.id) {
-				$scope.user.original = d;
-				if (window.localStorage) {
-					localStorage["username"] = $scope.username;
-					localStorage["password"] = $scope.password;
-				}
-				$scope.user.name = d.name;
-				$scope.user.photo = d.avatarUrl || "img/tem-img/img-person.jpg";
-				$scope.user.department = (d.department || {}).name || "n/a";
-				
-//				alert(JSON.stringify($scope.user.department));
-				if(d.roles && d.roles.length > 0){
-					$scope.user.roles = d.roles;
-				}else{
-					$scope.user.roles =  [{"name":"App游客"}];
-				}
-				
-//				alert(JSON.stringify($scope.user.roles));
-				$scope.user.id = d.id;
-				$scope.$location.path("/");
-				
-				model.user.list(function(d) {
-					if (d) $scope.user.list = d;
-				});
-			} else {
-				tipmessage("无效的用户名和密码。", "invalidUP");
-			}
-		});
+       var platform = 1;
+       if(!$scope.hasChecked && window.device){
+       switch(window.device.platform){
+       case 'iPhone':
+       platform = 1;
+       break;
+       case 'Android':
+       platform = 2;
+       break;
+       }
+       
+       }else{
+       $scope.setting.lastVersion = "0.0.0";
+       }
+       model.user.login($scope.username, $scope.password, $scope.origionVersion, platform, function(d) {
+            if (d && d.CODE) {
+            if(d.CODE == -101){//需要更新版本
+            model.setting.getVersion(platform, function(d){
+                                     if(d){//
+                                     $scope.hasChecked = true;
+                                     $scope.setting.currentVersion = d.version;
+                                     $scope.setting.versionTitle = d.title;
+                                     $scope.setting.versionRemark = d.remark;
+                                     if(d.url){
+                                     $scope.setting.installer = d.url;
+                                     }
+                                     
+                                     $scope.setting.lastVersion = $scope.origionVersion;
+                                     $scope.hasNewVersion = true;
+                                     $scope.popUpdateWin();
+                                     }
+                                     });
+                return;
+            }else if(d.CODE == -100){//登录失败
+                tipmessage("无效的用户名和密码。", "invalidUP");
+            }else if(d.CODE == 100 && d.DATA){//登录成功
+                        $scope.hasChecked = true;
+                $scope.user.original = d.DATA;
+                if (window.localStorage) {
+                    localStorage["username"] = $scope.username;
+                    localStorage["password"] = $scope.password;
+                }
+                $scope.user.name = d.DATA.name;
+                $scope.user.photo = d.DATA.avatarUrl || "img/tem-img/img-person.jpg";
+                $scope.user.department = (d.DATA.department || {}).name || "n/a";
+                
+                //					alert(JSON.stringify($scope.user.department));
+                if(d.roles && d.roles.length > 0){
+                    $scope.user.roles = d.DATA.roles;
+                }else{
+                    $scope.user.roles =  [{"name":"App游客"}];
+                }
+                
+                //					alert(JSON.stringify($scope.user.roles));
+                $scope.user.id = d.DATA.id;
+                $scope.$location.path("/");
+                
+                model.user.list(function(d) {
+                    if (d) $scope.user.list = d;
+                });
+            }else{
+            tipmessage("未知的登录错误。", "invalidUP");
+            }
+            
+            } else {
+                tipmessage("无效的用户名和密码。", "invalidUP");
+            }
+        });
 	};
 }])
 .controller("cZhuce", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
