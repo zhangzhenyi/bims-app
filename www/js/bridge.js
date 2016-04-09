@@ -2014,7 +2014,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
                 $scope.user.department = (d.DATA.department || {}).name || "n/a";
                 
                 //					alert(JSON.stringify($scope.user.department));
-                if(d.roles && d.roles.length > 0){
+                if(d.DATA.roles && d.DATA.roles.length > 0){
                     $scope.user.roles = d.DATA.roles;
                 }else{
                     $scope.user.roles =  [{"name":"App游客"}];
