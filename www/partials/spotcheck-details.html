@@ -13,7 +13,7 @@
 	</div>
 </header>
 <section class="mlr10 mt15 pb20">
-	<p class="title-1">{{trace.current.title}}</p>
+	<p class="title-1">{{::trace.current.title}}</p>
 </section>
 <section>
 	<ul class="list-3">
@@ -23,17 +23,17 @@
 		<li class="clearfix">
 			<span class="lll"><img src="img/i-xq-2.jpg">构件信息</span>
 			<div class="warp">
-				<p class="tp"><span>名称：</span>{{trace.current.component.name}}</p>
-				<p class="tp"><span>设计：</span>{{trace.current.component.designer}}</p>
-				<p class="tp"><span>施工：</span>{{trace.current.component.constructor}}</p>
-				<p class="tp"><span>监理：</span>{{trace.current.component.supervisor}}</p>        
+				<p class="tp"><span>名称：</span>{{::trace.current.component.name}}</p>
+				<p class="tp"><span>设计：</span>{{::trace.current.component.designer}}</p>
+				<p class="tp"><span>施工：</span>{{::trace.current.component.constructor}}</p>
+				<p class="tp"><span>监理：</span>{{::trace.current.component.supervisor}}</p>        
 			</div>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-13.jpg">签认意见</span><span class="r">{{trace.current.content}}</span>
+			<span class="l"><img src="img/i-xq-13.jpg">签认意见</span><span class="r">{{::trace.current.content}}</span>
 		</li>
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-14.jpg">签认</span><span class="rr">{{trace.current.publisherName}}</span>
+			<span class="l"><img src="img/i-xq-14.jpg">签认</span><span class="rr">{{::trace.current.publisherName}}</span>
 			<span class="time">{{::formatDate(trace.current.createTime)}}</span>
 		</li>
 		<li class="clearfix">

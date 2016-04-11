@@ -944,7 +944,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		return (new Date(time)).format("yyyy-MM-dd");
 	};
 	
-	$rootScope.origionVersion = "0.0.4.0109_beta";
+	$rootScope.origionVersion = "1.1.0.0401";
 //    $rootScope.origionVersion = "1.3.0";
 	$rootScope.hasChecked = false;
 	$rootScope.autoUpdateOnWiffi = false;
@@ -4385,8 +4385,8 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 		});
 		model.trace.get($scope.trace.current.id, function(d) {
-			if(d && d[0]) {
-				$scope.trace.current = d[0];
+			if(d && d.component) {
+				$scope.trace.current = d;
 			}
 		});
 		break;
