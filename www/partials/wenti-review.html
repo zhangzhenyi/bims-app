@@ -6,7 +6,7 @@
 	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
 	<p ng-if="isPublishReview == true" class="title">问题发布审核</p>
 	<p ng-if="isPublishReview == false" class="title">问题处理审核</p>
-	<span class="txt1" ><a ng-click="submit(false)" href="">拒绝</a></span><span class="nochoose"><a ng-click="submit(true)" href="">通过</a></span>
+	<!-- <span class="txt1" ><a ng-click="submit(false)" href="">拒绝</a></span><span class="nochoose"><a ng-click="submit(true)" href="">通过</a></span> -->
 </header>
 
 <section class="mt10 mlr10 bg2 pb75">
@@ -17,7 +17,10 @@
 			<label for="iHandleDesc" style="color:#aaa;">您还可输入{{remain}}个字符</label>
 			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged()" id="iHandleDesc" ng-model="reviewDesc" required ng-maxlength="150" maxlength="150"></textarea>
 			</span>
+			
 		</li>
+		<span><a ng-click="submit(false)" href="" class="abtn-agree">拒绝</a></span>
+		<span><a ng-click="submit(true)" href="" class="abtn-refuse">同意</a></span>
 	</ul>
 	</form>
 </section>
