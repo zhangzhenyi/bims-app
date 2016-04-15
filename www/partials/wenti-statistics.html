@@ -1,0 +1,32 @@
+<div class="pt60">
+	<header class="bg1">
+		<span class="return"><a ng-click="$location.back()" href=""><img
+				src="img/11.png" /></a></span> <span class="search"
+			ng-show="issueStatistics.searchIcon"
+			ng-click="issueStatistics.show(true,'.mydateblock')"><img
+			src="img/icon-search.png" /></span> <span ng-show="issueStatistics.nochoose"><span
+			class="txt1"><a href="" ng-click="go(true)">检索 </a></span><span
+			class="nochoose"><a href=""
+				ng-click="issueStatistics.show(false,'.mydateblock')">取消</a></span></span>
+		<p class="title">{{::title}}</p>
+	</header>
+	<section class="mlr10 mydateblock">
+		<ul class="list-4">
+			<li class="clearfix"><span class="l">起始月份：</span> <span
+				class="r"><my-month-picker
+						ng-model="issueStatistics.startTime"></my-month-picker></span></li>
+			<li class="clearfix"><span class="l">终止月份：</span> <span
+				class="r"><my-month-picker ng-model="issueStatistics.endTime"></my-month-picker></span>
+			</li>
+		</ul>
+	</section>
+	<div class="mlr10">
+		<my-column-chart model="chart_first"></my-column-chart>
+	</div>
+	<div class="mlr10" style="margin-top:3px;" ng-repeat="chart in charts">
+		<my-column-chart model="{{::chart}}"></my-column-chart>
+	</div>
+	<div class="mlr10" style="margin-top:3px;">
+		<my-column-chart model="chart_last"></my-column-chart>
+	</div>
+</div>

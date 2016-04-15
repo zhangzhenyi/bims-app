@@ -212,6 +212,61 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		    return value + (tail || ' …');
 	  };
 }])
+.directive("myColumnChart", ["$parse", "$timeout", function($parse, $timeout) {
+	Highcharts.setOptions({ global: { useUTC: false	} });
+	
+	function _options(m) {
+		return {
+			chart: {type: 'column'},
+			credits: {enabled: false},
+			title: { text: m.title || '' },
+			xAxis: { categories: m.xAxis || []},
+			yAxis: { min: 0, title: { text: m.yAxis || ''} },
+			tooltip: false,
+			plotOptions: { column: { pointPadding: 0.2, borderWidth: 0 } },
+			series: m.series || []
+		};
+	}
+	
+	return {
+		restrict: "E",
+		transclude: true,
+		replace: true,
+		template: "<div></div>",
+		compile: function(t, a) {
+			return {
+				post: function(s, e, a) {
+					$timeout(function _fn_chart_loading() {
+						var m = $parse(a.model)(s), chart;
+						if (m || false) {
+							chart = e.highcharts(_options(m)).highcharts();
+							s.$watch(
+								function() {
+									return $parse(a.model)(s);
+								},
+								function(n, o) {
+									if (n != o) {
+										if (n || false) {
+											chart.setTitle({text: n.title}, false, false);
+											chart.xAxis[0].setCategories(n.xAxis || [], false);
+											chart.yAxis[0].setTitle({text: n.yAxis || ""}, false);
+											chart.series[0].setData(n.series, true);
+										} else if (o || false) {
+											chart.setTitle({text: ""}, false, false);
+											chart.xAxis[0].setCategories([], false);
+											chart.yAxis[0].setTitle({text: ""}, false);
+											chart.series[0].setData([], true);
+										}
+									}
+								}
+							);
+						} else $timeout(_fn_chart_loading, 200);
+					});
+				}
+			};
+		}
+	};
+}])
 .directive("myChosen", ["$parse", "$timeout", function($parse, $timeout) {
 	return {
 		restrict: "AE",
@@ -733,7 +788,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		restrict: "E",
 		transclude: true,
 		link: function(scope, element, attrs) {
-			var v = $parse(attrs.ngModel)(scope) || new Date();
+			var v = $parse(attrs.ngModel)(scope);
+			if (!v) {
+				v = new Date();
+				($parse(attrs.ngModel).assign)(scope, v);
+			}
 			element.removeAttr("ng-model");
 			angular.element("<input/>")
 			.attr({
@@ -753,6 +812,45 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				minDate: new Date(2000,0,1,0,0),
 				maxDate: new Date(2999,11,31,23,59),
 				stepMinute: 1,
+				onSelect: function(t, e) {
+					($parse(attrs.ngModel).assign)(scope, e.getVal());
+				},
+				defaultValue: v
+			});
+		}
+	};
+}])
+.directive("myMonthPicker", ["$parse", function($parse) {
+	return {
+		restrict: "E",
+		transclude: true,
+		link: function(scope, element, attrs) {
+			var v = $parse(attrs.ngModel)(scope);
+			if (!v) {
+				v = new Date();
+				($parse(attrs.ngModel).assign)(scope, v);
+			}
+			element.removeAttr("ng-model");
+			angular.element("<input/>")
+			.attr({
+				type: "text",
+				placeholder: "请点击选择月份"
+			})
+			.css({
+				"width": "100%",
+				"border": "0"
+			})
+			.val(v.format("yyyy年MM月"))
+			.appendTo(element)
+			.mobiscroll().date({
+				theme: "ios",
+				mode: "mixed",
+				display: "bottom",
+				lang: "zh",
+				dateFormat: "yy年mm月",
+				onBeforeShow: function (inst) {
+					inst.settings.wheels[0].length > 2 ? inst.settings.wheels[0].pop() : null;
+				},
 				onSelect: function(t, e) {
 					($parse(attrs.ngModel).assign)(scope, e.getVal());
 				},
@@ -1001,9 +1099,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	$rootScope.messages = {
 		unreadCount:0
 	};
-
 	$rootScope.onepage = {id: "about"};
-
 	$rootScope.setting ={
 			installer : "",
 			currentVersion:"",
@@ -1197,6 +1293,71 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		});
 	}
 
+	$rootScope.issueStatistics = {
+		searchIcon: true,
+		show: function(b, e) {
+			if (b) {
+				angular.element(e).fadeIn();
+				$rootScope.issueStatistics.searchIcon = false;
+				$rootScope.issueStatistics.nochoose = true;
+			} else {
+				angular.element(e).fadeOut();
+				$rootScope.issueStatistics.searchIcon = true;
+				$rootScope.issueStatistics.nochoose = false;
+			}
+		},
+		get: function(issueType, chartType, c) {
+			if ($rootScope.issueStatistics.searchIcon) {
+				_req({
+					method: "get",
+					url: "issue/getBarchartData.jo",
+					params: {
+						issueType: issueType,
+						barchartType: chartType
+					}
+				},  angular.isFunction(c) ? c : angular.noop);
+			} else {
+				var start = $rootScope.issueStatistics.startTime, end = $rootScope.issueStatistics.endTime;
+				if (start > end) {
+					start = $rootScope.issueStatistics.endTime;
+					end = $rootScope.issueStatistics.startTime;
+				}
+				_req({
+					method: "get",
+					url: "issue/getBarchartDataByMonth.jo",
+					params: {
+						issueType: issueType,
+						barchartType: chartType,
+						startDate: start.format("yyyy/MM/dd"),
+						endDate: end.format("yyyy/MM/dd")
+					}
+				},  angular.isFunction(c) ? c : angular.noop);
+			}
+		},
+		toChartModel: function(d) {
+			var r = {
+				title: d.title,
+				xAxis: d.horiOrdinateLabels,
+				yAxis: "问题",
+				series: []
+			}, i, j, v;
+			if (angular.isArray(d.types)) {
+				for (i = 0; i < d.types.length; i++) {
+					v = {
+						name:  d.types[i],
+						data: []
+					};
+					if (angular.isArray(d.data)) {
+						for (j = 0; j < d.data.length; j++)
+							v.data.push(d.data[j][i]);
+					}
+					r.series.push(v);
+				}
+			}
+			return r;
+		}
+	};
+	
 	return {
 		base: function() {
 			return _host + _path;
@@ -2061,7 +2222,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 							$scope.tipVisibility = "block";
 							$timeout(function() {
 								$scope.tipVisibility = "none";
-								$scope.$location.back()
+								$scope.$location.back();
 							}, 2000);
 						}
 					});
@@ -5257,6 +5418,93 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		}
 	});
 }])
+.controller("cStatisticsQuality", ["$scope", function($scope) {
+	angular.extend($scope, {
+		title: "质量问题统计",
+		charts: [],
+		go: function(b) {
+			$scope.charts = [];
+			$scope.issueStatistics.get(1, 1, function(d) {
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_first"] = $scope.issueStatistics.toChartModel(d[0]);
+			});
+			$scope.issueStatistics.get(1, 2, function(d) {
+				if (angular.isArray(d)) {
+					var i, n;
+					for (i = 0; i < d.length; i++) {
+						n = "chart_" + i;
+						$scope.charts.push(n);
+						$scope[n] = $scope.issueStatistics.toChartModel(d[i]);
+					}
+				}
+			});
+			$scope.issueStatistics.get(1, 3, function(d) {
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_last"] = $scope.issueStatistics.toChartModel(d[0]);
+			});
+			if (b) $scope.issueStatistics.show(false,'.mydateblock');
+		}
+	});
+	$scope.go();
+}])
+.controller("cStatisticsSafe", ["$scope", function($scope) {
+	angular.extend($scope, {
+		title: "安全问题统计",
+		charts: [],
+		go: function(b) {
+			$scope.charts = [];
+			$scope.issueStatistics.get(2, 1, function(d) {
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_first"] = $scope.issueStatistics.toChartModel(d[0]);
+			});
+			$scope.issueStatistics.get(2, 2, function(d) {
+				if (angular.isArray(d)) {
+					var i, n;
+					for (i = 0; i < d.length; i++) {
+						n = "chart_" + i;
+						$scope.charts.push(n);
+						$scope[n] = $scope.issueStatistics.toChartModel(d[i]);
+					}
+				}
+			});
+			$scope.issueStatistics.get(2, 3, function(d) {
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_last"] = $scope.issueStatistics.toChartModel(d[0]);
+			});
+			if (b) $scope.issueStatistics.show(false,'.mydateblock');
+		}
+	});
+	$scope.go();
+}])
+.controller("cStatisticsDoc", ["$scope", function($scope) {
+	angular.extend($scope, {
+		title: "资料问题统计",
+		charts: [],
+		go: function(b) {
+			$scope.charts = [];
+			$scope.issueStatistics.get(3, 1, function(d) {
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_first"] = $scope.issueStatistics.toChartModel(d[0]);
+			});
+			$scope.issueStatistics.get(3, 2, function(d) {
+				if (angular.isArray(d)) {
+					var i, n;
+					for (i = 0; i < d.length; i++) {
+						n = "chart_" + i;
+						$scope.charts.push(n);
+						$scope[n] = $scope.issueStatistics.toChartModel(d[i]);
+					}
+				}
+			});
+			$scope.issueStatistics.get(3, 3, function(d) {
+				if (angular.isArray(d) && d.length > 0)
+					$scope["chart_last"] = $scope.issueStatistics.toChartModel(d[0]);
+			});
+			if (b) $scope.issueStatistics.show(false,'.mydateblock');
+		}
+	});
+	$scope.go();
+}])
 .config(["myRouteProvider", function(myRouteProvider) {
 	myRouteProvider
 	.when("/login", {
@@ -5421,7 +5669,18 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		templateUrl: "partials/wenti-review.html",
 		controller: "cIssueReview"
 	})
-	
+	.when("/issues-statistics-quality", {
+		templateUrl: "partials/wenti-statistics.html",
+		controller: "cStatisticsQuality"
+	})
+	.when("/issues-statistics-safe", {
+		templateUrl: "partials/wenti-statistics.html",
+		controller: "cStatisticsSafe"
+	})
+	.when("/issues-statistics-doc", {
+		templateUrl: "partials/wenti-statistics.html",
+		controller: "cStatisticsDoc"
+	})
 	.when("/onepage", {
 		templateUrl: "partials/one-page.html",
 		controller: "cOnePage"

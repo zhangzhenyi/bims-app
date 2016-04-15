@@ -428,3 +428,4 @@ select{width:80px;}
 .list3-2015-1-11 li .pic img{ display:block;width:100%;}
 .list3-2015-1-11 li .pic .title{ color:#2f3130; text-align:center; font-size:14px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis; padding:0 5px;}
 
+.mydateblock{height:128px;border:1px solid #e2e2e2;margin-top:10px;background:#fff;border-radius:5px;overflow: hidden;position:relative;display:none;}
