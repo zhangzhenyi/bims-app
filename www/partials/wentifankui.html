@@ -11,7 +11,8 @@
 
 <section class="mt15">
 	<ul class="list-1">
-		<li ng-repeat="item in sect.data"><a ng-click="sectClick(item.id)" href="" ><i><img src="img/icon-12.png"/></i>{{::item.sectionName}}</a><em>{{::item.openedIssueNum}}</em></li>
+		<li ng-repeat="item in sect.data"><a ng-click="sectClick(item.id)" href="" ><i><img src="img/icon-12.png"/></i>{{::item.sectionName}}</a>
+		<em ng-show="item.openedIssueNum > 0">{{::item.openedIssueNum}}</em></li>
 	</ul>
 </section>
 

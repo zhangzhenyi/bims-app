@@ -1151,7 +1151,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	}, false);
 	
 	function _req(o,c,l) {
-		if(l){
+		if(l || false){
 			$rootScope.loading = false;
 		}else
 		$rootScope.loading = true;
@@ -1758,14 +1758,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					method: "post",
 					url: u,
 					data: i
-				}, angular.isFunction(c) ? c : angular.noop);
+				}, angular.isFunction(c) ? c : angular.noop, true);
 			},
 			update: function(i, c) {
 				_req({
 					method: "post",
 					url: "issue/updateissue.jo",
 					data: i
-				}, angular.isFunction(c) ? c : angular.noop);
+				}, angular.isFunction(c) ? c : angular.noop, true);
 			},
 			//id is issue ID
 			remove: function(id, c) {
@@ -1775,7 +1775,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					params: {
 						id:parseInt(id)
 					}
-				}, angular.isFunction(c) ? c : angular.noop);
+				}, angular.isFunction(c) ? c : angular.noop, true);
 			},
 			list: function(s, t, pn, cat, c) {
 				if(cat ==0){
