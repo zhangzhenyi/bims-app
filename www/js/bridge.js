@@ -5068,16 +5068,16 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					$scope.newItem.component = oldComp;
 					return;
 				}
-				model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
-		  			  if(d && d[0]){
-		  				  tipmessage("该构件签认已完成", "_FoundCompId");
-		  			  }else{
+//				model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
+//		  			  if(d && d[0]){
+//		  				  tipmessage("该构件签认已完成", "_FoundCompId");
+//		  			  }else{
 				model.component.get(r.text, function(d) {
 					if (d) $scope.newItem.component = d;
 					else tipmessage("该构件编码不存在");
 				});
-		  			  }
-				});
+//		  			  }
+//				});
 			}, function(e) {
 				tipmessage("扫描二维码失败");
 			});
@@ -5268,13 +5268,13 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 //	alert("s: "+JSON.stringify($scope.component.current));
 //	alert("henji page end");
 	//成长过程
-	model.trace.getByCompId($scope.newItem.compId, 0, 3, function(d){
+	model.trace.getByCompId($scope.newItem.compId, 0, 2, function(d){
 		if(d && d[0]){
 			$scope.newItem.process = d;
 		}
 	});
 	//质量记录
-	model.trace.getByCompId($scope.newItem.compId, 0, 2, function(d){
+	model.trace.getByCompId($scope.newItem.compId, 0, 3, function(d){
 		if(d && d[0]){
 			$scope.newItem.qualityRecord = d;
 		}
@@ -5309,16 +5309,16 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					return;
 				}
 				
-				model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
-		  			  if(d && d[0]){
-		  				  tipmessage("该构件签认已完成", "_FoundCompId");
-		  			  }else{
+//				model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
+//		  			  if(d && d[0]){
+//		  				  tipmessage("该构件签认已完成", "_FoundCompId");
+//		  			  }else{
 				model.component.get(r.text, function(d) {
 					if (d) $scope.newItem.component = d;
 					else tipmessage("该构件编码不存在");
 				});
-		  			  }
-				});
+//		  			  }
+//				});
 			}, function(e) {
 				tipmessage("扫描二维码失败");
 			});
