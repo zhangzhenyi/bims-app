@@ -26,7 +26,9 @@
 				<p class="tp"><span>名称：</span>{{::trace.current.component.name}}</p>
 				<p class="tp"><span>设计：</span>{{::trace.current.component.designer}}</p>
 				<p class="tp"><span>施工：</span>{{::trace.current.component.constructor}}</p>
-				<p class="tp"><span>监理：</span>{{::trace.current.component.supervisor}}</p>        
+				<p class="tp"><span>监理：</span>{{::trace.current.component.supervisor}}</p>
+				<p class="tp" ng-repeat="(key, val) in trace.current.component.properties">
+        <span>{{key}}：</span>{{val}}</p>        
 			</div>
 		</li>
 		<li class="clearfix">

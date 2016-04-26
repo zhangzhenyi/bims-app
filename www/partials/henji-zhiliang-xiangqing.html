@@ -31,6 +31,9 @@
 				<p class="tp"><span>设计：</span>{{::trace.zhiliang.current.component.designer}}</p>
 				<p class="tp"><span>施工：</span>{{::trace.zhiliang.current.component.constructor}}</p>
 				<p class="tp"><span>监理：</span>{{::trace.zhiliang.current.component.supervisor}}</p>
+				<p class="tp" ng-repeat="(k, v) in trace.zhiliang.current.component.properties">
+            <span>{{k}}：</span>{{v}}
+        	</p>
 			</div>
 		</li>
 		<li class="clearfix">

@@ -31,6 +31,9 @@
 	            <p class="tp"><span>设计：</span>{{newItem.component.designer}}</p>
 	            <p class="tp"><span>施工：</span>{{newItem.component.constructor}}</p>
 	            <p class="tp"><span>监理：</span>{{newItem.component.supervisor}}</p>
+	            <p class="tp" ng-repeat="(k, v) in newItem.component.properties">
+            <span>{{k}}：</span>{{v}}
+        	</p>
             </div>
 		</li>
 		<li class="clearfix">

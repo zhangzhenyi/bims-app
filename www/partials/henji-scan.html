@@ -11,12 +11,14 @@
         <p class="tp"><span>名称：</span>{{newItem.component.name}}</p>
         <p class="tp"><span>设计：</span>{{newItem.component.designer}}</p>
         <p class="tp"><span>施工：</span>{{newItem.component.constructor}}</p>
-        <p class="tp"><span>监理：</span>{{newItem.component.supervisor}}</p>        
+        <p class="tp"><span>监理：</span>{{newItem.component.supervisor}}</p>
+        <p class="tp" ng-repeat="(key, val) in newItem.component.properties">
+        <span>{{key}}：</span>{{val}}</p>
     </div>
     <span class="lll"><img src="img/icon-25.png">成长过程</span>	
     <ul class="list-2015-1-11">
 		<li class="clearfix" ng-repeat="item in newItem.process track by item.id">
-            <a href="" ng-click=>
+            <a href="" ng-click="">
                 <span class="i"><img ng-src="{{::(item.publisherAvatarUrl || 'img/tem-img/img-person.jpg')}}"></span>
                 <span class="r">
                     <span class="txt">{{::item.title|cutTail:false:10:" ..."}}</span><span class="title">{{::item.compId}}</span>

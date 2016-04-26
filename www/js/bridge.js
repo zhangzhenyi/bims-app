@@ -5088,16 +5088,16 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				$scope.newItem.component = oldComp;
 				return;
 			}
-			model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
-  			  if(d && d[0]){
-  				  tipmessage("该构件签认已完成", "_FoundCompId");
-  			  }else{
+//			model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
+//  			  if(d && d[0]){
+//  				  tipmessage("该构件签认已完成", "_FoundCompId");
+//  			  }else{
   				  model.component.get($scope.newItem.compId, function(d) {
   						if (d && d.name) $scope.newItem.component = d;
   						else tipmessage("该构件编码不存在");
   					});
-  			  }
-			});
+//  			  }
+//			});
 		},
 		removeImage: function(url) {
 			for (var i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
@@ -5329,16 +5329,16 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				$scope.newItem.component = oldComp;
 				return;
 			}
-			model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
-  			  if(d && d[0]){
-  				  tipmessage("该构件签认已完成", "_FoundCompId");
-  			  }else{
+//			model.trace.getByCompId($scope.newItem.compId ,1,$scope.newItem.traceType, function(d) {
+//  			  if(d && d[0]){
+//  				  tipmessage("该构件签认已完成", "_FoundCompId");
+//  			  }else{
   				  model.component.get($scope.newItem.compId, function(d) {
   						if (d && d.name) $scope.newItem.component = d;
   						else tipmessage("该构件编码不存在");
   					});
-  			  }
-			});
+//  			  }
+//			});
 		},
 		removeImage: function(url) {
 			for (var i = 0; i < $scope.newItem.picAttachmentList.length; i++) {
