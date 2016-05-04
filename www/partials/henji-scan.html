@@ -5,7 +5,7 @@
 	<p class="title">扫一扫</p>
 </header>
 <section class="mlr10 mt15 bg2">
-	<span class="lll"><img src="img/icon-2.png">构件属性</span>	
+	<span class="lll"><img src="img/icon-2.png">构件信息</span>	
     <div class="warp">
     	<p class="tp"><span>编码：</span>{{newItem.component.compId}}</p>
         <p class="tp"><span>名称：</span>{{newItem.component.name}}</p>
@@ -18,7 +18,7 @@
     <span class="lll"><img src="img/icon-25.png">成长过程</span>	
     <ul class="list-2015-1-11">
 		<li class="clearfix" ng-repeat="item in newItem.process track by item.id">
-            <a href="" ng-click="">
+            <a href="" ng-click="jumpTo(item, 2)">
                 <span class="i"><img ng-src="{{::(item.publisherAvatarUrl || 'img/tem-img/img-person.jpg')}}"></span>
                 <span class="r">
                     <span class="txt">{{::item.title|cutTail:false:10:" ..."}}</span><span class="title">{{::item.compId}}</span>
@@ -27,10 +27,10 @@
             </a>
         </li>
     </ul>
-    <span class="lll"><img src="img/icon-26.png">质量记录</span>	
+    <span class="lll"><img src="img/icon-26.png"/>质量记录</span>	
     <ul class="list-2015-1-11">
 		<li class="clearfix" ng-repeat="item in newItem.qualityRecord track by item.id">
-            <a href="">
+            <a href="" ng-click="jumpTo(item, 3)">
                 <span class="i"><img ng-src="{{::(item.publisherAvatarUrl || 'img/tem-img/img-person.jpg')}}"></span>
                 <span class="r">
                     <span class="txt">{{::item.title|cutTail:false:10:" ..."}}</span><span class="title">{{::item.compId}}</span>
@@ -39,10 +39,10 @@
             </a>
         </li>
     </ul>
-	<span class="lll"><img src="img/icon-1.png">现场签认</span>	
+	<span class="lll"><img src="img/icon-1.png"/>现场签认</span>	
     <ul class="list-2015-1-11">
 		<li class="clearfix" ng-repeat="item in newItem.spotcheck track by item.id">
-            <a href="#.html">
+            <a href="" ng-click="jumpTo(item, 1)">
                 <span class="i"><img ng-src="{{::(item.publisherAvatarUrl || 'img/tem-img/img-person.jpg')}}"></span>
                 <span class="r">
                     <span class="txt">{{::item.title|cutTail:false:10:" ..."}}</span><span class="title">{{::item.compId}}</span>
@@ -51,5 +51,11 @@
             </a>
         </li>
     </ul>
+    <span class="lll"><img src="img/icon-14.png"/>监控复核</span>
+    <div class="warp">
+    	<p class="tp"><span>纵桥向偏差：</span>{{newItem.component.ld}}</p>
+    	<p class="tp"><span>横桥向偏差：</span>{{newItem.component.td}}</p>
+<!--     	<p class="tp"><span>允许值偏差：</span>{{newItem.component.adv}}</p> -->
+    </div>
 </section>
 </div>

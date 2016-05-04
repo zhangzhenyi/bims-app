@@ -23,11 +23,11 @@
 		<li class="clearfix">
 			<span class="lll"><img src="img/i-xq-2.jpg">构件信息</span>
 			<div class="warp">
-				<p class="tp"><span>名称：</span>{{::trace.current.component.name}}</p>
-				<p class="tp"><span>设计：</span>{{::trace.current.component.designer}}</p>
-				<p class="tp"><span>施工：</span>{{::trace.current.component.constructor}}</p>
-				<p class="tp"><span>监理：</span>{{::trace.current.component.supervisor}}</p>
-				<p class="tp" ng-repeat="(key, val) in trace.current.component.properties">
+				<p class="tp" style="margin-left:0px"><span>名称：</span>{{::trace.current.component.name}}</p>
+				<p class="tp" style="margin-left:0px"><span>设计：</span>{{::trace.current.component.designer}}</p>
+				<p class="tp" style="margin-left:0px"><span>施工：</span>{{::trace.current.component.constructor}}</p>
+				<p class="tp" style="margin-left:0px"><span>监理：</span>{{::trace.current.component.supervisor}}</p>
+				<p class="tp" style="margin-left:0px" ng-repeat="(key, val) in trace.current.component.properties">
         <span>{{key}}：</span>{{val}}</p>        
 			</div>
 		</li>

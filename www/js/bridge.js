@@ -4110,8 +4110,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			case "0101"://quality
 			case "0102"://Safe
 			case "0103"://Document
-//				$scope.issues.currentIssue = {id:item.refId};
-//				$scope.$location.path("/issue-details");
+				$scope.issues.currentIssue = {id:item.refId};
+				$scope.$location.path("/issue-details");
+				
 				break;
 			case "0201"://Task message
 				break;
@@ -4384,6 +4385,12 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				}, 1000);
 			}
 		});
+		
+		if($scope.trace.currentCompId){
+			$scope.newItem.compId = $scope.trace.currentCompId;
+			delete $scope.trace.currentCompId;
+			$scope.onCompIdChange();
+		}
 		break;
 	case "/spotcheck-edit":
 		var oldComp = {compId:"--"};
@@ -5262,6 +5269,35 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		newItem:{
 			compId:$scope.component.current.compId,
 			component:$scope.component.current
+		},
+		
+		jumpTo: function(item, type){
+			if(!type) return;
+			model.trace.get(item.id, function(d){
+				if(d){
+					switch(type){
+					case 1://现场签认
+						$scope.trace.current = d;
+						$scope.$location.path("/spotcheck-detail");
+						break;
+					case 2://成长过程
+						$scope.trace.chengzhangguocheng = {
+							current: d
+						};
+						$scope.$location.path("/henji-chengzhangguocheng-xiangqing");
+						break;
+					case 3://质量记录
+						$scope.trace.zhiliang = {
+							current: d
+						};
+						$scope.$location.path("/henji-zhiliang-xiangqing");
+						break;
+					}
+				}else{
+					
+				}
+			});
+			
 		}
 	});
 //	alert("henji page");
@@ -5283,6 +5319,14 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	model.trace.getByCompId($scope.newItem.compId, 0, 1, function(d){
 		if(d && d[0]){
 			$scope.newItem.spotcheck = d;
+		}else{
+			//没有签认记录，跳转到现场签认页面 TODO
+			tipmessage("没有签认记录");
+			$timeout(function(){
+				$scope.trace.currentCompId = $scope.newItem.compId;
+				$scope.$location.path("/spotcheck-create");
+			}, 1000);
+			
 		}
 	});
 }])
@@ -5446,6 +5490,24 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		}
 	});
 	$scope.go();
+}])
+.controller("cHenjiReport", ["$scope", function($scope){
+	angular.extend($scope, {
+		fileClicked: function(path) {
+//			$scope.files.filename = name;
+			$scope.files.filepath = path;
+			$scope.$location.path("/onefile");
+		}
+	})
+}])
+.controller("cHenjiShigong", ["$scope", function($scope){
+	angular.extend($scope, {
+		dataClicked: function(path) {
+//			$scope.files.filename = name;
+//			$scope.files.filepath = path;
+//			$scope.$location.path("/onefile");
+		}
+	})
 }])
 .controller("cStatisticsSafe", ["$scope", function($scope) {
 	angular.extend($scope, {
@@ -5768,6 +5830,22 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	.when("/message-list", {
 		templateUrl: "partials/message-list.html",
 		controller: "cMessage"
+	})
+	.when("/henji-shigong", {
+		templateUrl: "partials/henji_shigong.html",
+		controller: "cHenjiShigong"
+	})
+	.when("/henji-report", {
+		templateUrl: "partials/henji_shigong_report.html",
+		controller: "cHenjiReport"
+	})
+	.when("/henji-dashaqiao", {
+		templateUrl: "partials/henji_dashaqiao.html",
+		controller: ""
+	})
+	.when("/henji-nizhouba", {
+		templateUrl: "partials/henji_nizhouba.html",
+		controller: ""
 	})
 	.otherwise({
         redirectTo: "/"
