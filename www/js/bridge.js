@@ -5507,6 +5507,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	angular.extend($scope, {
 		dataClicked: function(id) {
 			$scope.shigong.currentId = id;
+//			$scope.shigong.history = [id];
 			$scope.$location.path("/henji-jiankong-data");
 		}
 	});
@@ -5519,22 +5520,24 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	
 }])
 .controller("cHenjiShigongData", ["$scope", function($scope){
+	var getCurrentData = function(id){
+		var curData;
+		for (var d in $scope.shigong.data) {
+			if(!$scope.shigong.data[d].isLeaf && id == $scope.shigong.data[d].id){
+				curData = $scope.shigong.data[d];
+				break;
+			}
+		}
+		return curData;
+	};
+	
 	angular.extend($scope, {
 		data:$scope.shigong.data,
 		currentId : $scope.shigong.currentId, 
-		currentData : function(){
-			var curData;
-			for (var d in $scope.data) {
-				if(!$scope.data[d].isLeaf && $scope.currentId == $scope.data[d].id){
-					curData = $scope.data[d];
-					break;
-				}
-			}
-			return curData;
-		},
+		currentData : getCurrentData($scope.shigong.currentId),
 		myFilter: function(item){
 			//Get current data's children
-			var children = $scope.currentData().children;
+			var children = $scope.currentData.children;
 			
 			if(children && children.length > 0){
 				for (var i = 0; i < children.length; i++) {
@@ -5546,9 +5549,38 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 			return false; 
 		},
+		historyClick:function(){
+			if($scope.shigong.history && $scope.shigong.history.length > 0){
+				//取出并删除最后一个元素，回到上一页面
+				$scope.shigong.currentId = $scope.shigong.history[$scope.shigong.history.length-1];
+				$scope.shigong.history.pop();
+//				$scope.$location.path("/henji-jiankong-data");
+				$scope.$location.back();
+			}else{
+//				$scope.$location.path("/henji-shigong");
+				$scope.$location.back();
+			}
+		},
 		dataClicked: function(id) {
-			$scope.shigong.currentId = id;
-			$scope.$location.path("/henji-jiankong-data");
+			if($scope.currentData && ($scope.currentData.isLeaf || false) ){
+				//叶子节点没反应
+			}else{
+				//没有子节点，没反应
+				var clickData = getCurrentData(id);
+				if(clickData && clickData.children.length > 0){
+					$scope.shigong.currentId = id;
+					if($scope.shigong.history){
+						$scope.shigong.history.push($scope.currentId);
+					}else{
+						$scope.shigong.history = [];
+						$scope.shigong.history.push($scope.currentId);
+					}
+					
+					$scope.$location.path("/henji-jiankong-data");
+				}
+				
+			}
+			
 		}
 	});
 }])
