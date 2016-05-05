@@ -1,14 +1,18 @@
 <div class="pb75 pt60 ng-scope">
 <header class="bg1">
 	<span class="return"><a ng-click="historyClick()" href=""><img src="img/11.png"/></a></span>
-	<p class="title">{{currentItem.name}}</p></header>
-<section class="mlr10 mt15 bg2">
-<span ng-repeat="it in data| filter: myFilter" style="margin-bottom:10px;">
-	<span class="lll"><a href="" ng-click="dataClicked(it.id)"><i><img src="img/icon-18.png"/></i>
-		<span ng-bind-html="it.name"></span></a></span>
-	<div class="warp" ng-if="it.isLeaf">
+	<p class="title" ng-bind-html="currentData.name"></p></header>
+<section class="mlr10 mt15">
+<span ng-repeat="it in data| filter: myFilter" class="bg2" style="margin-bottom:10px;">
+	<span class="lll" style="background:#fff; border-radius:5px;">
+	<a href="" ng-click="dataClicked(it.id)" style="line-height:50px;display:block;font-size:15px;color:#4c4c4c;>">
+	<img src="img/icon-18.png" style="margin:10px 10px 0 15px;vertical-align:top;"/>
+		<span ng-bind-html="it.name"></span></a>
+	<div class="warp" ng-if="it.isLeaf" style="position:relative; top:-5px;">
     	<p class="tp" ng-repeat="(key, val) in it.children">
         <span>{{key}}</span>{{val}}</p>
-    	</div>	
+    	</div>
+	</span>
+		
 </span>
 </section>

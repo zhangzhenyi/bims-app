@@ -4024,7 +4024,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	});
 }])
-.controller("cHenji", ["$scope", "model", function($scope, model){
+.controller("cHenji", ["$scope", "model", "$timeout",function($scope, model, $timeout){
 	angular.extend($scope, {
 		popTempTip:function(){
 			tipmessage("攻城师努力建设中...");
@@ -4039,8 +4039,25 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		    		  	if(d && d.name){
 		    		  		tipmessage("获得构件信息");
 		    		  		$scope.component.current = d;
+		    		  		//检查是否有签认信息，如果没有跳转到签认页面d
+//		    		  		alert($scope.component.current);
+		    		  		model.trace.getByCompId(d.compId, 0, 1, function(d1){
+//		    		  			alert(JSON.stringify(d1));
+		    		  			if(d1 && d1[0]){
+		    		  				$scope.$location.path('/henji-scan');
+		    		  			}else{
+		    		  				//没有签认记录，跳转到现场签认页面 TODO
+		    		  				tipmessage("没有签认记录");
+		    		  				$timeout(function(){
+		    		  					$scope.trace.currentCompId = d.compId;
+		    		  					$scope.$location.path("/spotcheck-create");
+		    		  				}, 1000);
+		    		  				
+		    		  			}
+		    		  		});
+		    		  		
 //		    		  		alert("component : "+ JSON.stringify($scope.component.current));
-		    		  		$scope.$location.path('/henji-scan');
+		    		  		
 		    		  	}else{
 			    		  	tipmessage("该构件编码不存在", "_notFoundCompId");
 		    		  	}
@@ -4352,19 +4369,20 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				tipmessage1(message="上传文件中",id="tipimg");
 	
 				model.uploadAttachments($scope.newItem, function(item) {
-				changeTipmessage("开始创建","tipimg");
+					closetipmessage1("tipimg");
+//					tipmessage1("开始创建","tipimg");
 					delete item.videoAttachmentList;
 					model.trace.create(item, function(d) {
 						if (d) {
-							changeTipmessage("创建成功”,”tipimg");
+							tipmessage("创建成功", "tipimg");
 							model.removeFiles($scope.newItem.picAttachmentList);
 							$timeout(function() {
 								$scope.$location.back();
 							}, 1000);
 						}else{
-							changeTipmessage("创建失败”,”tipimg");
+							tipmessage("创建失败", "tipimg");
 						}
-						closetipmessage1("tipimg");
+//						closetipmessage1("tipimg");
 					});
 				});
 				
@@ -4493,10 +4511,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				tipmessage1(message="上传文件中",id="tipimg");
 	
 				model.uploadAttachments($scope.newItem, function(item) {
-				changeTipmessage("开始编辑”,”tipimg");
+				changeTipmessage("开始编辑", "tipimg");
 					model.trace.update(item, function(d) {
 						if (d) {
-						changeTipmessage("编辑成功","tipimg");
+						changeTipmessage("编辑成功", "tipimg");
 							model.removeFiles($scope.newItem.picAttachmentList);
 							$timeout(function() {
 								$scope.$location.back();
