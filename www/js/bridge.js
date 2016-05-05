@@ -1099,6 +1099,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	$rootScope.messages = {
 		unreadCount:0
 	};
+	$rootScope.shigong = {
+		data:[]
+	}
 	$rootScope.onepage = {id: "about"};
 	$rootScope.setting ={
 			installer : "",
@@ -5500,14 +5503,54 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		}
 	})
 }])
-.controller("cHenjiShigong", ["$scope", function($scope){
+.controller("cHenjiShigong", ["$scope", "$rootScope", "$http",function($scope, $rootScope, $http){
 	angular.extend($scope, {
-		dataClicked: function(path) {
-//			$scope.files.filename = name;
-//			$scope.files.filepath = path;
-//			$scope.$location.path("/onefile");
+		dataClicked: function(id) {
+			$scope.shigong.currentId = id;
+			$scope.$location.path("/henji-jiankong-data");
 		}
-	})
+	});
+	
+	$http.get('json/henji_data.json').success(function(data)
+	{
+//		alert(JSON.stringify(data.records));
+		$rootScope.shigong.data = data.records;
+	});
+	
+}])
+.controller("cHenjiShigongData", ["$scope", function($scope){
+	angular.extend($scope, {
+		data:$scope.shigong.data,
+		currentId : $scope.shigong.currentId, 
+		currentData : function(){
+			var curData;
+			for (var d in $scope.data) {
+				if(!$scope.data[d].isLeaf && $scope.currentId == $scope.data[d].id){
+					curData = $scope.data[d];
+					break;
+				}
+			}
+			return curData;
+		},
+		myFilter: function(item){
+			//Get current data's children
+			var children = $scope.currentData().children;
+			
+			if(children && children.length > 0){
+				for (var i = 0; i < children.length; i++) {
+					//Find the id return true
+					if(children[i] == item.id){
+						return true;
+					}
+				}
+			}
+			return false; 
+		},
+		dataClicked: function(id) {
+			$scope.shigong.currentId = id;
+			$scope.$location.path("/henji-jiankong-data");
+		}
+	});
 }])
 .controller("cStatisticsSafe", ["$scope", function($scope) {
 	angular.extend($scope, {
@@ -5839,13 +5882,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		templateUrl: "partials/henji_shigong_report.html",
 		controller: "cHenjiReport"
 	})
-	.when("/henji-dashaqiao", {
-		templateUrl: "partials/henji_dashaqiao.html",
-		controller: ""
-	})
-	.when("/henji-nizhouba", {
-		templateUrl: "partials/henji_nizhouba.html",
-		controller: ""
+	.when("/henji-jiankong-data", {
+		templateUrl: "partials/henji_shigong_data.html",
+		controller: "cHenjiShigongData"
 	})
 	.otherwise({
         redirectTo: "/"

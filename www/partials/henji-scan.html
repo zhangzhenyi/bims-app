@@ -15,6 +15,13 @@
         <p class="tp" ng-repeat="(key, val) in newItem.component.properties">
         <span>{{key}}：</span>{{val}}</p>
     </div>
+    <span class="lll"><img src="img/icon-14.png"/>监控复核</span>
+    <div class="warp">
+    	<p class="tp"><span>标高：</span>{{newItem.component.hm}}</p> 
+    	<p class="tp"><span>纵桥向偏差：</span>{{newItem.component.ld}}</p>
+    	<p class="tp"><span>横桥向偏差：</span>{{newItem.component.td}}</p>
+     	
+    </div>
     <span class="lll"><img src="img/icon-25.png">成长过程</span>	
     <ul class="list-2015-1-11">
 		<li class="clearfix" ng-repeat="item in newItem.process track by item.id">
@@ -51,11 +58,6 @@
             </a>
         </li>
     </ul>
-    <span class="lll"><img src="img/icon-14.png"/>监控复核</span>
-    <div class="warp">
-    	<p class="tp"><span>纵桥向偏差：</span>{{newItem.component.ld}}</p>
-    	<p class="tp"><span>横桥向偏差：</span>{{newItem.component.td}}</p>
-<!--     	<p class="tp"><span>允许值偏差：</span>{{newItem.component.adv}}</p> -->
-    </div>
+    
 </section>
 </div>
