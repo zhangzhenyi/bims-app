@@ -1416,8 +1416,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				_req({
 					method: "post",
 					url: "login/userIsExists.jo",
-					params: {
-						username: u
+					data:{
+						username: u || ""
 					}
 				},  function(a) {
 					if (angular.isFunction(c)) {
@@ -2220,6 +2220,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			}
 			model.user.exists($scope.user.username, function(d) {
 				if (!d) {
+					$scope.user.name = $scope.user.username;
 					model.user.register($scope.user, function(data) {
 						if (data) {
 							$scope.tipVisibility = "block";
