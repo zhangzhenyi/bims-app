@@ -41,7 +41,15 @@ function sh_block(v){
 		$("."+cname+'-block').addClass(cname+"-block-h0");
 	}
 }
-
+/**
+ *  根据传来的id值设置其高度
+ * @param {String} el
+ */
+function fitTextArea(id){
+//	alert(id);
+	var h = $("#"+id)[0].scrollHeight;
+	$("#"+id).css("height", h+"px");
+}
 //tab切换
 function shtab(v){
 	var elem = v.attr("id");

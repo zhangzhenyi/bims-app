@@ -9,8 +9,10 @@
 	<img src="img/icon-18.png" style="margin:10px 10px 0 15px;vertical-align:top;"/>
 		<span ng-bind-html="it.name"></span></a>
 	<div class="warp" ng-if="it.isLeaf" style="position:relative; top:-5px;">
-    	<p class="tp" ng-repeat="(key, val) in it.children">
+	<span ng-repeat="cdn in it.children"">
+    	<p class="tp" ng-repeat="(key, val) in cdn">
         <span>{{key}}</span>{{val}}</p>
+    </span>
     	</div>
 	</span>
 		

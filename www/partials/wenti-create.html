@@ -37,13 +37,13 @@
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-3.jpg"/>问题描述</span>
 			<span class="r"><label for="issueDesc"  style="color:#aaa;">您还可输入{{remain}}个字符</label>
-			<textarea ng-model="newIssue.issueDesc" id="issueDesc" cols="" rows="" class="fromarea" ng-change="changed()" placeholder="点此输入" required="required" ng-maxlength="150" maxlength="150">
+			<textarea ng-model="newIssue.issueDesc" id="issueDesc" cols="" rows="" class="fromarea" ng-change="changed()" oninput= "fitTextArea('issueDesc')" placeholder="点此输入" required="required" ng-maxlength="150" maxlength="150">
 			</textarea></span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-4.jpg"/>整改要求</span><span class="r">
 			<label for="issueRectification" style="color:#aaa;">您还可输入{{remain1}}个字符</label>
-			<textarea ng-model="newIssue.issueRectification" id="issueRectification" cols="" rows="" class="fromarea" placeholder="点此输入" ng-change="changed()" required="required" ng-maxlength="150" maxlength="150"></textarea></span>
+			<textarea ng-model="newIssue.issueRectification" id="issueRectification" oninput= "fitTextArea('issueRectification')" cols="" rows="" class="fromarea" placeholder="点此输入" ng-change="changed()" required="required" ng-maxlength="150" maxlength="150"></textarea></span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r pr"><span ng-repeat="pic in newIssue.issuePicAttachmentList" class="pic" style="margin-right:5px;">

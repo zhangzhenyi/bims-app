@@ -144,7 +144,7 @@ select{width:80px;}
 .list-3 li .r .pic{width:50px;height:50px;overflow:hidden;margin-right:3px;display:inline-block;}
 .list-3 li .r .pic img{min-width:50px;min-height:50px;}
 .list-3 li .fromtxt,.list-3 li .fromselect,.list-3 li .fromselect option{border:none;font-size: 14px; line-height:18px;color: #525252;width:100%;}
-.list-3 li .fromarea{border:none;font-size: 14px; line-height:18px;color: #525252;width:100%;height:54px;}
+.list-3 li .fromarea{border:none;font-size: 14px; line-height:18px;color: #525252;width:100%;overflow-y:auto;min-height:54px;}
 .list-3 li .r.pr{position:relative;padding-top:0px;}
 .list-3 li .r.pr .file{position:absolute;width:100%;display:block;left:0;top:0;right:0;bottom:0;opacity:.01;filter: alpha(opacity=0);}
 .list-3-1 li .l img{float:left;}
