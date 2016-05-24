@@ -39,6 +39,10 @@
         },
         "org.devgeeks.Canvas2ImagePlugin": {
             "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "cn.jpush.phonegap.JPushPlugin": {
+            "API_KEY": "38abeeb97403dbfc2a0777ab",
+            "PACKAGE_NAME": "com.qiaoruan.humen"
         }
     },
     "dependent_plugins": {}

@@ -42,6 +42,10 @@
         },
         "org.devgeeks.Canvas2ImagePlugin": {
             "PACKAGE_NAME": "com.bridgesoft.bims"
+        },
+        "cn.jpush.phonegap.JPushPlugin": {
+            "API_KEY": "38abeeb97403dbfc2a0777ab",
+            "PACKAGE_NAME": "com.bridgesoft.bims"
         }
     },
     "dependent_plugins": {}
