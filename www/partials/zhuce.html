@@ -4,16 +4,16 @@
 <form name="form">
 <ul class="list-3">
 <li class="clearfix"><span class="l"><img src="img/icon-23.png"/>账户<span class="red">*</span></span>
-<span class="r"><input ng-model="user.username" name="username" type="text" maxlength="10" required="required" required class="fromtxt" placeholder="请输入真实姓名注册"></span>
+<span class="r"><input ng-model="user.username" name="username" type="text" maxlength="10" required="required" class="fromtxt" placeholder="请输入真实姓名注册"/></span>
 </li>
-<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>密码<span class="red">*</span></span><span class="r"><input ng-model="user.password" type="password" maxlength="6" required="required" required class="fromtxt"  placeholder="请输入六位密码"></span></li>
-<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>密码<span class="red">*</span></span><span class="r"><input ng-model="password0" type="password" maxlength="6" required="required" required class="fromtxt"  placeholder="请再次输入密码"></span></li>
-<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>手机</span><span class="r"><input ng-model="user.mobile" type="text" maxlength="11" class="fromtxt" placeholder="请输入正确手机号码" ></span></li>
-<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>邮件</span><span class="r"><input ng-model="user.email" type="text" class="fromtxt" placeholder="请输入正确邮件地址" ></span></li>
-<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>姓名<span class="red">*</span></span><span class="r"><input ng-model="user.name" type="text" maxlength="15" required="required" class="fromtxt" required placeholder="姓名不能超过15个字符"></span></li>
-<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>性别</span><span class="r"><input ng-model="user.gender" type="radio" value="1">男&nbsp;&nbsp;&nbsp;&nbsp;<input ng-model="gender" type="radio" value="0">女</span></li>
+<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>密码<span class="red">*</span></span><span class="r"><input ng-model="user.password" type="password" maxlength="6" required="required" class="fromtxt"  placeholder="请输入六位密码"/></span></li>
+<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>密码<span class="red">*</span></span><span class="r"><input ng-model="password0" type="password" maxlength="6" required="required" class="fromtxt"  placeholder="请再次输入密码"/></span></li>
+<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>手机</span><span class="r"><input ng-model="user.mobile" type="text" maxlength="11" class="fromtxt" placeholder="请输入正确手机号码" /></span></li>
+<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>邮件</span><span class="r"><input ng-model="user.email" type="text" class="fromtxt" placeholder="请输入正确邮件地址" /></span></li>
+<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>姓名<span class="red">*</span></span><span class="r"><input ng-model="user.name" type="text" maxlength="10" required="required" class="fromtxt" placeholder="姓名不能超过10个字符"/></span></li>
+<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>性别</span><span class="r"><input ng-model="user.gender" type="radio" value="1"/>男&nbsp;&nbsp;&nbsp;&nbsp;<input ng-model="gender" type="radio" value="0"/>女</span></li>
 <li class="clearfix"><span class="l"><img src="img/icon-24.png"/>单位</span><span class="r"><select class="fromselect" ng-model="user.department" ng-options="item as item.name for item in departments"></select></span></li>
-<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>职务</span><span class="r"><input ng-model="user.dutyTitle" type="text" maxlength="10" class="fromtxt" placeholder="职务不超过10个字符"></span></li>
+<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>职务</span><span class="r"><input ng-model="user.dutyTitle" type="text" maxlength="10" class="fromtxt" placeholder="职务不超过10个字符"/></span></li>
 </ul>
 </form>
 <a ng-click="register()" href="" class="abtn-login">提交</a>

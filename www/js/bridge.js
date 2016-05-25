@@ -1020,7 +1020,64 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		save: _save
 	};
 }])
-.factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute) {
+.factory("jpush", function() {
+	var push;
+    return {
+      setBadge: function(badge) {
+        if (push) {
+          console.log('jpush: set badge', badge);
+          plugins.jPushPlugin.setBadge(badge);
+        }
+      },
+      setAlias: function(alias) {
+        if (push) {
+          console.log('jpush: set alias', alias);
+          plugins.jPushPlugin.setAlias(alias);
+          alert("jpush: set alias complete");
+        }
+      },
+         setTagsWithAlias:function(tags, alias){//Tags is string[], alias is string
+         if (push) {
+            console.log('jpush: set alias', alias);
+            plugins.jPushPlugin.setTagsWithAlias(tags, alias);
+            alert("jpush: set tags with alias complete");
+         }
+      },
+      check: function() {
+        if (window.jpush && push) {
+          plugins.jPushPlugin.receiveNotificationIniOSCallback(window.jpush);
+          window.jpush = null;
+        }
+      },
+      getRegistrationID:function(onGetRegistrationID){
+         if (push) {
+            plugins.jPushPlugin.getRegistrationID(onGetRegistrationID);
+            alert("jpush: getRegistrationID complete");
+         }
+      },
+      init: function(notificationCallback) {
+      	alert("init jpush plugin")
+        console.log('jpush: start init-----------------------');
+        push = window.plugins && window.plugins.jPushPlugin;
+        if (push) {
+          console.log('jpush: init');
+          plugins.jPushPlugin.init();
+         getRegistrationID();
+         if (device.platform != "Android") {
+            plugins.jPushPlugin.setDebugModeFromIos();
+            plugins.jPushPlugin.setApplicationIconBadgeNumber(0);
+         } else {
+            plugins.jPushPlugin.setDebugMode(true);
+            plugins.jPushPlugin.setStatisticsOpen(true);
+         }
+//          plugins.jPushPlugin.setDebugMode(true);
+          plugins.jPushPlugin.openNotificationInAndroidCallback = notificationCallback;
+          plugins.jPushPlugin.receiveNotificationIniOSCallback = notificationCallback;
+        }
+      }
+    };
+})
+.factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", "jpush", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute, jpush) {
 //	var _host = "http://192.168.1.125:8080", _path="/bims", _base = _host + _path + "/rest/", _sessionId;
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
 //	var _host = "http://120.24.99.94", _path="/bims", _base = _host + _path + "/rest/", _sessionId;
@@ -1154,12 +1211,117 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	}
 	
+
+	function onGetRegistrationID(data) {
+		try {
+			console.log("JPushPreceiveNotificationIniOSCallbacklugin:registrationID is " + data);
+			if (data.length == 0) {
+				var t1 = $window.setTimeout(getRegistrationID, 1000);
+			}
+//			$("#registrationId").html(data);
+			alert(data);
+			//Save register ID
+		} catch (exception) {
+			console.log(exception);
+		}
+	}
+	function onTagsWithAlias(event) {
+		alert("tags with alias ");
+		try {
+			console.log("onTagsWithAlias");
+			var result = "result code:" + event.resultCode + " ";
+			result += "tags:" + event.tags + " ";
+			result += "alias:" + event.alias + " ";
+//			$("#tagAliasResult").html(result);
+			alert(result);
+		} catch (exception) {
+			console.log(exception)
+		}
+	}
+	function onOpenNotification(event) {
+		alert("Open notification ");
+		try {
+			var alertContent;
+			if (device.platform == "Android") {
+				alertContent = plugins.jPushPlugin.openNotification.alert;
+			} else {
+				alertContent = event.aps.alert;
+			}
+			alert("open Notification:" + alertContent);
+		} catch (exception) {
+			console.log("JPushPlugin:onOpenNotification" + exception);
+		}
+	}
+	function onReceiveNotification(event) {
+		alert("receive notification ");
+		try {
+			var alertContent;
+			if (device.platform == "Android") {
+				alertContent = plugins.jPushPlugin.receiveNotification.alert;
+			} else {
+				alertContent = event.aps.alert;
+			}
+//			$("#notificationResult").html(alertContent);
+			alert(alertContent);
+		} catch (exception) {
+			console.log(exception)
+		}
+	}
+	function onReceiveMessage(event) {
+		alert("receive message ");
+		try {
+			var message;
+			if (device.platform == "Android") {
+				message = plugins.jPushPlugin.receiveMessage.message;
+			} else {
+				message = event.content;
+			}
+//			$("#messageResult").html(message);
+		} catch (exception) {
+			console.log("JPushPlugin:onReceiveMessage-->" + exception);
+		}
+	}
+
+		// push notification callback
+  function notificationCallback(data) {
+    console.log('received data :' + data);
+    var notification = angular.fromJson(data);
+    //app 是否处于正在运行状态
+    var isActive = notification.notification;
+
+    // here add your code
+
+
+    //ios
+    if (device.platform != "Android") {
+      alert(notification);
+
+    } else {
+    //非 ios(android)
+    }
+  }
+	
 	document.addEventListener("deviceready", function() {
 		document.addEventListener("backbutton", _androidBackButton, false);
+		alert("init jpush");
+		//初始化
+		jpush.init(notificationCallback);
+		alert("set alias");
+		//设置别名
+		jpush.setAlias("12345678");
+        getRegistrationID
+		
+		//Initiate Jpush setting, after that, you can receive Push info
+//		initiateJPush();
 		if($window.navigator){
 			navigator.splashscreen.hide();
 		}
 	}, false);
+	//Register Jpush listener
+     document.addEventListener("jpush.setTagsWithAlias", onTagsWithAlias, false);
+     document.addEventListener("jpush.openNotification", onOpenNotification, false);
+      document.addEventListener("jpush.receiveNotification", onReceiveNotification, false);
+      document.addEventListener("jpush.receiveMessage", onReceiveMessage, false);
 	
 	function _req(o,c,l) {
 		if(l || false){
@@ -2228,7 +2390,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			}
 			model.user.exists($scope.user.username, function(d) {
 				if (!d) {
-					$scope.user.name = $scope.user.username;
+//					$scope.user.name = $scope.user.username;
 					model.user.register($scope.user, function(data) {
 						if (data) {
 							$scope.tipVisibility = "block";
@@ -5951,4 +6113,5 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 }])
 .run(["myRoute", function(myRoute) {
 	myRoute.path("/login");
+
 }]);
