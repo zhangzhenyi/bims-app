@@ -112,6 +112,31 @@ function isBlankString(s) {
 	if (s.replace(/(^s*)|(s*$)/g, "").length ==0) return true;
 	return false;
 }
+function CheckChinese(val){
+	var reg = /^[\u4E00-\u9FA5]+$/; 
+//       全是汉字,如果存在非汉字,返回false　　
+	if(reg.test(val)){
+	  return true;
+　　} {
+	return false;
+	}
+	
+}
+
+function checkHasChar(val){
+	var isFullChinese = 0;
+	for(var i = 0;i < str.length; i++){
+　　		if(str.charCodeAt(i) > 255)
+		{
+	
+		}else {
+			isFullChinese = false;
+			break;
+		}
+　　　　　　　　
+	}
+	return isFullChinese;
+}
 
 (function() {
     'use strict';
@@ -1033,14 +1058,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
         if (push) {
           console.log('jpush: set alias', alias);
           plugins.jPushPlugin.setAlias(alias);
-          alert("jpush: set alias complete");
+//        alert("jpush: set alias complete");
         }
       },
          setTagsWithAlias:function(tags, alias){//Tags is string[], alias is string
          if (push) {
             console.log('jpush: set alias', alias);
             plugins.jPushPlugin.setTagsWithAlias(tags, alias);
-            alert("jpush: set tags with alias complete");
+//          alert("jpush: set tags with alias complete");
          }
       },
       check: function() {
@@ -1052,11 +1077,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
       getRegistrationID:function(onGetRegistrationID){
          if (push) {
             plugins.jPushPlugin.getRegistrationID(onGetRegistrationID);
-            alert("jpush: getRegistrationID complete");
+//          alert("jpush: getRegistrationID complete");
          }
       },
       init: function(notificationCallback) {
-      	alert("init jpush plugin")
+//    	alert("init jpush plugin")
         console.log('jpush: start init-----------------------');
         push = window.plugins && window.plugins.jPushPlugin;
         if (push) {
@@ -1219,27 +1244,27 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				var t1 = $window.setTimeout(getRegistrationID, 1000);
 			}
 //			$("#registrationId").html(data);
-			alert(data);
+//			alert(data);
 			//Save register ID
 		} catch (exception) {
 			console.log(exception);
 		}
 	}
 	function onTagsWithAlias(event) {
-		alert("tags with alias ");
+//		alert("tags with alias ");
 		try {
 			console.log("onTagsWithAlias");
 			var result = "result code:" + event.resultCode + " ";
 			result += "tags:" + event.tags + " ";
 			result += "alias:" + event.alias + " ";
 //			$("#tagAliasResult").html(result);
-			alert(result);
+//			alert(result);
 		} catch (exception) {
 			console.log(exception)
 		}
 	}
 	function onOpenNotification(event) {
-		alert("Open notification ");
+//		alert("Open notification ");
 		try {
 			var alertContent;
 			if (device.platform == "Android") {
@@ -1253,7 +1278,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	}
 	function onReceiveNotification(event) {
-		alert("receive notification ");
+//		alert("receive notification ");
 		try {
 			var alertContent;
 			if (device.platform == "Android") {
@@ -1268,7 +1293,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	}
 	function onReceiveMessage(event) {
-		alert("receive message ");
+//		alert("receive message ");
 		try {
 			var message;
 			if (device.platform == "Android") {
@@ -1307,9 +1332,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		//初始化
 		jpush.init(notificationCallback);
 		alert("set alias");
-		//设置别名
-		jpush.setAlias("12345678");
-        getRegistrationID
+//		//设置别名
+//		jpush.setAlias("12345678");
+//      getRegistrationID();
 		
 		//Initiate Jpush setting, after that, you can receive Push info
 //		initiateJPush();
@@ -2274,7 +2299,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		$rootScope.myHeaderPosition = "relative";
 	};
 }])
-.controller("cLogin", ["$scope", "model", function($scope, model) {
+.controller("cLogin", ["$scope", "model", "jpush", function($scope, model, jpush) {
 	if (window.localStorage) {
 		$scope.username = localStorage["username"];
 		$scope.password = localStorage["password"];
@@ -2356,6 +2381,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
                 
                 //					alert(JSON.stringify($scope.user.roles));
                 $scope.user.id = d.DATA.id;
+//              alert("pop alia");
+                var tags = [d.DATA.department.group, d.DATA.department];
+                var alias = ""+$scope.user.id;
+//              alert(alias);
+                //设置别名
+				jpush.setTagsWithAlias(tags, alias);
+                
                 $scope.$location.path("/");
                 
                 model.user.list(function(d) {
@@ -2388,6 +2420,22 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				tipmessage("请输入正确的密码！", "wrongPwd");
 				return;
 			}
+			//中文名判断
+			var isChinese = CheckChinese($scope.user.username);
+			if(isChinese || false){
+				//是中文
+			}else{
+				tipmessage("必须使用中文姓名注册用户名！", "wrongUserName");
+				return;
+			}
+			var isChinese = CheckChinese($scope.user.name);
+			if(isChinese || false){
+				//是中文
+			}else{
+				tipmessage("必须使用中文姓名作为名字！", "wrongName");
+				return;
+			}
+			
 			model.user.exists($scope.user.username, function(d) {
 				if (!d) {
 //					$scope.user.name = $scope.user.username;
