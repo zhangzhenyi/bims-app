@@ -117,26 +117,12 @@ function CheckChinese(val){
 //       全是汉字,如果存在非汉字,返回false　　
 	if(reg.test(val)){
 	  return true;
-　　} {
+	}else {
 	return false;
 	}
 	
 }
 
-function checkHasChar(val){
-	var isFullChinese = 0;
-	for(var i = 0;i < str.length; i++){
-　　		if(str.charCodeAt(i) > 255)
-		{
-	
-		}else {
-			isFullChinese = false;
-			break;
-		}
-　　　　　　　　
-	}
-	return isFullChinese;
-}
 
 (function() {
     'use strict';
@@ -1054,6 +1040,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
           plugins.jPushPlugin.setBadge(badge);
         }
       },
+      setApplicationBadgeNum: function(badge){
+      	if(push){
+      		console.log('jpush: set application badge', badge);
+      		plugins.jPushPlugin.setApplicationIconBadgeNumber(badge)
+      	}
+      },
       setAlias: function(alias) {
         if (push) {
           console.log('jpush: set alias', alias);
@@ -1328,10 +1320,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	
 	document.addEventListener("deviceready", function() {
 		document.addEventListener("backbutton", _androidBackButton, false);
-		alert("init jpush");
+//		alert("init jpush");
 		//初始化
 		jpush.init(notificationCallback);
-		alert("set alias");
+//		alert("set alias");
 //		//设置别名
 //		jpush.setAlias("12345678");
 //      getRegistrationID();
@@ -2382,12 +2374,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
                 //					alert(JSON.stringify($scope.user.roles));
                 $scope.user.id = d.DATA.id;
 //              alert("pop alia");
-                var tags = [d.DATA.department.group, d.DATA.department];
+                var tags = [d.DATA.department.group];
+//              var tags = [d.DATA.department.group, d.DATA.department+d.DATA.department.group];
                 var alias = ""+$scope.user.id;
 //              alert(alias);
                 //设置别名
 				jpush.setTagsWithAlias(tags, alias);
-                
+                jpush.setBadge(0);
+                jpush.setApplicationBadgeNum(0);
                 $scope.$location.path("/");
                 
                 model.user.list(function(d) {
