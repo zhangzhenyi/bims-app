@@ -30,12 +30,12 @@
 <section class="mt10">
 	<ul class="list-3">
 		<li class="clearfix">
-			<span class="l"><img src="img/i-xq-1.jpg"/>问题编号</span><span class="r">{{issueItem.code}}</span>
+			<span class="l"><img src="img/i-xq-1.jpg"/>问题编号</span><span class="r">{{issueItem.codeWithSection}}</span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/icon-10.png"/>@到：</span>
 			<span class="r">
-			<textarea ng-model="issueItem.at" class="fromarea" readonly="true"></textarea></span>
+			<textarea ng-model="issueItem.atWithName" class="fromarea" readonly="true"></textarea></span>
 		</li>
 		<li class="clearfix"  ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
 			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span><span class="r">{{issueItem.location}}</span>

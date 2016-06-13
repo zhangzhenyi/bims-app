@@ -1095,8 +1095,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
     };
 })
 .factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", "jpush", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute, jpush) {
-//	var _host = "http://192.168.1.125:8080", _path="/bims", _base = _host + _path + "/rest/", _sessionId;
+	/**虎门二桥*/
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
+	/**温州**/
 //	var _host = "http://120.24.99.94", _path="/bims", _base = _host + _path + "/rest/", _sessionId;
 	
 	function _fn() {
@@ -1107,6 +1108,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	_fn();
 	$interval(_fn, 300000, 0, false);
 	$rootScope.loading = false;
+	$rootScope.isBusying = false;
 	$rootScope.$location = {
 		path: function(p, s) {
 			if (s) {
@@ -1125,7 +1127,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	};
 	
 	$rootScope.origionVersion = "1.1.0.0401";
-//    $rootScope.origionVersion = "1.3.0";
+//    $rootScope.origionVersion = "1.1.2.06.03";
 	$rootScope.hasChecked = false;
 	$rootScope.autoUpdateOnWiffi = false;
 	$rootScope.Constants = {
@@ -1176,7 +1178,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	$rootScope.trace = {};
 	$rootScope.news = {};
 	$rootScope.sect = {};
-	$rootScope.issues = {};
+	$rootScope.issues = {
+		openIssueNum:0
+	};
 	$rootScope.issue = {};
 	$rootScope.messages = {
 		unreadCount:0
@@ -1264,7 +1268,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			} else {
 				alertContent = event.aps.alert;
 			}
-			alert("open Notification:" + alertContent);
+//			alert("open Notification:" + alertContent);
 		} catch (exception) {
 			console.log("JPushPlugin:onOpenNotification" + exception);
 		}
@@ -1279,7 +1283,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				alertContent = event.aps.alert;
 			}
 //			$("#notificationResult").html(alertContent);
-			alert(alertContent);
+//			alert(alertContent);
 		} catch (exception) {
 			console.log(exception)
 		}
@@ -1311,25 +1315,40 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 
     //ios
     if (device.platform != "Android") {
-      alert(notification);
+//    alert(notification);
 
     } else {
     //非 ios(android)
     }
   }
+  
+  function onPause(){
+  	console.log('onpause ');
+  }
+  function onResume(){
+  	console.log('onResume ');
+  	jpush.setBadge(0);
+    jpush.setApplicationBadgeNum(0);
+  }
+  function onOnline(){
+  	console.log('onOnline ');
+  }
 	
 	document.addEventListener("deviceready", function() {
 		document.addEventListener("backbutton", _androidBackButton, false);
+		document.addEventListener("pause", onPause , false);
+		document.addEventListener("resume", onResume , false);
+		document.addEventListener("online", onOnline , false);
 //		alert("init jpush");
 		//初始化
 		jpush.init(notificationCallback);
-//		alert("set alias");
-//		//设置别名
-//		jpush.setAlias("12345678");
-//      getRegistrationID();
 		
-		//Initiate Jpush setting, after that, you can receive Push info
-//		initiateJPush();
+		jpush.setBadge(0);
+    		jpush.setApplicationBadgeNum(0);
+    		$timeout(function _fn_waiting_clearBadge() {
+			jpush.setBadge(0);
+    			jpush.setApplicationBadgeNum(0);
+		}, 200);
 		if($window.navigator){
 			navigator.splashscreen.hide();
 		}
@@ -1626,10 +1645,13 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					url: "login/getAllDepartment.jo"
 				},  angular.isFunction(c) ? c : angular.noop);
 			},
-			list: function(c) {
+			list: function(s, c) {
 				_req({
 					method: "get",
-					url: "user/list.jo"
+					url: "user/list.jo",
+					params: {
+						sectionId: s
+					}
 				},  angular.isFunction(c) ? c : angular.noop);
 			},
 			checkAutority: function(auth, c){
@@ -1991,6 +2013,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					}, angular.isFunction(c) ? c : angular.noop);
 				}
 			},
+			getOpenedIssueNum: function(c){
+				_req({
+						method: "get",
+						url: "issue/getOpenedIssueNum.jo",
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
 			search:function(s,t,pn,st,cat, c){
 				if(cat ==0){
 					_req({
@@ -2282,13 +2310,17 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}else{
 			closetipmessage1(id="tipimgLoading");
 		}
-		return $scope.loading ? "block" : "none";
+//		return $scope.loading ? "block" : "none";
+		return "none";
 	};
 	$scope.onHide = function(){
+		console.log("onHide");
 		$rootScope.myHeaderPosition = "fixed";
 	};
 	$scope.onShow = function(){
+		console.log("onShow");
 		$rootScope.myHeaderPosition = "relative";
+		
 	};
 }])
 .controller("cLogin", ["$scope", "model", "jpush", function($scope, model, jpush) {
@@ -2374,25 +2406,26 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
                 //					alert(JSON.stringify($scope.user.roles));
                 $scope.user.id = d.DATA.id;
 //              alert("pop alia");
-                var tags = [d.DATA.department.group];
-//              var tags = [d.DATA.department.group, d.DATA.department+d.DATA.department.group];
+				var tags;
+				if(d.DATA.department.section && d.DATA.department.section.id){
+					tags = [d.DATA.department.group, d.DATA.department.section.id+d.DATA.department.group];
+				}else{
+					tags = [d.DATA.department.group];
+				}
                 var alias = ""+$scope.user.id;
 //              alert(alias);
                 //设置别名
 				jpush.setTagsWithAlias(tags, alias);
-                jpush.setBadge(0);
-                jpush.setApplicationBadgeNum(0);
+                
                 $scope.$location.path("/");
                 
-                model.user.list(function(d) {
-                    if (d) $scope.user.list = d;
-                });
+               
             }else{
             tipmessage("未知的登录错误。", "invalidUP");
             }
             
             } else {
-                tipmessage("无效的用户名和密码。", "invalidUP");
+                tipmessage("服务器没有返回结果。", "invalidUP");
             }
         });
 	};
@@ -2546,6 +2579,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			if (d.length > 1) $scope.issues.second = d[1];
 		}
 	});
+	
+	model.issues.getOpenedIssueNum(function(d){
+		if(d){
+			$rootScope.issues.openIssueNum = d;
+		}
+	});
 
 	if(!$rootScope.hasChecked && window.device){
 		var platform = 1;
@@ -2557,23 +2596,23 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			platform = 2;
 			break;
 		}
-		model.setting.getVersion(platform, function(d){
-		if(d){//
-			$rootScope.hasChecked = true;
-			$scope.setting.currentVersion = d.version;
-			$scope.setting.versionTitle = d.title;
-			$scope.setting.versionRemark = d.remark;
-			if(d.url){
-				$scope.setting.installer = d.url;
-			}
-			
-			$scope.setting.lastVersion = $scope.origionVersion;
-			if(d.version != $scope.setting.lastVersion){
-				$scope.hasNewVersion = true;
-				$scope.popUpdateWin();
-			}
-		}
-	  });
+//		model.setting.getVersion(platform, function(d){
+//		if(d){//
+//			$rootScope.hasChecked = true;
+//			$scope.setting.currentVersion = d.version;
+//			$scope.setting.versionTitle = d.title;
+//			$scope.setting.versionRemark = d.remark;
+//			if(d.url){
+//				$scope.setting.installer = d.url;
+//			}
+//			
+//			$scope.setting.lastVersion = $scope.origionVersion;
+//			if(d.version != $scope.setting.lastVersion){
+//				$scope.hasNewVersion = true;
+//				$scope.popUpdateWin();
+//			}
+//		}
+//	  });
 	}else{
 		$scope.setting.lastVersion = "0.0.1";
 	}
@@ -3394,6 +3433,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					createAuth = false;
 				}
 			});
+			
+	model.user.list($scope.issues.currentSectId, function(d) {
+		if (d) {
+			$scope.user.list = d;
+		}
+	});
 	angular.extend($scope, {
 		authoCreateIssue: createAuth,
 		page: 1,
@@ -3763,14 +3808,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	};
 		
 	$scope.save = function(){
-			if(!$scope.form.$valid){
+		if($scope.isBusying || false){
+			return;
+		}
+		if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
-	        }
-			$scope.newIssue.at = $scope.newIssue.at.join();
+	    }
+		$scope.isBusying = true;
+		$scope.newIssue.at = $scope.newIssue.at.join();
 		transferCache.push($scope.newIssue, "issue","update");
 			tipmessage("保存成功");//是否需要返回值？
 			$timeout(function() {
+				$scope.isBusying = false;
 				$scope.$location.back();
 			}, 1000);
 	};
@@ -3788,10 +3838,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		);
 	};
 	$scope.submit = function(){
+		if($scope.isBusying || false){
+			return;
+		}
 		if(!$scope.form.$valid){
         	tipmessage("请检查输入内容是否正确");
-        	return;
+        		return;
         }
+		$scope.isBusying = true;
 		tipmessage1(message="上传文件中",id="tipimg");
 		$scope.newIssue.at = $scope.newIssue.at.join();
 		model.uploadAttachments($scope.newIssue, function(item) {
@@ -3808,6 +3862,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 						changeTipmessage("编辑失败","tipimg");
 					}
 					closetipmessage1("tipimg");
+					$timeout(function() {
+							$scope.isBusying =false;
+					}, 1000);
 				});
 		});
 	};
@@ -3828,7 +3885,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		sectionId : $scope.issues.currentSectId,
 		at: ""
 	};
-	
+                
 	$scope.choiceImportant = function(i){
 		$scope.newIssue.important = i;
 	};
@@ -3886,24 +3943,33 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		);
 	};
 	$scope.save = function(){
+		if($scope.isBusying ||false){
+			return;
+		}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
+			$scope.isBusying = true;
 			tipmessage1(message="保存中",id="tipimg");
 			$scope.newIssue.at = $scope.newIssue.at.join();
 			transferCache.push($scope.newIssue, "issue");
 			changeTipmessage("保存成功",id="tipimg");
 			closetipmessage1("tipimg");
 			$timeout(function() {
+				$scope.isBusying = false;
 				$scope.$location.back();
 			}, 1000);
 	};
 	$scope.submit = function(){
+		if($scope.isBusying ||false){
+			return;
+		}
 		if(!$scope.form.$valid){
         	tipmessage("请检查输入内容是否正确");
         	return;
         }
+		$scope.isBusying = true;
 		$scope.newIssue.at = $scope.newIssue.at.join();
 		tipmessage1(message="上传文件中",id="tipimg");
 		model.uploadAttachments($scope.newIssue, function(item) {
@@ -3921,6 +3987,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 						changeTipmessage("创建失败","tipimg");
 					}
 					closetipmessage1("tipimg");
+					$timeout(function() {
+							$scope.isBusying =false;
+					}, 1000);
 				});
 		});
 				
@@ -3942,10 +4011,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			}
 		},
 		submit: function(s){
+			if($scope.isBusying ||false){
+				return;
+			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
+			$scope.isBusying = true;
 			var _item = {
 					id: $scope.issueItem.id,
 					acceptStatus: s,
@@ -3959,6 +4032,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 						$scope.$location.back();
 					}, 1000);
 				}
+				$timeout(function() {
+						$scope.isBusying = false;
+					}, 1000);
 			});
 		}
 	});
@@ -4044,6 +4120,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		remain2:150,
 		tipVisibility: "none",
 		tipContent:"",
+		isBusying:false,
 		selectAction:function(){
 			if($scope.issueItem.issueCategory != 4){
 				$scope.issueItem.issueCategoryRemark = "";
@@ -4102,10 +4179,16 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		},
 	
 	    submit: function(i){
+	    	if($scope.isBusying || false){
+	    		return;
+	    	}
+	    	var date = new Date();
+	    	console.log(date.format("yyyy/MM/dd hh:mm:ss"));
 	    	if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
-	        }
+	    }
+	    	$scope.isBusying = true;
 	    	tipmessage1(message="上传文件中",id="tipimg");
 			model.uploadAttachments($scope.issueItem, function(item) {
 				changeTipmessage("开始创建","tipimg");
@@ -4123,6 +4206,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 						changeTipmessage("提交失败","tipimg");
 					}
 					closetipmessage1("tipimg");
+					$timeout(function() {
+							$scope.isBusying = false;
+						}, 1200);
+					
 				});
 			});			
 		}
@@ -4134,6 +4221,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	model.sect.list($scope.Constants.ISSUETYPE_QUALITY,0,function(d) {
 		if(d) $scope.sect.data = d;
 	});
+	
 	//****************************************
 	$scope.sectClick = function(s) {
 		$scope.issues.currentSectId = s;
@@ -4568,6 +4656,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			},
 			
 			submit: function() {
+				if($scope.isBusying || false){
+					return;
+				}
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
@@ -4579,6 +4670,8 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
+				
+				$scope.isBusying = true;
 				tipmessage1(message="上传文件中",id="tipimg");
 	
 				model.uploadAttachments($scope.newItem, function(item) {
@@ -4596,11 +4689,18 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 							tipmessage("创建失败", "tipimg");
 						}
 //						closetipmessage1("tipimg");
+						$timeout(function() {
+							$scope.isBusying =false;
+						}, 1000);
 					});
 				});
 				
 			},
 			save: function() {
+				if($scope.isBusying || false){
+					return;
+				}
+				
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
@@ -4612,9 +4712,11 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
+				$scope.isBusying = true;
 				transferCache.push($scope.newItem, $scope.saveTitle);
 				tipmessage("保存成功");//是否需要返回值？
 				$timeout(function() {
+					$scope.isBusying = false;
 					$scope.$location.back();
 				}, 1000);
 			}
@@ -4711,6 +4813,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				});
 			},
 			submit: function() {
+				if($scope.isBusying  || false){
+					return;
+				}
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
@@ -4721,6 +4826,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
+				$scope.isBusying= true;
 				tipmessage1(message="上传文件中",id="tipimg");
 	
 				model.uploadAttachments($scope.newItem, function(item) {
@@ -4736,11 +4842,17 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 							changeTipmessage("编辑失败","tipimg");
 						}
 						closetipmessage1("tipimg");
+						$timeout(function() {
+							$scope.isBusying= false;
+							}, 1000);
 					});
 				});
 				
 			},
 			save: function() {
+				if($scope.isBusying  || false){
+					return;
+				}
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
 		        	return;
@@ -4751,9 +4863,11 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 					tipmessage("请检查构件是否存在");
 		        	return;
 				}
+				$scope.isBusying = true;
 				transferCache.push($scope.newItem, $scope.saveTitle, "update");
 				tipmessage("保存成功");//是否需要返回值？
 				$timeout(function() {
+					$scope.isBusying = false;
 					$scope.$location.back();
 				}, 1000);
 			}
@@ -4896,10 +5010,14 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		submit: function() {
+			if($scope.isBusying ||false){
+				return;
+			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
+			$scope.isBusying = true;
 			model.uploadAttachments($scope.newItem, function(item) {
 				delete item._index;
 				delete item._type;
@@ -4917,15 +5035,24 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
+					}else{
+						tipmessage("提交失败");
 					}
+					$timeout(function(){
+						$scope.isBusying = false;
+					}, 1000);
 				});
 			});
 		},
 		save: function() {
+			if($scope.isBusying ||false){
+				return;
+			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
 	        }
+			$scope.isBusying = true;
 			if ($scope.trace.henjishangchuan.current || false) {
 				var opt = angular.extend({}, $scope.trace.henjishangchuan);
 				delete opt.current;
@@ -4940,6 +5067,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 			tipmessage("保存成功");
 			$timeout(function() {
+				$scope.isBusying = false;
 				$scope.$location.back();
 			}, 1000);
 		}
@@ -5357,6 +5485,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		submit: function() {
+			if($scope.isBusying ||false){
+				return;
+			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
@@ -5367,6 +5498,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				tipmessage("请检查构件是否存在");
 	        	return;
 			}
+			$scope.isBusying = true;
 			model.uploadAttachments($scope.newItem, function(item) {
 				delete item._index;
 				delete item._type;
@@ -5385,10 +5517,16 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 							$scope.$location.back();
 						}, 1000);
 					}
+					$timeout(function(){
+						$scope.isBusying = false;
+					}, 1000);
 				});
 			});
 		},
 		save: function() {
+			if($scope.isBusying ||false){
+				return;
+			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
@@ -5399,6 +5537,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				tipmessage("请检查构件是否存在");
 	        	return;
 			}
+			$scope.isBusying = true;
 			if ($scope.trace.zhiliang.current || false) {
 				var opt = angular.extend({}, $scope.trace.zhiliang);
 				delete opt.current;
@@ -5413,6 +5552,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 			tipmessage("保存成功");
 			$timeout(function() {
+				$scope.isBusying = false;
 				$scope.$location.back();
 			}, 1000);
 		}
@@ -5635,6 +5775,9 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			});
 		},
 		submit: function() {
+			if($scope.isBusying ||false){
+				return;
+			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
@@ -5645,6 +5788,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				tipmessage("请检查构件是否存在");
 	        	return;
 			}
+			$scope.isBusying = true;
 			model.uploadAttachments($scope.newItem, function(item) {
 				delete item._index;
 				delete item._type;
@@ -5663,10 +5807,17 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 							$scope.$location.back();
 						}, 1000);
 					}
+					
+					$timeout(function(){
+						$scope.isBusying = true;
+					});
 				});
 			});
 		},
 		save: function() {
+			if($scope.isBusying ||false){
+				return;
+			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
 	        	return;
@@ -5677,6 +5828,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				tipmessage("请检查构件是否存在");
 	        	return;
 			}
+			$scope.isBusying = true;
 			if ($scope.trace.chengzhangguocheng.current || false) {
 				var opt = angular.extend({}, $scope.trace.chengzhangguocheng);
 				delete opt.current;
@@ -5691,6 +5843,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 			tipmessage("保存成功");
 			$timeout(function() {
+				$scope.isBusying = false;
 				$scope.$location.back();
 			}, 1000);
 		}
