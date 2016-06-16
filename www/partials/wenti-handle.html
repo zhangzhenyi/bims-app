@@ -52,10 +52,11 @@
 			<textarea ng-model="issueItem.preventionDesc" id="iPreventionDesc" cols="" rows="" class="fromarea" placeholder="" ng-change="contentChanged(2)" placeholder="点此输入" required ng-maxlength="150" maxlength="150"></textarea></span>
 		</li>
 		<li class="clearfix" ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
-			<span class="l"><img src="img/i-xq-10.jpg"/>隐患类型</span><span class="r">
-			<select ng-model="issueItem.issueCategory" ng-if="issueItem.issueType ==1" ng-change="selectAction()"  ng-options="cat.id as cat.name for cat in issueCats"></select>
-			<select ng-model="issueItem.issueCategory" ng-if="issueItem.issueType == 2"  ng-change="selectAction()"  ng-options="cat.id as cat.name for cat in issueCatsSafe"></select>
-			<span class="r" ng-if="issueItem.issueCategory==4" ><input ng-model="issueItem.issueCategoryRemark" type="text" class="fromtxt" placeholder="请输入其他隐患类型" placeholder="点此输入" maxlength="15" required/></span>
+			<span class="l"><img src="img/i-xq-10.jpg"/>隐患类型</span>
+			<span class="r">
+			<select class="fromselect"  ng-model="issueItem.issueCategory" ng-if="issueItem.issueType ==1" ng-change="selectAction()"  ng-options="cat.id as cat.name for cat in issueCats"></select>
+			<select class="fromselect"  ng-model="issueItem.issueCategory" ng-if="issueItem.issueType == 2"  ng-change="selectAction()"  ng-options="cat.id as cat.name for cat in issueCatsSafe"></select>
+			<span ng-if="issueItem.issueCategory==4" ><input ng-model="issueItem.issueCategoryRemark" type="text" class="fromtxt" placeholder="请输入其他隐患类型" placeholder="点此输入" maxlength="15" required/></span>
 			</span>
 			  
 		</li>

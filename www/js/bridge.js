@@ -2444,7 +2444,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	        	return;
 	        }
 			if ($scope.user.password != $scope.password0) {
-				tipmessage("请输入正确的密码！", "wrongPwd");
+				tipmessage("两次密码必须输入一致！", "wrongPwd");
+				$("#password0")[0].setCustomValidity("两次密码必须输入一致！");
+				$("#password1")[0].setCustomValidity("两次密码必须输入一致！");
 				return;
 			}
 			//中文名判断
@@ -2452,7 +2454,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			if(isChinese || false){
 				//是中文
 			}else{
-				tipmessage("必须使用中文姓名注册用户名！", "wrongUserName");
+				tipmessage("必须使用中文姓名注册账户！", "wrongUserName");
 				return;
 			}
 			var isChinese = CheckChinese($scope.user.name);
