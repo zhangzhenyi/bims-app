@@ -2438,6 +2438,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			password: "",
 			gender: 1
 		},
+		onChange:function(elId){
+			$("#"+elId)[0].setCustomValidity("");
+		},
 		register: function() {
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
