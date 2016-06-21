@@ -1168,6 +1168,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			USER_ROLE_AUTHORITY_ISSUE_PUBLISH:"/publishissue.jo",
 			USER_ROLE_AUTHORITY_ISSUE_HANDLE:"/handleissue.jo",
 			USER_ROLE_AUTHORITY_ISSUE_ACCEPT:"/acceptissue.jo",
+			USER_ROLE_AUTHORITY_ISSUE_REFUSE:"/refuseIssueByLeader.jo",
 			USER_ROLE_AUTHORITY_ISSUE_PUBLISH_DOC:"/publishissueForDoc.jo",
 			USER_ROLE_AUTHORITY_ISSUE_HANDLE_DOC:"/handleissueForDoc.jo",
 			USER_ROLE_AUTHORITY_ISSUE_ACCEPT_DOC:"/acceptissueForDoc.jo"
@@ -3574,7 +3575,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				});
 	}
 	
-	$scope.hasRectification = true;
+	model.user.checkAutority($scope.Constants.USER_ROLE_AUTHORITY_ISSUE_REFUSE, function(d){if(d || false){
+		$scope.authoRefuseIssue = true;
+	}else{
+		
+		$scope.authoRefuseIssue = false;
+	}});
+	
+	
 	
 	//＊＊＊＊＊＊＊如果是新创建待审核的问题，公司领导可以审核 TODO ＊＊＊＊＊＊＊＊＊＊＊
 	model.issues.getIssue(id, function(d) {
@@ -3603,7 +3611,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			if($scope.authoHandleIssue == true 
 					&& ($scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_HANDLE_REVIEW_REFUSED 
 							|| $scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_PUBLISHED 
-							|| $scope.issueItem.issueStatus == $scope.Constants.ISSUESTATUS_REFUSED)){
+							|| $scope.issueItem.issueStatus == $scope.Constants.ISSUESTATUS_REFUSED || $scope.issueItem.issueStatus == $scope.Constants.ISSUESTATUS_RECTIFICATION)){
 				$scope.hasHandleMenu = true;
 			}else{
 				$scope.hasHandleMenu = false;
@@ -3627,6 +3635,20 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			}else{
 				$scope.noAnyMenu = false;
 			}
+			hasRectification = false;
+			if($scope.issueItem.issueStatus == $scope.Constants.ISSUESTATUS_ACCEPTED){
+				if($scope.user.id==$scope.issueItem.publisherId){
+				$scope.hasRectification = true;
+			}else{
+				if($scope.authoRefuseIssue == true){
+					$scope.hasRectification = true;
+				}else{
+					$scope.hasRectification = false;
+				}
+				
+			}
+			}
+			
 //			$scope.setSelected($scope.issueItem.at);
 		    var issueCats = ["制度／方案缺陷","交底培训缺陷","有章不循","未识别的危险源"];
 			
@@ -4094,7 +4116,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			var _item = {
 					id: $scope.issueItem.id,
 					issueType:$scope.issueItem.issueType,
-					acceptDesc:$scope.issueItem.refuseDesc
+					refuseDesc:$scope.issueItem.refuseDesc
 			};
 			model.issues.recnificateIssues(_item, function(d) {
 				if (d) {
