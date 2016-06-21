@@ -1073,13 +1073,14 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
          }
       },
       init: function(notificationCallback) {
-//    	alert("init jpush plugin")
+//    	alert("init jpush plugin");
         console.log('jpush: start init-----------------------');
         push = window.plugins && window.plugins.jPushPlugin;
         if (push) {
-          console.log('jpush: init');
+//        alert('jpush: init');
           plugins.jPushPlugin.init();
-         getRegistrationID();
+//       getRegistrationID();
+//       alert("jpush plugin okay")
          if (device.platform != "Android") {
             plugins.jPushPlugin.setDebugModeFromIos();
             plugins.jPushPlugin.setApplicationIconBadgeNumber(0);
@@ -1154,6 +1155,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			ISSUESTATUS_ACCEPTED:3,//已验收
 			ISSUESTATUS_HOUSEKEEP:4,//已存档
 			ISSUESTATUS_REFUSED:0,//验收未通过，重新处理
+			ISSUESTATUS_RECTIFICATION:-300,//验收通过被重新打回再处理
 			ATTACHMENTTYPE_COMMON:1,
 			ATTACHMENTTYPE_PICTURE:2,
 			ATTACHMENTTYPE_VIDEO:3,
@@ -1324,6 +1326,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
   
   function onPause(){
   	console.log('onpause ');
+//	alert("pause");
   }
   function onResume(){
   	console.log('onResume ');
@@ -1342,7 +1345,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 //		alert("init jpush");
 		//初始化
 		jpush.init(notificationCallback);
-		
+		jpush.getRegistrationID(onGetRegistrationID);
 		jpush.setBadge(0);
     		jpush.setApplicationBadgeNum(0);
     		$timeout(function _fn_waiting_clearBadge() {
@@ -2102,7 +2105,19 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 					url: u,
 					data:i
 				}, angular.isFunction(c) ? c : angular.noop);
-			}
+			},
+			recnificateIssues: function(i, c) {//
+				var u = "issue/refuseIssueByLeader.jo";
+				if(i.issueType == $rootScope.Constants.ISSUETYPE_MATERIAL){
+					u = "issue/refuseIssueByLeader.jo"
+				}
+				_req({
+					method: "post",
+					url: u,
+					data:i
+				}, angular.isFunction(c) ? c : angular.noop);
+			},
+			
 			
 		},
 		sect : {
@@ -3559,6 +3574,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				});
 	}
 	
+	$scope.hasRectification = true;
+	
 	//＊＊＊＊＊＊＊如果是新创建待审核的问题，公司领导可以审核 TODO ＊＊＊＊＊＊＊＊＊＊＊
 	model.issues.getIssue(id, function(d) {
 		if(d) {
@@ -3696,6 +3713,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			$scope.files.filename = name;
 			$scope.files.filepath = path;
 			$scope.$location.path("/onefile");
+		},
+		//Jumpto rectification page
+		rectificate:function(){
+			$scope.$location.path("/issue-rectification");
 		}
 	});
 	$scope._page = 0;
@@ -3975,6 +3996,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
         	return;
         }
 		$scope.isBusying = true;
+		
 		$scope.newIssue.at = $scope.newIssue.at.join();
 		tipmessage1(message="上传文件中",id="tipimg");
 		model.uploadAttachments($scope.newIssue, function(item) {
@@ -4045,7 +4067,50 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	});
 	
 }])
-
+.controller("cIssueRectificate", ["$scope", "model", "$timeout",function($scope, model, $timeout){
+	angular.extend($scope, {
+		issueItem:{
+			id : $scope.issues.currentIssue.id,
+			issueType: $scope.issues.currentIssue.issueType,
+			refuseDesc:""
+		},
+		tipVisibility: "none",
+		tipContent:"提交成功",
+		remain:150,
+		contentChanged:function(){
+			if($scope.issueItem.refuseDesc!= null){
+				$scope.remain = 150 - $scope.issueItem.refuseDesc.length;
+			}
+		},
+		submit: function(){
+			if($scope.isBusying ||false){
+				return;
+			}
+			if(!$scope.form.$valid){
+	        	tipmessage("请检查输入内容是否正确");
+	        	return;
+	        }
+			$scope.isBusying = true;
+			var _item = {
+					id: $scope.issueItem.id,
+					issueType:$scope.issueItem.issueType,
+					acceptDesc:$scope.issueItem.refuseDesc
+			};
+			model.issues.recnificateIssues(_item, function(d) {
+				if (d) {
+					$scope.tipVisibility = "block";
+					$timeout(function() {
+						$scope.$location.back();
+					}, 1000);
+				}
+				$timeout(function() {
+						$scope.isBusying = false;
+					}, 1000);
+			});
+		}
+	});
+	
+}])
 .controller("cIssueReview", ["$scope", "model", "$timeout",function($scope, model, $timeout){
 	if($scope.issues.currentIssue.issueStatus != $scope.Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW
 			&& $scope.issues.currentIssue.issueStatus != $scope.Constants.ISSUESTATUS_HANDLED_WAITING_REVIEW){
@@ -6190,6 +6255,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	.when("/issue-check",{
 		templateUrl: "partials/wenti-check.html",
 		controller: "cIssueCheck"
+	})
+	.when("/issue-rectification",{
+		templateUrl: "partials/wenti-rectification.html",
+		controller: "cIssueRectificate"
 	})
 	.when("/issue-review",{
 		templateUrl: "partials/wenti-review.html",
