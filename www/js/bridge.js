@@ -2448,6 +2448,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 }])
 .controller("cZhuce", ["$scope", "$timeout", "model", function($scope, $timeout, model) {
 	angular.extend($scope, {
+		diffPwd : false,
 		tipVisibility: "none",
 		user: {
 			username: "",
@@ -2458,15 +2459,37 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			$("#"+elId)[0].setCustomValidity("");
 		},
 		register: function() {
+			
 			if(!$scope.form.$valid){
-	        	tipmessage("请检查输入内容是否正确");
-	        	return;
+	       	 	var msg = "请检查输入内容是否正确";
+	       	 	if($scope.form.username.$pristine){
+	       	 		msg = "账户不能为空";
+//	       	 		$scope.form.username.setCustomValidity("账户不能为空");
+	       	 		$scope.form.username.$dirty = true;
+	       	 	}
+	       	 	
+	       	 	if($scope.form.name.$pristine){
+	       	 		$scope.form.name.$dirty = true;
+	       	 	}
+	       	 	
+	       	 	if($scope.form.password0.$pristine){
+	       	 		$scope.form.password0.$dirty = true;
+	       	 	}
+	       	 	if($scope.form.password1.$pristine){
+	       	 		$scope.form.password1.$dirty = true;
+	       	 	}
+	       	 	
+	       	 	tipmessage(msg);
+	        		return;
 	        }
 			if ($scope.user.password != $scope.password0) {
 				tipmessage("两次密码必须输入一致！", "wrongPwd");
 				$("#password0")[0].setCustomValidity("两次密码必须输入一致！");
 				$("#password1")[0].setCustomValidity("两次密码必须输入一致！");
+				$scope.diffPwd=true;
 				return;
+			}else{
+				$scope.diffPwd=true;
 			}
 			//中文名判断
 			var isChinese = CheckChinese($scope.user.username);

@@ -1,18 +1,44 @@
 <div class="pb75 pt60 ng-scope">
 <header class="bg1"><span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span><p class="title">注册</p></header>
 <section class="mt10 mlr10 pb20 bg2">
-<form name="form">
+<form name="form" novalidate="novalidate">
 <ul class="list-3">
 <li class="clearfix"><span class="l"><img src="img/icon-23.png"/>账户<span class="red">*</span></span>
 <span class="r"><input ng-model="user.username" name="username" type="text" maxlength="5" required="required" class="fromtxt clearfix" 
- title="仅支持2-5位中文"	placeholder="请输入真实姓名注册" pattern="^[\u4E00-\u9FA5][\u4E00-\u9FA5]+$" /></span>
+ title="仅支持2-5位中文"	placeholder="请输入真实姓名注册" pattern="^[\u4E00-\u9FA5][\u4E00-\u9FA5]+$" />
+<span style="color:red" ng-show="form.username.$dirty && form.username.$invalid">
+	<small ng-show="form.username.$error.pattern || form.username.$error.minLength ||form.username.$error.maxLength">仅支持2-5位中文</small>
+ <small ng-show="form.username.$error.required">账户不能为空</small>
+ </span>
+</span>
+ 
 </li>
-<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>密码<span class="red">*</span></span><span class="r"><input ng-model="user.password" type="password" maxlength="6" id="password0" required="required" class="fromtxt"  placeholder="请输入六位密码" pattern="[A-z0-9]{6}" ng-change="onChange('password0')"/></span></li>
-<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>密码<span class="red">*</span></span><span class="r"><input ng-model="password0" type="password" maxlength="6" id="password1" required="required" pattern="[A-z0-9]{6}" class="fromtxt"  placeholder="请再次输入密码" ng-change="onChange('password1')"/></span></li>
-<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>手机</span><span class="r"><input ng-model="user.mobile" type="tel" maxlength="11" class="fromtxt" placeholder="请输入正确手机号码" pattern="(\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$"/></span></li>
-<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>邮件</span><span class="r"><input ng-model="user.email" type="email" class="fromtxt" placeholder="请输入正确邮件地址" /></span></li>
+<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>密码<span class="red">*</span></span><span class="r"><input ng-model="user.password" type="password" name="password0" maxlength="6" id="password0" required="required" class="fromtxt"  placeholder="请输入六位密码" pattern="[A-z0-9]{6}" ng-change="onChange('password0')"/>
+<span style="color:red" ng-show="form.password0.$dirty && form.password0.$invalid">
+	<small ng-show="form.password0.$error.pattern || form.password0.$error.minLength ||form.password0.$error.maxLength">请输入6位英文或数字密码</small>
+ <small ng-show="form.password0.$error.required">密码不能为空</small>
+ </span></span></li>
+<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>密码<span class="red">*</span></span><span class="r"><input ng-model="password0" type="password" maxlength="6" name="password1" id="password1" required="required" pattern="[A-z0-9]{6}" class="fromtxt"  placeholder="请再次输入密码" ng-change="onChange('password1')"/>
+<span style="color:red" ng-show="form.password1.$dirty && (form.password0.$invalid || diffPwd)">
+	<small ng-show="form.password1.$error.pattern || form.password1.$error.minLength ||form.password1.$error.maxLength">请输入6位英文或数字密码</small>
+ <small ng-show="form.password1.$error.required">密码不能为空</small>
+ <small ng-show="diffPwd">密码不一致</small>
+</span>
+</span></li>
+<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>手机</span><span class="r"><input ng-model="user.mobile" type="tel" maxlength="11" name="mobile" class="fromtxt" placeholder="请输入正确手机号码" pattern="(\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$"/>
+<span style="color:red" ng-show="form.mobile.$dirty && form.mobile.$invalid">
+	<small ng-show="form.mobile.$error.pattern || form.mobile.$error.minLength ||form.mobile.$error.maxLength">请输入正确手机号码</small>
+</span></span></li>
+<li class="clearfix"><span class="l"><img src="img/icon-24.png"/>邮件</span><span class="r"><input ng-model="user.email" type="email" class="fromtxt" name="email" placeholder="请输入正确邮件地址" />
+<span style="color:red" ng-show="form.email.$dirty && form.email.$invalid">
+	<small ng-show="form.email.$invalid">请输入正确邮件地址</small>
+</span></span></li>
 <li class="clearfix"><span class="l"><img src="img/icon-24.png"/>姓名<span class="red">*</span></span><span class="r">
-	<input ng-model="user.name" type="text" maxlength="10" required="required" class="fromtxt" pattern="^[\u4E00-\u9FA5][\u4E00-\u9FA5]+$" placeholder="请输入真实姓名"/></span></li>
+	<input ng-model="user.name" type="text" name="name" required="required" class="fromtxt" pattern="^[\u4E00-\u9FA5][\u4E00-\u9FA5]+$" placeholder="请输入真实姓名"/>
+<span style="color:red" ng-show="form.name.$dirty && form.name.$invalid">
+	<small ng-show="form.name.$error.pattern || form.name.$error.minLength ||form.name.$error.maxLength">仅支持2-5位中文</small>
+ <small ng-show="form.name.$error.required">姓名不能为空</small>
+ </span></span></li>
 <li class="clearfix"><span class="l"><img src="img/icon-24.png"/>性别</span><span class="r"><input ng-model="user.gender" type="radio" value="1"/>男&nbsp;&nbsp;&nbsp;&nbsp;<input ng-model="gender" type="radio" value="0"/>女</span></li>
 <li class="clearfix"><span class="l"><img src="img/icon-24.png"/>单位</span><span class="r"><select class="fromselect" ng-model="user.department" ng-options="item as item.name for item in departments"></select></span></li>
 <li class="clearfix"><span class="l"><img src="img/icon-24.png"/>职务</span><span class="r"><input ng-model="user.dutyTitle" type="text" maxlength="10" class="fromtxt" placeholder="职务不超过10个字符"/></span></li>
