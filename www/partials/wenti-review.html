@@ -15,9 +15,12 @@
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-12.jpg"/>审核意见</span><span class="r">
 			<label for="iHandleDesc" style="color:#aaa;">您还可输入{{remain}}个字符</label>
-			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged()" id="iHandleDesc" oninput= "fitTextArea('iHandleDesc')" ng-model="reviewDesc" required ng-maxlength="150" maxlength="150"></textarea>
+			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged()" id="iHandleDesc" oninput= "fitTextArea('iHandleDesc')" ng-model="reviewDesc" required ng-maxlength="150" maxlength="150" name="reviewDesc"></textarea>
+			<span style="color:red" ng-show="form.reviewDesc.$dirty && form.reviewDesc.$invalid">
+			<small ng-show="form.reviewDesc.$error.maxLength">审核意见长度不能超过150</small>
+				<small ng-show="form.reviewDesc.$error.required">审核意见不能为空</small>
+ 			</span>
 			</span>
-			
 		</li>
 		<span><a ng-click="submit(false)" href="" class="abtn-agree">拒绝</a></span>
 		<span><a ng-click="submit(true)" href="" class="abtn-refuse">同意</a></span>

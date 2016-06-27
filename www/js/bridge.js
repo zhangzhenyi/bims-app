@@ -123,6 +123,9 @@ function CheckChinese(val){
 	
 }
 
+var isTestVersion = true;
+var zhiliangDocId =  isTestVersion == true? 808 : 4296;
+var anquanDocId = isTestVersion == true? 809 : 4295;
 
 (function() {
     'use strict';
@@ -2363,8 +2366,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
    };
 	$scope.login = function() {
 		if(!$scope.userForm.$valid){
-        	tipmessage("请输入用户名和密码");
-        	return;
+        		tipmessage("请输入正确的用户名和密码");
+        		return;
         }
        var platform = 1;
        if(!$scope.hasChecked && window.device){
@@ -3613,7 +3616,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			$scope.issueItem = d;
 			//判断显示menu
 			if(($scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW 
-					|| $scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_PUBLISH_REVIEW_REFUSED) 
+					|| $scope.issueItem.issueStatus==$scope.Constants.ISSUESTATUS_PUBLISH_REVIEW_REFUSED
+			||  $scope.issueItem.issueStatus == $scope.Constants.ISSUESTATUS_PUBLISHED)
 					&& $scope.user.id==$scope.issueItem.publisherId){
 				$scope.hasEditMenu = true;
 			}else{
@@ -3877,15 +3881,39 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			}
 		}
 	};
+	$scope.checkContent= function(){
+		if(!$scope.form.$valid){
+        	tipmessage("请检查输入内容是否正确");
+        		if($scope.form.atTo.$pristine){
+        			$scope.form.atTo.$dirty = true;
+        		}
+        		if($scope.form.title.$pristine){
+        			$scope.form.title.$dirty = true;
+        		}
+        		if($scope.form.location.$pristine){
+        			$scope.form.location.$dirty = true;
+        		}
+        		if($scope.form.issueDesc.$pristine){
+        			$scope.form.issueDesc.$dirty = true;
+        		}
+        		if($scope.form.issueRect.$pristine){
+        			$scope.form.issueRect.$dirty = true;
+        		}
+        		return false;
+        }else{
+        		return true;
+        }
+	}
 		
 	$scope.save = function(){
 		if($scope.isBusying || false){
 			return;
 		}
-		if(!$scope.form.$valid){
-	        	tipmessage("请检查输入内容是否正确");
-	        	return;
-	    }
+		if($scope.checkContent() || false){
+			//continue
+		}else{
+			return;
+		}
 		$scope.isBusying = true;
 		$scope.newIssue.at = $scope.newIssue.at.join();
 		transferCache.push($scope.newIssue, "issue","update");
@@ -3912,10 +3940,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		if($scope.isBusying || false){
 			return;
 		}
-		if(!$scope.form.$valid){
-        	tipmessage("请检查输入内容是否正确");
-        		return;
-        }
+		if($scope.checkContent() || false){
+			//continue
+		}else{
+			return;
+		}
 		$scope.isBusying = true;
 		tipmessage1(message="上传文件中",id="tipimg");
 		$scope.newIssue.at = $scope.newIssue.at.join();
@@ -4017,10 +4046,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		if($scope.isBusying ||false){
 			return;
 		}
-			if(!$scope.form.$valid){
-	        	tipmessage("请检查输入内容是否正确");
-	        	return;
-	        }
+		if($scope.checkContent() || false){
+			//continue
+		}else{
+			return;
+		}
 			$scope.isBusying = true;
 			tipmessage1(message="保存中",id="tipimg");
 			$scope.newIssue.at = $scope.newIssue.at.join();
@@ -4032,16 +4062,40 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				$scope.$location.back();
 			}, 1000);
 	};
+	$scope.checkContent= function(){
+		if(!$scope.form.$valid){
+        	tipmessage("请检查输入内容是否正确");
+        		if($scope.form.atTo.$pristine){
+        			$scope.form.atTo.$dirty = true;
+        		}
+        		if($scope.form.title.$pristine){
+        			$scope.form.title.$dirty = true;
+        		}
+        		if($scope.form.location.$pristine){
+        			$scope.form.location.$dirty = true;
+        		}
+        		if($scope.form.issueDesc.$pristine){
+        			$scope.form.issueDesc.$dirty = true;
+        		}
+        		if($scope.form.issueRect.$pristine){
+        			$scope.form.issueRect.$dirty = true;
+        		}
+        		return false;
+        }else{
+        		return true;
+        }
+	}
+	
 	$scope.submit = function(){
 		if($scope.isBusying ||false){
 			return;
 		}
-		if(!$scope.form.$valid){
-        	tipmessage("请检查输入内容是否正确");
-        	return;
-        }
+		if($scope.checkContent() || false){
+			//continue
+		}else{
+			return;
+		}
 		$scope.isBusying = true;
-		
 		$scope.newIssue.at = $scope.newIssue.at.join();
 		tipmessage1(message="上传文件中",id="tipimg");
 		model.uploadAttachments($scope.newIssue, function(item) {
@@ -4087,9 +4141,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				return;
 			}
 			if(!$scope.form.$valid){
-	        	tipmessage("请检查输入内容是否正确");
-	        	return;
-	        }
+        			tipmessage("请检查输入内容是否正确");
+	        		if($scope.form.accepDesc.$pristine){
+	        			$scope.form.accepDesc.$dirty = true;
+	        		}
+	        		return;
+        		}
 			$scope.isBusying = true;
 			var _item = {
 					id: $scope.issueItem.id,
@@ -4132,9 +4189,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				return;
 			}
 			if(!$scope.form.$valid){
-	        	tipmessage("请检查输入内容是否正确");
-	        	return;
-	        }
+        			tipmessage("请检查输入内容是否正确");
+	        		if($scope.form.refuseDesc.$pristine){
+	        			$scope.form.refuseDesc.$dirty = true;
+	        		}
+	        		return;
+        		}
 			$scope.isBusying = true;
 			var _item = {
 					id: $scope.issueItem.id,
@@ -4179,9 +4239,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		},
 		submit: function(s){
 			if(!$scope.form.$valid){
-	        	tipmessage("请检查输入内容是否正确");
-	        	return;
-	        }
+        			tipmessage("请检查输入内容是否正确");
+	        		if($scope.form.reviewDesc.$pristine){
+	        			$scope.form.reviewDesc.$dirty = true;
+	        		}
+	        		return;
+        		}
 			var _item = {
 					id: $scope.issueItem.id
 			};
@@ -4299,10 +4362,21 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	    	}
 	    	var date = new Date();
 	    	console.log(date.format("yyyy/MM/dd hh:mm:ss"));
+
 	    	if(!$scope.form.$valid){
-	        	tipmessage("请检查输入内容是否正确");
-	        	return;
-	    }
+        	tipmessage("请检查输入内容是否正确");
+        		if($scope.form.handleDesc.$pristine){
+        			$scope.form.handleDesc.$dirty = true;
+        		}
+        		if($scope.form.lessonDesc.$pristine){
+        			$scope.form.lessonDesc.$dirty = true;
+        		}
+        		if($scope.form.preventionDesc.$pristine){
+        			$scope.form.preventionDesc.$dirty = true;
+        		}
+        		return;
+        }
+	    	
 	    	$scope.isBusying = true;
 	    	tipmessage1(message="上传文件中",id="tipimg");
 			model.uploadAttachments($scope.issueItem, function(item) {
@@ -4410,7 +4484,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	if (path.indexOf("sousuo-single") > 0) {
 		$scope.files.parentId = parseInt(path.substring(path.indexOf("?id=") + 4));
 		$scope.status[0] = '';
-		if ($scope.files.parentId == 808 || $scope.files.parentId == 809) $scope.status[3] = 'on';
+		if ($scope.files.parentId == zhiliangDocId || $scope.files.parentId == anquanDocId) $scope.status[3] = 'on';
 		else $scope.status[2] = 'on';
 	}
 	model.getFileList($scope.files.parentId, function(d) {
@@ -6246,11 +6320,11 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		templateUrl: "partials/sousuo-list.html",
 		controller: "cSousuo"
 	})
-	.when("/sousuo-single?id=808", {
+	.when("/sousuo-single?id="+zhiliangDocId, {
 		templateUrl: "partials/sousuo-list.html",
 		controller: "cSousuo"
 	})
-	.when("/sousuo-single?id=809", {
+	.when("/sousuo-single?id="+anquanDocId, {
 		templateUrl: "partials/sousuo-list.html",
 		controller: "cSousuo"
 	})

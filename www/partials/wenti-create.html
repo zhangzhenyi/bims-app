@@ -7,7 +7,7 @@
 </header>
 
 <section class="mt10 mlr10 bg2 pb75">
-<form name="form">
+<form name="form" novalidate="novalidate">
 	<ul class="list-3">
 
 		<li class="clearfix">
@@ -17,7 +17,11 @@
 		
 		<li class="clearfix">
 			<span class="l"><img src="img/icon-10.png"/>@到：</span>
-			<span class="r" style="width:60%;"><my-chosen placeholder="选择人员..." ng-model="newIssue.at" data="user.list" text="name" value="username"></my-chosen></span>
+			<span class="r" style="width:60%;"><my-chosen placeholder="选择人员..." ng-model="newIssue.at" data="user.list" text="name" value="username" name="atTo" required></my-chosen>
+				<span style="color:red" ng-show="form.atTo.$dirty && form.atTo.$invalid">
+					<small ng-show="form.atTo.$error.required">@到不能为空</small>
+					</span>
+			</span>
 		</li>
 		
 		<li class="clearfix">
@@ -26,24 +30,47 @@
 			<span class="l" ng-if="newIssue.issueType == Constants.ISSUETYPE_MATERIAL">
 			<img src="img/icon-23.png"/>资料名称</span>
 			<span class="r">
-			<input ng-model="newIssue.issueTitle"  type="text" class="fromtxt" placeholder="点此输入" required="required" ng-maxlength="50" maxlength="50"/></span>
+			<input ng-model="newIssue.issueTitle"  type="text" class="fromtxt" placeholder="点此输入" name="title" required="required" ng-maxlength="50" maxlength="50"/>
+			<span style="color:red" ng-show="form.title.$dirty && form.title.$invalid">
+				<span ng-if="newIssue.issueType != Constants.ISSUETYPE_MATERIAL">
+					<small ng-show="form.title.$error.required">标题不能为空</small>
+				</span>
+				<span ng-if="newIssue.issueType == Constants.ISSUETYPE_MATERIAL"><small ng-show="form.title.$error.required">资料名称不能为空</small></span>
+ 			</span>
+			</span>
 		</li>
 		
 		<li class="clearfix" ng-if="newIssue.issueType != Constants.ISSUETYPE_MATERIAL">
 			<span class="l"><img src="img/i-xq-2.jpg"/>位置</span>
-			<span class="rr"><input ng-model="newIssue.location"  type="text" class="fromtxt" placeholder="点此输入" required="required" ng-maxlength="150" maxlength="150"/></span>
+			<span class="rr"><input ng-model="newIssue.location"  type="text" class="fromtxt" placeholder="点此输入" name="location" required="required" ng-maxlength="50" maxlength="50"/>
+			<span style="color:red" ng-show="form.location.$dirty && form.location.$invalid">
+			<small ng-show="form.location.$error.maxLength">位置长度不能超过50</small>
+				<small ng-show="form.location.$error.required">位置不能为空</small>
+ 			</span>
+	</span>
 			<span class="ll"><a href="" ng-click="onscan()"><img src="img/scan.png"></a></span>
+		
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-3.jpg"/>问题描述</span>
 			<span class="r"><label for="issueDesc"  style="color:#aaa;">您还可输入{{remain}}个字符</label>
-			<textarea ng-model="newIssue.issueDesc" id="issueDesc" cols="" rows="" class="fromarea" ng-change="changed()" oninput= "fitTextArea('issueDesc')" placeholder="点此输入" required="required" ng-maxlength="150" maxlength="150">
-			</textarea></span>
+			<textarea ng-model="newIssue.issueDesc" id="issueDesc" cols="" rows="" class="fromarea" name="issueDesc" ng-change="changed()" oninput= "fitTextArea('issueDesc')" placeholder="点此输入" required="required" ng-maxlength="150" maxlength="150">
+			</textarea>
+			<span style="color:red" ng-show="form.issueDesc.$dirty && form.issueDesc.$invalid">
+			<small ng-show="form.issueDesc.$error.maxLength">位置长度不能超过50</small>
+				<small ng-show="form.issueDesc.$error.required">位置不能为空</small>
+ 			</span>
+			</span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-4.jpg"/>整改要求</span><span class="r">
 			<label for="issueRectification" style="color:#aaa;">您还可输入{{remain1}}个字符</label>
-			<textarea ng-model="newIssue.issueRectification" id="issueRectification" oninput= "fitTextArea('issueRectification')" cols="" rows="" class="fromarea" placeholder="点此输入" ng-change="changed()" required="required" ng-maxlength="150" maxlength="150"></textarea></span>
+			<textarea ng-model="newIssue.issueRectification" id="issueRectification" oninput= "fitTextArea('issueRectification')" cols="" rows="" class="fromarea" placeholder="点此输入" ng-change="changed()" name="issueRect" required="required" ng-maxlength="150" maxlength="150"></textarea>
+			<span style="color:red" ng-show="form.issueRect.$dirty && form.issueRect.$invalid">
+			<small ng-show="form.issueRect.$error.maxLength">位置长度不能超过150</small>
+				<small ng-show="form.issueRect.$error.required">位置不能为空</small>
+ 			</span>
+			</span>
 		</li>
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-5.jpg"/>相片</span><span class="r pr"><span ng-repeat="pic in newIssue.issuePicAttachmentList" class="pic" style="margin-right:5px;">

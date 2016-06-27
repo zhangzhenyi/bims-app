@@ -14,7 +14,11 @@
 		<li class="clearfix">
 			<span class="l"><img src="img/i-xq-12.jpg"/>整改意见</span><span class="r">
 			<label for="iHandleDesc" style="color:#aaa;">您还可输入{{remain}}个字符</label>
-			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged()" id="iHandleDesc" ng-model="issueItem.refuseDesc" required ng-maxlength="150" maxlength="150"></textarea>
+			<textarea cols="" rows="" class="fromarea" ng-change="contentChanged()" id="iHandleDesc" ng-model="issueItem.refuseDesc" name="refuseDesc" required ng-maxlength="150" maxlength="150"></textarea>
+			<span style="color:red" ng-show="form.refuseDesc.$dirty && form.refuseDesc.$invalid">
+			<small ng-show="form.refuseDesc.$error.maxLength">验收意见长度不能超过150</small>
+				<small ng-show="form.refuseDesc.$error.required">验收意见不能为空</small>
+ 			</span>
 			</span>
 		</li>
 		<span><a ng-click="submit()" href="" class="abtn-agree">重新整改</a></span>
