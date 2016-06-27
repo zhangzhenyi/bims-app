@@ -4850,11 +4850,20 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				}
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
-		        	return;
+		        		if($scope.form.title.$pristine){
+		        			$scope.form.title.$dirty = true;
+		        		}
+		        		if($scope.form.compId.$pristine){
+		        			$scope.form.compId.$dirty = true;
+		        		}
+		        		if($scope.form.content.$pristine){
+		        			$scope.form.content.$dirty = true;
+		        		}
+		        		return;
 		        }
 				else if(isBlankString($scope.newItem.compId)){
 					tipmessage("请检查构件是否存在");
-		        	return;
+		        		return;
 				}else if(!$scope.newItem.component || !$scope.newItem.component.name || $scope.newItem.component.name.length <= 0){
 					tipmessage("请检查构件是否存在");
 		        	return;
@@ -5007,6 +5016,15 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				}
 				if(!$scope.form.$valid){
 		        	tipmessage("请检查输入内容是否正确");
+		        		if($scope.form.title.$pristine){
+		        			$scope.form.title.$dirty = true;
+		        		}
+		        		if($scope.form.compId.$pristine){
+		        			$scope.form.compId.$dirty = true;
+		        		}
+		        		if($scope.form.content.$pristine){
+		        			$scope.form.content.$dirty = true;
+		        		}
 		        	return;
 		        }else if(isBlankString($scope.newItem.compId)){
 					tipmessage("请检查构件是否存在");
@@ -5204,6 +5222,21 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
+	        		if($scope.form.title.$pristine){
+	        			$scope.form.title.$dirty = true;
+	        		}
+	        		if($scope.form.location.$pristine){
+	        			$scope.form.location.$dirty = true;
+	        		}
+	        		if($scope.form.person && $scope.form.person.$pristine){
+	        			$scope.form.person.$dirty = true;
+	        		}
+	        		if($scope.form.background && $scope.form.background.$pristine){
+	        			$scope.form.background.$dirty = true;
+	        		}
+	        		if($scope.form.sectionName && $scope.form.sectionName.$pristine){
+	        			$scope.form.sectionName.$dirty = true;
+	        		}
 	        	return;
 	        }
 			$scope.isBusying = true;
@@ -5239,6 +5272,23 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
+	       	 	if($scope.form.title.$pristine){
+	        			$scope.form.title.$dirty = true;
+	        		}
+	        		if($scope.form.location.$pristine){
+	        			$scope.form.location.$dirty = true;
+	        		}
+	        		if($scope.form.person && $scope.form.person.$pristine){
+	        			$scope.form.person.$dirty = true;
+	        		}
+	        		if($scope.form.background && $scope.form.background.$pristine){
+	        			$scope.form.background.$dirty = true;
+	        		}
+	        		if($scope.form.sectionName && $scope.form.sectionName.$pristine){
+	        			$scope.form.sectionName.$dirty = true;
+	        		}
+	        		
+	        		
 	        	return;
 	        }
 			$scope.isBusying = true;
@@ -5679,6 +5729,18 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
+	        		if($scope.form.title.$pristine){
+	        			$scope.form.title.$dirty = true;
+	        		}
+	        		if($scope.form.compId.$pristine){
+	        			$scope.form.compId.$dirty = true;
+	        		}
+	        		if($scope.form.stage.$pristine){
+	        			$scope.form.stage.$dirty = true;
+	        		}
+	        		if($scope.form.reportType.$pristine){
+	        			$scope.form.reportType.$dirty = true;
+	        		}
 	        	return;
 	        }else if(isBlankString($scope.newItem.compId)){
 				tipmessage("请检查构件是否存在");
@@ -5718,6 +5780,18 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
+	        		if($scope.form.title.$pristine){
+	        			$scope.form.title.$dirty = true;
+	        		}
+	        		if($scope.form.compId.$pristine){
+	        			$scope.form.compId.$dirty = true;
+	        		}
+	        		if($scope.form.stage.$pristine){
+	        			$scope.form.stage.$dirty = true;
+	        		}
+	        		if($scope.form.reportType.$pristine){
+	        			$scope.form.reportType.$dirty = true;
+	        		}
 	        	return;
 	        }else if(isBlankString($scope.newItem.compId)){
 				tipmessage("请检查构件是否存在");
@@ -5968,7 +6042,16 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 				return;
 			}
 			if(!$scope.form.$valid){
-	        	tipmessage("请检查输入内容是否正确");
+	       	 	tipmessage("请检查输入内容是否正确");
+	        		if($scope.form.title.$pristine){
+	        			$scope.form.title.$dirty = true;
+	        		}
+	        		if($scope.form.compId.$pristine){
+	        			$scope.form.compId.$dirty = true;
+	        		}
+	        		if($scope.form.stage.$pristine){
+	        			$scope.form.stage.$dirty = true;
+	        		}
 	        	return;
 	        }else if(isBlankString($scope.newItem.compId)){
 				tipmessage("请检查构件是否存在");
@@ -6009,6 +6092,15 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 			}
 			if(!$scope.form.$valid){
 	        	tipmessage("请检查输入内容是否正确");
+	        		if($scope.form.title.$pristine){
+	        			$scope.form.title.$dirty = true;
+	        		}
+	        		if($scope.form.compId.$pristine){
+	        			$scope.form.compId.$dirty = true;
+	        		}
+	        		if($scope.form.stage.$pristine){
+	        			$scope.form.stage.$dirty = true;
+	        		}
 	        	return;
 	        }else if(isBlankString($scope.newItem.compId)){
 				tipmessage("请检查构件是否存在");
