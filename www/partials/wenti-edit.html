@@ -50,8 +50,8 @@
 			<span class="r"><label for="issueDesc" ng-model="issueDescTip"  style="color:#aaa;">您还可输入{{remain}}个字符</label>
 			<textarea ng-model="newIssue.issueDesc" id="issueDesc" oninput= "fitTextArea('issueDesc')" cols="" rows="" name="issueDesc" class="fromarea" ng-change="changed()" placeholder="点此输入" required="required"  ng-maxlength="150" maxlength="150">
 			</textarea><span style="color:red" ng-show="form.issueDesc.$dirty && form.issueDesc.$invalid">
-			<small ng-show="form.issueDesc.$error.maxLength">位置长度不能超过50</small>
-				<small ng-show="form.issueDesc.$error.required">位置不能为空</small>
+			<small ng-show="form.issueDesc.$error.maxLength">问题描述长度不能超过50</small>
+				<small ng-show="form.issueDesc.$error.required">问题描述不能为空</small>
  			</span></span>
 		</li>
 		<li class="clearfix">
@@ -59,8 +59,8 @@
 			<label for="issueRectification" ng-model="issueRectifyTip" style="color:#aaa;">您还可输入{{remain1}}个字符</label>
 			<textarea ng-model="newIssue.issueRectification" id="issueRectification" oninput= "fitTextArea('issueRectification')" class="fromarea" ng-change="changed()" placeholder="点此输入" required="required" name="issueRect" maxlength="150"></textarea>
 			<span style="color:red" ng-show="form.issueRect.$dirty && form.issueRect.$invalid">
-			<small ng-show="form.issueRect.$error.maxLength">位置长度不能超过150</small>
-				<small ng-show="form.issueRect.$error.required">位置不能为空</small>
+			<small ng-show="form.issueRect.$error.maxLength">整改要求长度不能超过150</small>
+				<small ng-show="form.issueRect.$error.required">整改要求不能为空</small>
  			</span></span>
 		</li>
 		<li class="clearfix">

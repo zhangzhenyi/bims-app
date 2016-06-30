@@ -59,8 +59,8 @@
 			<label for="iPreventionDesc" style="color:#aaa;">您还可输入{{remain2}}个字符</label>
 			<textarea ng-model="issueItem.preventionDesc" id="iPreventionDesc" cols="" rows="" class="fromarea" placeholder="" ng-change="contentChanged(2)" placeholder="点此输入" required ng-maxlength="150" maxlength="150" name="preventionDesc"></textarea>
 			<span style="color:red" ng-show="form.preventionDesc.$dirty && form.preventionDesc.$invalid">
-			<small ng-show="form.preventionDesc.$error.maxLength">整改情况长度不能超过150</small>
-				<small ng-show="form.preventionDesc.$error.required">整改情况不能为空</small>
+			<small ng-show="form.preventionDesc.$error.maxLength">防治措施长度不能超过150</small>
+				<small ng-show="form.preventionDesc.$error.required">防治措施不能为空</small>
  			</span>
 			</span>
 		</li>
@@ -69,7 +69,12 @@
 			<span class="r">
 			<select class="fromselect"  ng-model="issueItem.issueCategory" ng-if="issueItem.issueType ==1" ng-change="selectAction()"  ng-options="cat.id as cat.name for cat in issueCats"></select>
 			<select class="fromselect"  ng-model="issueItem.issueCategory" ng-if="issueItem.issueType == 2"  ng-change="selectAction()"  ng-options="cat.id as cat.name for cat in issueCatsSafe"></select>
-			<span ng-if="issueItem.issueCategory==4" ><input ng-model="issueItem.issueCategoryRemark" type="text" class="fromtxt" placeholder="请输入其他隐患类型" maxlength="15" style="margin-top: 5px;" required/></span>
+			<span ng-if="issueItem.issueCategory==4" ><input ng-model="issueItem.issueCategoryRemark" name="categoryMark" type="text" class="fromtxt" placeholder="请输入其他隐患类型" maxlength="15" style="margin-top: 5px;" required/>
+			<span style="color:red" ng-show="form.categoryMark.$invalid">
+			<small ng-show="form.categoryMark.$error.maxLength">隐患类型长度不能超过15</small>
+				<small ng-show="form.categoryMark.$error.required">请输入备注内容</small>
+ 			</span>
+			</span>
 			</span>
 			  
 		</li>

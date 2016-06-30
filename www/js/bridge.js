@@ -124,8 +124,9 @@ function CheckChinese(val){
 }
 
 var isTestVersion = true;
-var zhiliangDocId =  isTestVersion == true? 808 : 4296;
-var anquanDocId = isTestVersion == true? 809 : 4295;
+ 
+var zhiliangDocId =  isTestVersion == true? 808 : 4295;
+var anquanDocId = isTestVersion == true? 809 : 4296;
 
 (function() {
     'use strict';
@@ -1131,7 +1132,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	};
 	
 	$rootScope.origionVersion = "1.1.0.0401";
-//    $rootScope.origionVersion = "1.1.2.06.03";
+//  $rootScope.origionVersion = "1.1.2.06.03";
 	$rootScope.hasChecked = false;
 	$rootScope.autoUpdateOnWiffi = false;
 	$rootScope.Constants = {
@@ -2341,6 +2342,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		$rootScope.myHeaderPosition = "relative";
 		
 	};
+}])
+.controller("cFaxian", ["$scope", "model", function($scope, model){
+	angular.extend($scope, {
+		zhilaingId: zhiliangDocId,
+		anquanId: anquanDocId
+	});
 }])
 .controller("cLogin", ["$scope", "model", "jpush", function($scope, model, jpush) {
 	if (window.localStorage) {
@@ -4481,9 +4488,11 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 .controller("cSousuo", ["$scope", "model", function($scope, model) {
 	$scope.status = ['on','','','',''];
 	var path = $scope.$location.path();
+                       
 	if (path.indexOf("sousuo-single") > 0) {
 		$scope.files.parentId = parseInt(path.substring(path.indexOf("?id=") + 4));
 		$scope.status[0] = '';
+                        
 		if ($scope.files.parentId == zhiliangDocId || $scope.files.parentId == anquanDocId) $scope.status[3] = 'on';
 		else $scope.status[2] = 'on';
 	}
@@ -6354,7 +6363,8 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		controller: "cHenji"
 	})
 	.when("/faxian", {
-		templateUrl: "partials/a1-1-1faxian.html"
+		templateUrl: "partials/a1-1-1faxian.html",
+		controller: "cFaxian"
 	})
 	.when("/wode", {
 		templateUrl: "partials/a5-1-1wode.html",

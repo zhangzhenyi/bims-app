@@ -16,8 +16,8 @@ function tipmessage1(message,id){
 function changeTipmessage(message,id){
 	$("#"+id).remove();
 	$("#loadingContainer").append("<div class='tipmessage' id='"+id+"'><span><img src='img/loading.gif'><br/>"+message+"</span></div>");
-//	$("#loadingContainer").show();
-//	$("#"+id).animate({opacity:1},300);
+	$("#loadingContainer").show();
+	$("#"+id).animate({opacity:1},300);
 }
 function closetipmessage1(id){
 	if ($("#" + id)) {
