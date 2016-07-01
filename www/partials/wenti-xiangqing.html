@@ -130,8 +130,8 @@
 		</li>
 	</ul>
 </section>
-<section class="mt10" ng-if="issueHandle.issueStatus == Constants.ISSUESTATUS_ACCEPTED">
-	<a ng-click="rectificate()" href="" class="abtn-login" style="margin-top: 10px;" ng-disabled="{{hasRectification}}">重新整改</a>
+<section class="mt10" ng-if="issueHandle.issueStatus == Constants.ISSUESTATUS_ACCEPTED && (hasRectification || false)">
+	<a  ng-click="rectificate()" href="" class="abtn-login" style="margin-top: 10px;">重新整改</a>
 </section>
 
 <section class="mt10" ng-if="issueHandle.issueStatus == Constants.ISSUESTATUS_RECTIFICATION">

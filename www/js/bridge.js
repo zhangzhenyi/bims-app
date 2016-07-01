@@ -3568,6 +3568,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	$scope.authoAcceptIssue=false;
 	$scope.authoReviewPublishIssue=false;
 	$scope.authoReviewHandleIssue=false;
+	$scope.hasRectification = false;
 	if($scope.issueItem.issueType == $scope.Constants.ISSUETYPE_MATERIAL){
 		$scope.authoHandleIssue=true;
 		$scope.authoAcceptIssue=true;
@@ -3669,7 +3670,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			}else{
 				$scope.noAnyMenu = false;
 			}
-			hasRectification = false;
+			$scope.hasRectification = false;
 			if($scope.issueItem.issueStatus == $scope.Constants.ISSUESTATUS_ACCEPTED){
 				if($scope.user.id==$scope.issueItem.publisherId){
 				$scope.hasRectification = true;
@@ -4136,6 +4137,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			acceptDesc:""
 		},
 		tipVisibility: "none",
+		isAgreeClicked:false,
 		tipContent:"提交成功",
 		remain:150,
 		contentChanged:function(){
@@ -4143,6 +4145,33 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				$scope.remain = 150 - $scope.issueItem.acceptDesc.length;
 			}
 		},
+		popUpdateWin: function(isAgree){
+			if(!$scope.form.$valid){
+        			tipmessage("请检查输入内容是否正确");
+	        		if($scope.form.reviewDesc.$pristine){
+	        			$scope.form.reviewDesc.$dirty = true;
+	        		}
+	        		return;
+        		}
+			$scope.isAgreeClicked = isAgree;
+	   		$("#zoomscroll").addClass("loaded").animate({opacity:1},200);
+		   $(document.body).addClass("noscroll");
+		   $("#agreeBtn").click(function(){
+				$(".pop-window1").animate({height:0},50);
+				$("#zoomscroll").animate({opacity:0},200);
+	            setTimeout(function(){$('#zoomscroll').removeClass('loaded');
+	            $(document.body).removeClass("noscroll");
+	            $("#zoom").html("");},400);
+	            $scope.submit($scope.isAgreeClicked);
+            });
+            $("#cancelBtn").click(function(){
+            		$(".pop-window1").animate({height:0},50);
+				$("#zoomscroll").animate({opacity:0},200);
+	            setTimeout(function(){$('#zoomscroll').removeClass('loaded');
+	            $(document.body).removeClass("noscroll");
+	            $("#zoom").html("");},400);
+            });
+  		},
 		submit: function(s){
 			if($scope.isBusying ||false){
 				return;
@@ -4234,6 +4263,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			id : $scope.issues.currentIssue.id,
 			reviewDesc:""
 		},
+		isAgreeClicked:false,
 		isPublishReview:$scope.issues.currentIssue.issueStatus == $scope.Constants.ISSUESTATUS_PUBLISH_WAITING_REVIEW,
 		isHandleReview:$scope.issues.currentIssue.issueStatus == $scope.Constants.ISSUESTATUS_HANDLED_WAITING_REVIEW,
 		tipVisibility: "none",
@@ -4244,6 +4274,34 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 				$scope.remain = 150 - $scope.issueItem.reviewDesc.length;
 			}
 		},
+		popUpdateWin: function(isAgree){
+			if(!$scope.form.$valid){
+        			tipmessage("请检查输入内容是否正确");
+	        		if($scope.form.reviewDesc.$pristine){
+	        			$scope.form.reviewDesc.$dirty = true;
+	        		}
+	        		return;
+        		}
+			$scope.isAgreeClicked = isAgree;
+	   		$("#zoomscroll").addClass("loaded").animate({opacity:1},500);
+		   $(document.body).addClass("noscroll");
+		   $("#agreeBtn").click(function(){
+				$(".pop-window1").animate({height:0},50);
+				$("#zoomscroll").animate({opacity:0},200);
+	            setTimeout(function(){$('#zoomscroll').removeClass('loaded');
+	            $(document.body).removeClass("noscroll");
+	            $("#zoom").html("");},400);
+	            $scope.submit($scope.isAgreeClicked);
+            });
+            $("#cancelBtn").click(function(){
+            		$(".pop-window1").animate({height:0},50);
+				$("#zoomscroll").animate({opacity:0},200);
+	            setTimeout(function(){$('#zoomscroll').removeClass('loaded');
+	            $(document.body).removeClass("noscroll");
+	            $("#zoom").html("");},400);
+            });
+  		},
+  		
 		submit: function(s){
 			if(!$scope.form.$valid){
         			tipmessage("请检查输入内容是否正确");

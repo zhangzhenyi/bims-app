@@ -21,8 +21,8 @@
  			</span>
 			</span>
 		</li>
-		<span><a ng-click="submit(false)" href="" class="abtn-agree">拒绝</a></span>
-		<span><a ng-click="submit(true)" href="" class="abtn-refuse">同意</a></span>
+		<span><a ng-click="popUpdateWin(false)" href="" class="abtn-agree">拒绝</a></span>
+		<span><a ng-click="popUpdateWin(true)" href="" class="abtn-refuse">同意</a></span>
 	</ul>
 	</form>
 </section>
@@ -30,5 +30,19 @@
 
 <div class="mtip" style="display:{{tipVisibility}};">{{tipContent}}</div>
 
-
+<!--pop window-->
+<div id="zoomscrollblock">
+    <div id="zoomscroll" class="pop_catewindow" onclick="return false;">
+        <div class="i-block20151214-6" style="width:90%;height:240px;margin-top:-100px;margin-left:-48%;padding-left:10px;padding-right:10px;text-align: center;">
+			<p class="txt-24" ng-if="isAgreeClicked||false">验收通过</p>
+			<p class="txt-24" ng-if="!isAgreeClicked||false">验收未通过</p>
+			<div style="text-align: center;">
+			<textarea ng-model="issueItem.acceptDesc" cols="" rows="6" class="fromarea" style="width:90%; padding: 5px; margin-bottom:5px;"  readonly="true"/>
+			</div>
+			<div class="line-1"></div>
+			<p class="abtn-refuse" id="agreeBtn">确定</p>
+			<p class="abtn-agree" id="cancelBtn">取消</p>
+		</div>
+    </div>
+</div>
 </div>
