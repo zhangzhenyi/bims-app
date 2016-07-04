@@ -7,6 +7,10 @@
         "files": {}
     },
     "installed_plugins": {
+        "cn.jpush.phonegap.JPushPlugin": {
+            "API_KEY": "38abeeb97403dbfc2a0777ab",
+            "PACKAGE_NAME": "com.srcpoint.bims"
+        },
         "com.hiddentao.cordova.filepath": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         },
@@ -34,15 +38,11 @@
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         },
-        "phonegap-plugin-barcodescanner": {
-            "PACKAGE_NAME": "com.srcpoint.bims"
-        },
         "org.devgeeks.Canvas2ImagePlugin": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         },
-        "cn.jpush.phonegap.JPushPlugin": {
-            "API_KEY": "38abeeb97403dbfc2a0777ab",
-            "PACKAGE_NAME": "com.qiaoruan.humen"
+        "phonegap-plugin-barcodescanner": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
         }
     },
     "dependent_plugins": {}
