@@ -924,6 +924,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			element.removeAttr("ng-if src controls autoplay width height");
 			angular.element("<video></video>").attr({
 				"src": $parse(attrs.src)(scope),
+				"poster": $parse(attrs.poster)(scope),
 				"controls": (attrs.controls && "true" == attrs.controls.toLowerCase()) ? "controls" : null,
 				"autoplay": (attrs.autoplay && "true" == attrs.autoplay.toLowerCase()) ? "autoplay" : null,
 				"width": (attrs.width) ? attrs.width : null,

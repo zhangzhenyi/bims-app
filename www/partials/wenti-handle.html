@@ -36,7 +36,7 @@
 		<li class="clearfix" ng-if="issueItem.issueType != Constants.ISSUETYPE_MATERIAL">
 			<span class="l"><img src="img/i-xq-7.jpg"/>视频</span><span class="r pr">
 			<span ng-repeat="vid in issueItem.handleVideoList" class="vid" style="margin-right:5px;">
-			<my-video src="vid.thumbnailUrl" width="50px" height="50px" margin-top="5px" my-touch-remove="removeVideo(vid.fileUrl)"></my-video></span>
+			<my-video poster="vid.thumbnailUrl" src="vid.fileUrl"  width="50px" height="50px" margin-top="5px" my-touch-remove="removeVideo(vid.fileUrl)"></my-video></span>
 			<my-media-selector src="img/i-jia.jpg" class="pic" type="video" change="videoChanged($uri)"></my-media-selector>
 			<!-- <span ng-repeat="vid in issueItem.handleVideoList" class="vid" style="margin-right:5px;"><my-video src="vid.thumbnailUrl" height="50px"></my-video></span><img src="img/i-jia.jpg" class="pic"/><input type="file" accept="video/*" class="file" onchange="angular.element(this).scope().videoChanged(this)"/> -->
 			</span>
