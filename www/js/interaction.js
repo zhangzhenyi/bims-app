@@ -5,6 +5,7 @@ function tipmessage(message,id){
 	$("#"+id).animate({opacity:1},300);
 	$("#msgContainer").show();
  	setTimeout(function(){$("#"+id).animate({opacity:0},300);setTimeout(function(){$("#"+id).remove();$("#msgContainer").hide();},100);},2000); 
+ 	
 }
 //提示信息带图片
 function tipmessage1(message,id){
@@ -20,15 +21,19 @@ function changeTipmessage(message,id){
 	$("#"+id).animate({opacity:1},300);
 }
 function closetipmessage1(id){
+//	alert("close message "+ id);
 	if ($("#" + id)) {
 		setTimeout(function() {
 			$("#" + id).animate({
 				opacity: 0
 			}, 300);
 			setTimeout(function() {
+//				console.log("close tip "+id);
+				var hsC = $("#loadingContainer").children().length;
+//				console.log("" + hsC);
 				$("#" + id).remove();
-				var hsC = $("#loadingContainer" .child).length;
-				console.log("" + hsC);
+				var hsC = $("#loadingContainer").children().length;
+//				console.log("" + hsC);
 				if (hsC <= 0) {
 					$("#loadingContainer").hide();
 				}

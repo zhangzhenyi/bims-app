@@ -26,6 +26,9 @@
         "cordova-plugin-file-transfer": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         },
+        "cordova-plugin-media": {
+            "PACKAGE_NAME": "com.srcpoint.bims"
+        },
         "cordova-plugin-media-capture": {
             "PACKAGE_NAME": "com.srcpoint.bims"
         },

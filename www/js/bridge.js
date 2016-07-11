@@ -1319,7 +1319,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
     var isActive = notification.notification;
 
     // here add your code
-
+	alert(notification);
 
     //ios
     if (device.platform != "Android") {
@@ -2329,7 +2329,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		if($scope.loading ){
 			tipmessage1(message="努力加载中",id="tipimgLoading");
 		}else{
-			closetipmessage1(id="tipimgLoading");
+			closetipmessage1("tipimgLoading");
 		}
 //		return $scope.loading ? "block" : "none";
 		return "none";
@@ -2555,7 +2555,6 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	}
 	else $rootScope.autoUpdateOnWiffi = false;
 
-	
 //	$scope.messages.unreadCount = $rootScope.messages.unreadCount;
 	angular.extend($scope, {
 		items: [],
@@ -3955,22 +3954,22 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			return;
 		}
 		$scope.isBusying = true;
-		tipmessage1(message="上传文件中",id="tipimg");
+		tipmessage1(message="上传文件中",id="tipimgEditIssue");
 		$scope.newIssue.at = $scope.newIssue.at.join();
 		model.uploadAttachments($scope.newIssue, function(item) {
-			changeTipmessage("开始创建","tipimg");
+			changeTipmessage("开始创建","tipimgEditIssue");
 			delete item.topicType;
 				model.issues.update(item, function(d) {
 					if (d) {
-						changeTipmessage("编辑成功", "tipimg");
+						changeTipmessage("编辑成功", "tipimgEditIssue");
 						model.removeFiles($scope.newIssue.issuePicAttachmentList.concat($scope.newIssue.issueVideoAttachmentList));
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
 					}else{
-						changeTipmessage("编辑失败","tipimg");
+						changeTipmessage("编辑失败","tipimgEditIssue");
 					}
-					closetipmessage1("tipimg");
+					closetipmessage1("tipimgEditIssue");
 					$timeout(function() {
 							$scope.isBusying =false;
 					}, 1000);
@@ -4106,22 +4105,22 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 		$scope.isBusying = true;
 		$scope.newIssue.at = $scope.newIssue.at.join();
-		tipmessage1(message="上传文件中",id="tipimg");
+		tipmessage1(message="上传文件中",id="tipimgCreateIssue");
 		model.uploadAttachments($scope.newIssue, function(item) {
-			changeTipmessage("开始创建","tipimg");
+			changeTipmessage("开始创建","tipimgCreateIssue");
 				delete item.topicType;
 				
 				model.issues.create(item, function(d) {
 					if (d) {
-						changeTipmessage("创建成功",id="tipimg");
+						changeTipmessage("创建成功",id="tipimgCreateIssue");
 						model.removeFiles($scope.newIssue.issuePicAttachmentList.concat($scope.newIssue.issueVideoAttachmentList));
 						$timeout(function() {
 							$scope.$location.back();
 						}, 1000);
 					}else{
-						changeTipmessage("创建失败","tipimg");
+						changeTipmessage("创建失败","tipimgCreateIssue");
 					}
-					closetipmessage1("tipimg");
+					closetipmessage1("tipimgCreateIssue");
 					$timeout(function() {
 							$scope.isBusying =false;
 					}, 1000);
