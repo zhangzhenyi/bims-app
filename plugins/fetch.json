@@ -106,5 +106,13 @@
         "variables": {
             "API_KEY": "38abeeb97403dbfc2a0777ab"
         }
+    },
+    "cordova-plugin-console": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-console"
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

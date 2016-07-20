@@ -27,8 +27,8 @@
 
 var DEFAULT_URL = '';
 var DEFAULT_SCALE_DELTA = 1.1;
-var MIN_SCALE = 0.25;
-var MAX_SCALE = 10.0;
+var MIN_SCALE = 0.1;
+var MAX_SCALE = 20.0;
 var SCALE_SELECT_CONTAINER_PADDING = 8;
 var SCALE_SELECT_PADDING = 22;
 var PAGE_NUMBER_LOADING_INDICATOR = 'visiblePageIsLoading';
@@ -2645,6 +2645,13 @@ var PDFPresentationMode = (function PDFPresentationModeClosure() {
       delete this.mouseDownBind;
       delete this.resetMouseScrollStateBind;
       delete this.contextMenuBind;
+      
+      touch.off(viewContainer, "pinchend");
+	touch.off(viewContainer, "swiping");
+	touch.off(viewContainer, "pinch");
+	touch.off(viewContainer, "pinchstart");
+	Touch.off(viewcontainer, "pinchin");
+	Touch.off(viewcontainer, "pinchout");
     },
 
     /**
@@ -6317,6 +6324,17 @@ var PDFViewerApplication = {
     } while (--ticks > 0 && newScale > MIN_SCALE);
     this.pdfViewer.currentScaleValue = newScale;
   },
+  
+  scaleTo: function pdfViewScale(i, s){
+  	console.log("scale pdf "+scale);
+  	
+  	var newScale = this.pdfViewer.currentScale;
+  	newScale += (scale -1);
+  	newScale = Math.floor(newScale * 10) / 10;
+    newScale = Math.max(MIN_SCALE, newScale);
+    newScale = Math.min(MAX_SCALE, newScale);
+  	this.pdfViewer.currentScaleValue = newScale;
+  },
 
   get pagesCount() {
     return this.pdfDocument.numPages;
@@ -7249,6 +7267,50 @@ function webViewerInitialized() {
       outerContainer.classList.remove('sidebarMoving');
     }
   }, true);
+  
+  var viewContainer = document.getElementById("viewer");
+  var _pdf_initialScale = 1;
+//alert("init touch");
+touch.on(viewContainer, "pinchstart", function(e) {
+//	_scale = e.scale;
+	_pdf_initialScale = e.scale;
+	e.preventDefault();
+//		alert("pinch start "+e.scale+ "  initialScale "+initialScale);
+	
+});
+
+touch.on(viewContainer, "pinchend", function(e) {
+	
+//	alert("pinch end "+e.scale);
+	_pdf_initialScale = e.scale;
+//	e.scale = 1;
+	
+});
+touch.on(viewContainer, "pinchin", function(e) {
+});
+touch.on(viewContainer, "pinchout", function(e) {
+});
+touch.on(viewContainer, "pinch", function(e) {
+	console.log("pinch "+e.scale);
+	var s = e.scale;
+	if(Math.abs(s-_pdf_initialScale) > 0.2){
+		if(s > _pdf_initialScale){
+			PDFViewerApplication.zoomIn();
+		}else{
+			PDFViewerApplication.zoomOut();
+		}
+		_pdf_initialScale = s;
+	}
+//	PDFViewerApplication.scaleTo(initialScale, e.scale);
+});
+touch.on(viewContainer, "swiping", function(e) {
+//	alert("swiping");
+});
+touch.on(viewContainer, "swipeend", function(e) {
+//	alert("swipeend");
+	
+});
+//alert("init touch end");
 
   document.getElementById('sidebarToggle').addEventListener('click',
     function() {
@@ -7679,8 +7741,8 @@ function handleMouseWheel(evt) {
   }
 }
 
-window.addEventListener('DOMMouseScroll', handleMouseWheel);
-window.addEventListener('mousewheel', handleMouseWheel);
+//window.addEventListener('DOMMouseScroll', handleMouseWheel);
+//window.addEventListener('mousewheel', handleMouseWheel);
 
 window.addEventListener('click', function click(evt) {
   if (SecondaryToolbar.opened &&

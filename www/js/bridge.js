@@ -220,7 +220,7 @@ var anquanDocId = isTestVersion == true? 809 : 4296;
     })());
 })();
 
-angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"])
+angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64", "ngPDFViewer"])
 .filter('cutTail', [function () {
 	  return function (value, wordwise, max, tail) {
 		    if (!value) return '';
@@ -902,7 +902,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	};
 }])
-.directive("myPdf", ["$parse", "$window", function ($parse, $window) {
+.directive("myPdf", ["$parse", "$window", "$document", function ($parse, $window, $document) {
 	return {
 		restrict: "E",
 		transclude: true,
@@ -910,9 +910,12 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			element.removeAttr("ng-if src");
 			angular.element("<iframe></iframe>").attr({
 				"src": "lib/pdf/viewer.html?file=" + $parse(attrs.src)(scope),
+				"id" : "pdfview",
+				"name" : "pdfview",
 				"width": "100%",
 				"height": angular.element($window).height() - 90
 			}).appendTo(element);
+
 		}
 	};
 }])
@@ -1132,7 +1135,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		return (new Date(time)).format("yyyy-MM-dd");
 	};
 	
-	$rootScope.origionVersion = "1.1.0.0401";
+	$rootScope.origionVersion = (isTestVersion || false) ? "1.1.0.0401": "1.1.2.06.03";
 //  $rootScope.origionVersion = "1.1.2.06.03";
 	$rootScope.hasChecked = false;
 	$rootScope.autoUpdateOnWiffi = false;
@@ -1276,7 +1279,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			} else {
 				alertContent = event.aps.alert;
 			}
-//			alert("open Notification:" + alertContent);
+//			synchronizeOpenIssueNum();
 		} catch (exception) {
 			console.log("JPushPlugin:onOpenNotification" + exception);
 		}
@@ -1292,6 +1295,7 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			}
 //			$("#notificationResult").html(alertContent);
 //			alert(alertContent);
+			synchronizeOpenIssueNum();
 		} catch (exception) {
 			console.log(exception)
 		}
@@ -1317,9 +1321,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
     var notification = angular.fromJson(data);
     //app 是否处于正在运行状态
     var isActive = notification.notification;
-
     // here add your code
-	alert(notification);
+//	alert(notification);
 
     //ios
     if (device.platform != "Android") {
@@ -1338,9 +1341,30 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
   	console.log('onResume ');
   	jpush.setBadge(0);
     jpush.setApplicationBadgeNum(0);
+//  alert("onResume");
+    synchronizeOpenIssueNum();
   }
   function onOnline(){
   	console.log('onOnline ');
+  }
+  
+  function synchronizeOpenIssueNum(){
+//	alert("Get open issue num");
+  	retrieveOpenIssueNum(function(d){
+		if(d){
+			$rootScope.issues.openIssueNum = d.total;
+			$rootScope.issues.openedDocNum = d.t3;
+			$rootScope.issues.openedQualityNum = d.t1;
+			$rootScope.issues.openedSafetyNum = d.t2;
+		}
+	});
+  }
+  
+  function retrieveOpenIssueNum(c){
+  		_req({
+			method: "get",
+			url: "issue/getOpenedIssueNumByIssueTypeGroup.jo",
+		}, angular.isFunction(c) ? c : angular.noop);
   }
 	
 	document.addEventListener("deviceready", function() {
@@ -2025,7 +2049,8 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			getOpenedIssueNum: function(c){
 				_req({
 						method: "get",
-						url: "issue/getOpenedIssueNum.jo",
+//						url: "issue/getOpenedIssueNum.jo",
+						url: "issue/getOpenedIssueNumByIssueTypeGroup.jo"
 				}, angular.isFunction(c) ? c : angular.noop);
 			},
 			search:function(s,t,pn,st,cat, c){
@@ -2636,7 +2661,10 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	
 	model.issues.getOpenedIssueNum(function(d){
 		if(d){
-			$rootScope.issues.openIssueNum = d;
+			$rootScope.issues.openIssueNum = d.total;
+			$rootScope.issues.openedDocNum = d.t3;
+			$rootScope.issues.openedQualityNum = d.t1;
+			$rootScope.issues.openedSafetyNum = d.t2;
 		}
 	});
 
@@ -6374,6 +6402,34 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	});
 	$scope.go();
 }])
+.controller('TestController', [ '$scope', 'PDFViewerService', function($scope, pdf) {
+	console.log('TestController: new instance');
+
+	$scope.pdfURL = "lib/pdfviewer/test.pdf";
+
+	$scope.instance = pdf.Instance("viewer");
+
+	$scope.nextPage = function() {
+		$scope.instance.nextPage();
+	};
+
+	$scope.prevPage = function() {
+		$scope.instance.prevPage();
+	};
+
+	$scope.gotoPage = function(page) {
+		$scope.instance.gotoPage(page);
+	};
+
+	$scope.pageLoaded = function(curPage, totalPages) {
+		$scope.currentPage = curPage;
+		$scope.totalPages = totalPages;
+	};
+
+	$scope.loadProgress = function(loaded, total, state) {
+		console.log('loaded =', loaded, 'total =', total, 'state =', state);
+	};
+}])
 .config(["myRouteProvider", function(myRouteProvider) {
 	myRouteProvider
 	.when("/login", {
@@ -6654,6 +6710,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	.when("/henji-jiankong-data", {
 		templateUrl: "partials/henji_shigong_data.html",
 		controller: "cHenjiShigongData"
+	})
+	.when("/testPdf", {
+		templateUrl: "lib/pdfviewer/index.html",
+		controller: "TestController"
 	})
 	.otherwise({
         redirectTo: "/"

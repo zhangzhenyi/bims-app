@@ -46,6 +46,9 @@
         },
         "phonegap-plugin-barcodescanner": {
             "PACKAGE_NAME": "com.srcpoint.bims"
+        },
+        "cordova-plugin-console": {
+            "PACKAGE_NAME": "com.qiaoruan.humen.test"
         }
     },
     "dependent_plugins": {}

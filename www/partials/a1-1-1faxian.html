@@ -4,9 +4,14 @@
 	<ul class="list-1">
 		<li><a ng-click="$location.path('/sousuo-single?id='+zhilaingId)" href=""><i><img src="img/icon-4.png"/></i>质量检评标准</a></li>
 		<li><a ng-click="$location.path('/sousuo-single?id='+anquanId)" href=""><i><img src="img/icon-5.png"/></i>安全防控要素</a></li>
-		<li><a ng-click="$location.path('/issues-feedback-quality')" href=""><i><img src="img/icon-6.png"/></i>质量问题反馈</a></li>
-		<li><a ng-click="$location.path('/issues-feedback-safe')" href=""><i><img src="img/icon-7.png"/></i>安全问题反馈</a></li>
-		<li><a ng-click="$location.path('/issues-feedback-material')" href=""><i><img src="img/icon-1.png"/></i>资料问题反馈</a></li>
+		<li><a ng-click="$location.path('/issues-feedback-quality')" href=""><i><img src="img/icon-6.png"/></i>质量问题反馈
+		</a><span ng-if="$root.issues.openedQualityNum > 0" class="tip-red-with-num">{{$root.issues.openedQualityNum}}</span></li>
+		<li><a ng-click="$location.path('/issues-feedback-safe')" href=""><i><img src="img/icon-7.png"/></i>安全问题反馈
+		</a>
+		<span ng-if="$root.issues.openedSafetyNum > 0" class="tip-red-with-num">{{$root.issues.openedSafetyNum}}</span>
+		</li>
+		<li><a ng-click="$location.path('/issues-feedback-material')" href=""><i><img src="img/icon-1.png"/></i>资料问题反馈
+		</a><span ng-if="$root.issues.openedDocNum > 0" class="tip-red-with-num">{{$root.issues.openedSafetyNum}}</span></li>
 		<li><a ng-click="$location.path('/issues-statistics-quality')" href=""><i><img src="img/icon-6.png"/></i>质量问题统计</a></li>
 		<li><a ng-click="$location.path('/issues-statistics-safe')" href=""><i><img src="img/icon-7.png"/></i>安全问题统计</a></li>
 		<li><a ng-click="$location.path('/issues-statistics-doc')" href=""><i><img src="img/icon-1.png"/></i>资料问题统计</a></li>
@@ -20,7 +25,7 @@
 	<a ng-click="$location.path('/henji', true)" href=""><span class="i2"></span>痕迹</a>
 	<a ng-click="$location.path('/', true)" href=""><span class="i3"></span>首页</a>
 	<a ng-click="$location.path('/faxian', true)" href="" class="on"><span class="i4">
-		<span ng-if="$root.issues.openIssueNum > 0" style="background-color:rgba(256,0,0,0.8); border-radius:10px;color:#FFF;width:20px;height:20px;text-align:center;margin-left:15px;margin-bottom:10px;">{{$root.issues.openIssueNum}}</span>
+		<span ng-if="$root.issues.openIssueNum > 0" class="tip-red-with-num">{{$root.issues.openIssueNum}}</span>
 	</span>发现</a>
 	<a ng-click="$location.path('/wode', true)" href=""><span class="i5">
 	<span ng-if="$root.messages.unreadCount > 0" style="background-color:rgba(256,0,0,0.8); border-radius:10px;color:#FFF;width:20px;height:20px;text-align:center;margin-left:15px;margin-bottom:10px;">{{$root.messages.unreadCount}}</span>
