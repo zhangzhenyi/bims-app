@@ -7268,49 +7268,41 @@ function webViewerInitialized() {
     }
   }, true);
   
-  var viewContainer = document.getElementById("viewer");
-  var _pdf_initialScale = 1;
-//alert("init touch");
-touch.on(viewContainer, "pinchstart", function(e) {
-//	_scale = e.scale;
-	_pdf_initialScale = e.scale;
-	e.preventDefault();
-//		alert("pinch start "+e.scale+ "  initialScale "+initialScale);
-	
-});
-
-touch.on(viewContainer, "pinchend", function(e) {
-	
-//	alert("pinch end "+e.scale);
-	_pdf_initialScale = e.scale;
-//	e.scale = 1;
-	
-});
-touch.on(viewContainer, "pinchin", function(e) {
-});
-touch.on(viewContainer, "pinchout", function(e) {
-});
-touch.on(viewContainer, "pinch", function(e) {
-	console.log("pinch "+e.scale);
-	var s = e.scale;
-	if(Math.abs(s-_pdf_initialScale) > 0.2){
-		if(s > _pdf_initialScale){
-			PDFViewerApplication.zoomIn();
-		}else{
-			PDFViewerApplication.zoomOut();
-		}
-		_pdf_initialScale = s;
-	}
-//	PDFViewerApplication.scaleTo(initialScale, e.scale);
-});
-touch.on(viewContainer, "swiping", function(e) {
-//	alert("swiping");
-});
-touch.on(viewContainer, "swipeend", function(e) {
-//	alert("swipeend");
-	
-});
-//alert("init touch end");
+//var viewContainer = document.getElementById("viewer");
+//var _pdf_initialScale = 1;
+////alert("init touch");
+//touch.on(viewContainer, "pinchstart", function(e) {
+////	_scale = e.scale;
+//	_pdf_initialScale = e.scale;
+//	e.preventDefault();
+////		alert("pinch start "+e.scale+ "  initialScale "+initialScale);
+//	
+//});
+//
+//touch.on(viewContainer, "pinchend", function(e) {
+//	
+////	alert("pinch end "+e.scale);
+//	_pdf_initialScale = e.scale;
+////	e.scale = 1;
+//	
+//});
+//touch.on(viewContainer, "pinchin", function(e) {
+//});
+//touch.on(viewContainer, "pinchout", function(e) {
+//});
+//touch.on(viewContainer, "pinch", function(e) {
+//	console.log("pinch "+e.scale);
+//	var s = e.scale;
+//	if(Math.abs(s-_pdf_initialScale) > 0.2){
+//		if(s > _pdf_initialScale){
+//			PDFViewerApplication.zoomIn();
+//		}else{
+//			PDFViewerApplication.zoomOut();
+//		}
+//		_pdf_initialScale = s;
+//	}
+////	PDFViewerApplication.scaleTo(initialScale, e.scale);
+//});
 
   document.getElementById('sidebarToggle').addEventListener('click',
     function() {

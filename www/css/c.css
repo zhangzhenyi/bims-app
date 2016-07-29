@@ -451,4 +451,4 @@ select{width:80px;}
 
 .tip-red-no-num{background-color:rgba(256,0,0,0.8); border-radius:5px;color:#FFF;width:10px;height:10px;text-align:center;display:inline-block;}
 .tip-red-with-num{background-color:rgba(256,0,0,0.8);font-size: 13px; border-radius:12px;color:#FFF;width:24px;height:24px;text-align:center;vertical-align: middle;}
-
+.pdf-page-section{overflow-x: hidden; margin-top: 0px;}

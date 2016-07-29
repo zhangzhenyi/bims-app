@@ -902,23 +902,49 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 		}
 	};
 }])
-.directive("myPdf", ["$parse", "$window", "$document", function ($parse, $window, $document) {
+.directive("myPdf", ["$window", "$parse", "$window", "$document", function ($window, $parse, $window, $document) {
 	return {
 		restrict: "E",
 		transclude: true,
 		link: function (scope, element, attrs) {
+			//Remove 75px margin on bottom for parent
+			element.parent().parent().css({"padding-bottom":"0", "background-color":"#fff"});
 			element.removeAttr("ng-if src");
-			angular.element("<iframe></iframe>").attr({
-				"src": "lib/pdf/viewer.html?file=" + $parse(attrs.src)(scope),
-				"id" : "pdfview",
-				"name" : "pdfview",
-				"width": "100%",
-				"height": angular.element($window).height() - 90
-			}).appendTo(element);
-
+				angular.element("<iframe></iframe>").attr({
+					"src": "lib/touchpdf/viewer.html?file=" + $parse(attrs.src)(scope)
+				}).css({"border":"none",
+					"width": "100%",
+					"height": angular.element($window).height() - 70,
+					"background-color":"#fffff;",
+					"overflow-x" : "hidden",
+					"scrolling":"no"
+					})
+				.appendTo(element);
+				
+			
 		}
+			
 	};
 }])
+//.directive("myPdf", ["$parse", "$window", "$document", function ($parse, $window, $document) {
+//	return {
+//		restrict: "E",
+//		transclude: true,
+//		link: function (scope, element, attrs) {
+//			if (device.platform != "Android") {
+//				//use default web viewer
+//	         } else {
+//  		     }
+//			element.removeAttr("ng-if src");
+//			angular.element("<iframe></iframe>").attr({
+//				"src": "lib/touchpdf/viewer.html?file=" + $parse(attrs.src)(scope),
+//				"width": "100%",
+//				"height": angular.element($window).height() - 90
+//			}).appendTo(element);
+//
+//		}
+//	};
+//}])
 .directive("myVideo", ["$parse", function($parse) {
 	return {
 		restrict: "E",
@@ -1106,6 +1132,15 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 .factory("model", ["$window", "$rootScope", "$http", "$interval", "$timeout", "$base64", "myRoute", "jpush", function($window, $rootScope, $http, $interval, $timeout, $base64, myRoute, jpush) {
 	/**虎门二桥*/
 	var _host = "http://101.201.141.1", _path="/bims-test", _base = _host + _path + "/rest/", _sessionId;
+	if(isTestVersion || false){
+		_host = "http://101.201.141.1";
+		_path="/bims-test";
+		_base = _host + _path + "/rest/";
+	}else{
+		_host = "http://120.24.99.94";
+		_path="/bims";
+		_base = _host + _path + "/rest/";
+	}
 	/**温州**/
 //	var _host = "http://120.24.99.94", _path="/bims", _base = _host + _path + "/rest/", _sessionId;
 	
@@ -5211,7 +5246,7 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	}
 }])
 .controller("cHenjiShangchuan", ["$scope", "model", function($scope, model) {
-	var _titles = ["全景照片", "主要设备", "工艺与技术", "标准化建设", "专题会议", "任务风采", "其它"];
+	var _titles = ["全景照片", "主要设备", "工艺与技术", "标准化建设", "专题会议", "人物风采", "其它"];
 	model.trace.picsList(function(d) {
 		if (d) $scope.list = d;
 	});
@@ -6402,6 +6437,22 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	});
 	$scope.go();
 }])
+.controller("TestController1", ["$scope", function($scope){
+	$(function() {
+		$("#myPDF").pdf( {
+			source: "lib/touchpdf/demo/demo.pdf",
+			title :"touch demo",
+			loadingHeight : 400,
+			loadingWidth : 300,
+			loadingHTML : "<b>文件加载中......</b> ",
+			tabs: [
+//				{title: "Section 1", page: 2, color: "orange"},
+//				{title: "Section 2", page: 3, color: "green"},
+//				{title: "Section 3", page: 5, color: "blue"},
+			]
+		} );
+	});
+}])
 .controller('TestController', [ '$scope', 'PDFViewerService', function($scope, pdf) {
 	console.log('TestController: new instance');
 
@@ -6714,6 +6765,10 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	.when("/testPdf", {
 		templateUrl: "lib/pdfviewer/index.html",
 		controller: "TestController"
+	})
+	.when("/testPdf1", {
+		templateUrl: "lib/touchpdf/index.html",
+		controller: "TestController1"
 	})
 	.otherwise({
         redirectTo: "/"
