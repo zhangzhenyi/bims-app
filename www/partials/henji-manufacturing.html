@@ -1,0 +1,22 @@
+<div class="pb75 pt60 ng-scope">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">钢结构智能制造</p>
+	<span class="jia"><a ng-click="scan()"><img src="img/scan-top.png" /></a></span>
+</header>
+<section class="mlr10 mt15" my-scroll="load()">
+	<ul class="list-2015-1-11">
+		<li class="clearfix" ng-repeat="x in dataList">
+           <a ng-click="itemClicked(t)" href="" class="manufact">
+                <span>
+                 	<span class="color-dark-gray">{{x.compId}} </span>
+                 	<span>  {{::formatDate(x.workDate)}}</span>
+               </span>
+                <span>
+                   <span>{{::progress(x.status)}}</span>
+                   <span>{{::x.name}}</div>
+                </span>
+            </a>
+        </li>
+    </ul>
+</section>

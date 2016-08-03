@@ -1,0 +1,32 @@
+
+<html>
+<head>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <meta charset="UTF-8">
+  <title>TouchPDF</title>
+  <link href="lib/touchpdf/jquery.touchPDF.css" rel="stylesheet" media="screen" />
+	<style>
+		body , html{
+			background-color: #fffff;
+			height: 100%;
+			padding: 0;
+			margin: 0;
+			overflow:hidden !important;
+			overflow:-moz-hidden-unscrollable;
+			
+		}
+	</style>
+</head>
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">测试pdf</p>
+</header>
+<body>
+<div style="height: 80px;"></div>
+<!--<div class="pdf-toolbar">
+	<div class="pdf-title">{options.title}}</div>
+</div>-->
+<div id="myPDF" style="height: 95%; width: 100%;"></div>
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+
+<html>
+<head>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <meta charset="UTF-8">
+  <title>TouchPDF</title>
+  <link href="./jquery.touchPDF.css" rel="stylesheet" media="screen" />
+	<style>
+		body , html{
+			background-color: #FFFFFF;
+			height: 100%;
+			width: 100%;
+			padding: 0;
+			margin: 0;
+			overflow:hidden !important;
+			overflow:-moz-hidden-unscrollable;
+		}
+	</style>
+</head>
+<body>
+<!--<div style="height: 80px;"></div>-->
+<!--<div class="pdf-toolbar">
+	<div class="pdf-title">{options.title}}</div>
+</div>-->
+<div id="myPDF" style="height: 100%; width: 100%;"></div>
+<script type="text/javascript" src="./pdf.compatibility.js"></script>
+<script type="text/javascript" src="./pdf.js"></script>
+<script type="text/javascript" src="./jquery.min.js"></script>
+<script type="text/javascript" src="./jquery.touchSwipe.js"></script>
+<script type="text/javascript" src="./jquery.touchPDF.js"></script>
+<script type="text/javascript" src="./jquery.panzoom.js"></script>
+<script type="text/javascript" src="./jquery.mousewheel.js"></script>
+<script type="text/javascript">
+	var queryString = document.location.search.substring(1);
+  	var params = parseQueryString(queryString);
+  	var file = 'file' in params ? params.file : DEFAULT_URL;
+	console.log("file "+file);
+	$(function() {
+		
+		$("#myPDF").pdf( {
+			source: file,
+			showToolbar: true,
+			loadingHTML:"<span style='font-size:18px; color:#000; '>加载文件中...</span>",
+			loadingHeight:$("#myPDF").css("height"),
+			loadingWidth: $("#myPDF").css("width"),
+			quality:2,
+			pdfScale: 1,
+			title: "     "
+//			tabs: [
+//				{title: "Section 1", page: 2, color: "orange"},
+//				{title: "Section 2", page: 3, color: "green"},
+//				{title: "Section 3", page: 5, color: "blue"},
+//			]
+		} );
+	});
+	
+	
+	/**
+	 * Helper function to parse query string (e.g. ?param1=value&parm2=...).
+	 */
+	function parseQueryString(query) {
+	  var parts = query.split('&');
+	  var params = {};
+	  for (var i = 0, ii = parts.length; i < ii; ++i) {
+	    var param = parts[i].split('=');
+	    var key = param[0].toLowerCase();
+	    var value = param.length > 1 ? param[1] : null;
+	    params[decodeURIComponent(key)] = decodeURIComponent(value);
+	  }
+	  return params;
+	}
+</script>
+</body>
+</html>

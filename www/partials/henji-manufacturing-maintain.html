@@ -1,0 +1,34 @@
+<div class="pb75 pt60 ng-scope">
+<header class="bg1">
+	<span class="return"><a ng-click="$location.back()" href=""><img src="img/11.png"/></a></span>
+	<p class="title">钢结构智能制造</p>
+	<span class="jia"><a ng-click="scan()"><img src="img/scan-top.png" /></a></span>
+</header>
+<section>
+	<ul class="list-3">
+		<li class="clearfix">
+			<span class="l"><img src="img/i-xq-1.jpg">构件编码</span><span class="r">{{::component.compId}} </span>
+		</li>
+		<li class="clearfix">
+			<span class="lll"><img src="img/i-xq-2.jpg">构件信息</span>
+			<div class="warp">
+				<p class="tp" style="margin-left:0px"><span>名称：</span>{{::component.name}}</p>
+				<p class="tp" style="margin-left:0px"><span>设计：</span>{{::component.designer}}</p>
+				<p class="tp" style="margin-left:0px"><span>施工：</span>{{::component.constructor}}</p>
+				<p class="tp" style="margin-left:0px"><span>监理：</span>{{::component.supervisor}}</p>
+				<p class="tp" style="margin-left:0px" ng-repeat="(key, val) in component.properties">
+        <span>{{key}}：</span>{{val}}</p>        
+			</div>
+		</li>
+		<li class="clearfix">
+			<span class="lll"><img src="img/i-xq-13.jpg">状态</span>
+			<div class="warp">
+				<p class="list-item"><span class="pot"></span> <span>板单元开始生产</span><input type="checkbox" ng-checked="statusArray[0]" ng-click="checkedStatus(0)"/></p>
+				<p class="list-item"><span class="pot"></span> <span>所有板单元生产完成</span><input type="checkbox" ng-checked="statusArray[1]" ng-click="checkedStatus(1)"/></p>
+				<p class="list-item"><span class="pot"></span> <span>节段梁拼装完成</span><input type="checkbox" ng-checked="statusArray[2]" ng-click="checkedStatus(2)"/></p>
+				<p class="list-item"><span class="pot"></span> <span>节段梁吊装完成</span><input type="checkbox" ng-checked="statusArray[3]" ng-click="checkedStatus(3)"/></p>
+			</div>
+		</li>
+	</ul>
+	<a ng-click="register()" href="" class="abtn-login">提交</a>
+</section>
