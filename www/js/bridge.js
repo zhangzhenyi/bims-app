@@ -1242,6 +1242,9 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 			versionRemark:"",
 			lastVersion:""
 	};
+	$rootScope.manufacturing = {
+		param:""
+	},
 	$rootScope.files = (function() {
 		var _icons = {
 			"工程简介": "icon-4",
@@ -1638,6 +1641,21 @@ angular.module("bridgeH5", ["myRoute", "ngSanitize", "radialIndicator", "base64"
 	return {
 		base: function() {
 			return _host + _path;
+		},
+		manufacturing:{
+			list: function(p, n, c){
+				_req({
+					method: "get",
+					url: "manufacturing/list.jo",
+					params: {
+						 pageCnt: n,
+						 pageNum: p
+					}
+//					header:{
+//						"contentType":"application/x-www-form-urlencoded;charset=UTF-8"
+//					}
+				},  angular.isFunction(c) ? c : angular.noop);
+			}
 		},
 		user: {
 			uploadAvatar: function(fileURI, callback) {
@@ -6031,6 +6049,96 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		}
 	});
 }])
+.controller("cHenjiManufacturingMaintain", ["$scope", "model",function($scope, model){
+	angular.extend($scope, {
+		component:$scope.manufacturing.param,
+		status: -1,
+		statusArray:[false,false,false,false],
+		data:{
+			compId: $scope.component.compId
+		},
+		checkStatus : function(s){
+			if($scope.status >= s){//回退状态
+				$scope.status = --s;
+			}else $scope.status = s;
+			for (var i = 0; i < $scope.statusArray.length; i++) {
+				$scope.statusArray[i] = ($scope.status >= i);
+			}
+		},
+		load: function(){
+			//Get component status from server
+			$scope.status = 0;
+			$scope.checkStatus(status);
+		},
+		update: function(){
+			if($scope.status < 0 || $scope.status > 3){
+				tipmessage("请选择当前状态");
+			}
+			
+		},
+		checkedStatus :function(s){
+			if(s < 0) s= 0;
+			if(s > 3) s =3;
+			$scope.checkStatus(s);
+		}
+	});
+}])
+.controller("cHenjiManufacturing", ["$scope", "model", "$location",function($scope, model,$location){
+	var statusOnProgress = ["板单元开始生产"
+	,"所有板单元生产完成", "节段梁拼装完成", "节段梁吊装完成"];
+		
+	_pSize = 10;
+	_page = 0;
+	testDate = new Date().getTime();
+	angular.extend($scope, {
+		page: 1,
+		dataList:[],
+		scan: function() {
+//			cordova.plugins.barcodeScanner.scan(function(r) {
+//				 if(r.cancelled != 0) return;
+//				$scope.newItem.compId = r.text;
+//				if(oldComp.compId == $scope.newItem.compId){
+//					//编辑模式，取出的compid没变,恢复原先的component
+//					$scope.newItem.component = oldComp;
+//					return;
+//				}
+				//后台获取该组建的详情
+				$scope.manufacturing.param = {
+					"name":"大啥水道桥佐夫外侧T1两防撞护栏",
+					"designer":"重教公路规划设计研究院游戏那公司",
+					"constructor": "中交第二航务工程局有限公司",
+					"supervisor": "中铁武汉大桥工程咨询监理有限公司",
+					"properties":{
+						"宽(毫米)":"503.5",
+						"长(毫米)":"5624.2",
+						"高(毫米)":"1712.1"
+					}
+				};
+				$scope.$location.path("/henji-manufacturing-maintain");//TODO
+//			}, function(e) {
+//				tipmessage("扫描二维码失败");
+//			});
+		},
+		progress: function(s){
+			if(s < 0) s = 0;
+			return statusOnProgress[s];	
+		},
+		load:function(){
+			if (_page != $scope.page) {
+//				model.manufacturing.list($scope.page, 20, function(d){
+//					if(d){
+						//Show data
+						$scope.dataList = [{"compId" :"3.4.12.1.1.13", "status":0, "workDate":testDate, "name":"李国柱"},
+						{"compId" :"3.4.12.1.1.14", "status":2, "workDate":testDate,"name":"柱"}]
+						_page = $scope.page;
+						$scope.page++;
+//					}
+//				});
+			}
+		}
+	});
+	$scope.load();
+}])
 .controller("cHenjiScan", ["$scope", "$timeout", "model", function($scope, $timeout, model){
 	angular.extend($scope, {
 		newItem:{
@@ -6437,22 +6545,6 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 	});
 	$scope.go();
 }])
-.controller("TestController1", ["$scope", function($scope){
-	$(function() {
-		$("#myPDF").pdf( {
-			source: "lib/touchpdf/demo/demo.pdf",
-			title :"touch demo",
-			loadingHeight : 400,
-			loadingWidth : 300,
-			loadingHTML : "<b>文件加载中......</b> ",
-			tabs: [
-//				{title: "Section 1", page: 2, color: "orange"},
-//				{title: "Section 2", page: 3, color: "green"},
-//				{title: "Section 3", page: 5, color: "blue"},
-			]
-		} );
-	});
-}])
 .controller('TestController', [ '$scope', 'PDFViewerService', function($scope, pdf) {
 	console.log('TestController: new instance');
 
@@ -6762,14 +6854,19 @@ model.trace.getByCompId($scope.newItem.compId ,1,traceType, function(d) {
 		templateUrl: "partials/henji_shigong_data.html",
 		controller: "cHenjiShigongData"
 	})
+	.when("/manufacturing", {
+		templateUrl: "partials/henji-manufacturing.html",
+		controller: "cHenjiManufacturing"
+	})
+	.when("/henji-manufacturing-maintain", {
+		templateUrl: "partials/henji-manufacturing-maintain.html",
+		controller: "cHenjiManufacturingMaintain"
+	})
 	.when("/testPdf", {
 		templateUrl: "lib/pdfviewer/index.html",
 		controller: "TestController"
 	})
-	.when("/testPdf1", {
-		templateUrl: "lib/touchpdf/index.html",
-		controller: "TestController1"
-	})
+	
 	.otherwise({
         redirectTo: "/"
     });

@@ -452,3 +452,17 @@ select{width:80px;}
 .tip-red-no-num{background-color:rgba(256,0,0,0.8); border-radius:5px;color:#FFF;width:10px;height:10px;text-align:center;display:inline-block;}
 .tip-red-with-num{background-color:rgba(256,0,0,0.8);font-size: 13px; border-radius:12px;color:#FFF;width:24px;height:24px;text-align:center;vertical-align: middle;}
 .pdf-page-section{overflow-x: hidden; margin-top: 0px;}
+
+.manufact {color:#969696; border: none; border-bottom: solid 4px #EE5F5F;}
+.manufact >span {display: inline-block;width: 48%;}
+.manufact >:last-child{text-align: right;}
+.manufact span :first-child{display: block;margin: 5px;}
+.manufact span :last-child {display: block;margin: 5px;}
+
+
+.color-dark-gray{color: #636264; }
+.pot {background-color:#0480BE; display: inline-block; width: 6px;height: 6px;
+border-radius:3px ;}
+.list-item {color: #858585;margin: 5px 0; line-height: 30px;}
+.list-item >:nth-child(2) {margin-left: 10px; display: inline-block;width: 50%;}
+.list-item >:nth-child(3) {position: absolute; right: 55px;width: 25px; height: 25px;}
